@@ -69,6 +69,7 @@ export default function Home() {
         <div className="flex justify-between items-center mb-3">
           <h1 className="text-xl font-bold">🏂 單板教學</h1>
           <div className="flex items-center gap-3">
+            {user && <Link href="/practice" className="text-lg">📝</Link>}
             {user && <Link href="/favorites" className="text-lg">❤️</Link>}
             {user ? (
               <button onClick={() => signOut()} className="text-sm text-zinc-400">登出</button>

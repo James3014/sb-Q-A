@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Lesson } from '@/lib/lessons'
 import { useAuth } from './AuthProvider'
 import { getFavorites, addFavorite, removeFavorite } from '@/lib/favorites'
+import { addPracticeLog } from '@/lib/practice'
 
 const LEVEL_NAMES: Record<string, string> = {
   beginner: '初級', intermediate: '中級', advanced: '進階'
@@ -17,6 +18,9 @@ const SLOPE_NAMES: Record<string, string> = {
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const { user } = useAuth()
   const [isFav, setIsFav] = useState(false)
+  const [showNote, setShowNote] = useState(false)
+  const [note, setNote] = useState('')
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -34,17 +38,40 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
     setIsFav(!isFav)
   }
 
+  const savePractice = async () => {
+    if (!user) return
+    await addPracticeLog(user.id, lesson.id, note)
+    setSaved(true)
+    setNote('')
+    setTimeout(() => { setSaved(false); setShowNote(false) }, 1500)
+  }
+
   return (
     <main className="min-h-screen bg-slate-900 text-white">
       <div className="max-w-lg mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-4">
           <Link href="/" className="text-slate-400">← 返回</Link>
           {user && (
-            <button onClick={toggleFav} className="text-2xl">
-              {isFav ? '❤️' : '🤍'}
-            </button>
+            <div className="flex gap-3">
+              <button onClick={() => setShowNote(!showNote)} className="text-xl">📝</button>
+              <button onClick={toggleFav} className="text-2xl">{isFav ? '❤️' : '🤍'}</button>
+            </div>
           )}
         </div>
+
+        {showNote && user && (
+          <div className="bg-slate-800 rounded-lg p-4 mb-4">
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="記錄今天的練習心得..."
+              className="w-full bg-slate-700 rounded p-2 text-sm mb-2 h-20"
+            />
+            <button onClick={savePractice} className="bg-blue-600 px-4 py-2 rounded text-sm">
+              {saved ? '✓ 已儲存' : '儲存紀錄'}
+            </button>
+          </div>
+        )}
 
         <h1 className="text-xl font-bold mb-3">{lesson.title}</h1>
 
