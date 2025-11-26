@@ -18,7 +18,7 @@ export async function addFavorite(userId: string, lessonId: string) {
   
   const { error } = await supabase
     .from('favorites')
-    .insert({ user_id: userId, lesson_id: lessonId })
+    .upsert({ user_id: userId, lesson_id: lessonId }, { onConflict: 'user_id,lesson_id' })
   
   return { error }
 }
