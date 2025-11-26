@@ -82,6 +82,13 @@ export default function Home() {
       </header>
 
       <div className="p-4 space-y-6">
+        {/* 新用戶提示 */}
+        {user && !search && !selectedCategory && (
+          <div className="bg-zinc-800 rounded-lg p-3 text-sm text-zinc-300">
+            💡 進入課程後，點 <span className="text-red-400">❤️</span> 收藏、點 <span className="text-blue-400">📝</span> 記錄練習
+          </div>
+        )}
+
         {/* 問題分類按鈕 */}
         {!search && (
           <section>

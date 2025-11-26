@@ -52,9 +52,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         <div className="flex justify-between items-center mb-4">
           <Link href="/" className="text-slate-400">← 返回</Link>
           {user && (
-            <div className="flex gap-3">
-              <button onClick={() => setShowNote(!showNote)} className="text-xl">📝</button>
-              <button onClick={toggleFav} className="text-2xl">{isFav ? '❤️' : '🤍'}</button>
+            <div className="flex gap-3 items-center">
+              <button onClick={() => setShowNote(!showNote)} className="text-xl" title="記錄練習">📝</button>
+              <button onClick={toggleFav} className="text-2xl" title={isFav ? '取消收藏' : '加入收藏'}>{isFav ? '❤️' : '🤍'}</button>
             </div>
           )}
         </div>
