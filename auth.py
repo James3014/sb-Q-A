@@ -12,11 +12,25 @@ def signup(email: str, password: str) -> dict:
         return {"error": "Supabase 未設定（環境變數缺失）"}
     
     try:
+        # 1. 註冊 auth
         result = client.auth.sign_up({"email": email, "password": password})
-        return {"user": result.user.__dict__ if result.user else None}
+        if not result.user:
+            return {"error": "註冊失敗"}
+        
+        # 2. 直接在程式碼建立 user 記錄（不靠 trigger）
+        try:
+            client.table("users").insert({
+                "id": str(result.user.id),
+                "email": result.user.email,
+                "is_premium": False
+            }).execute()
+        except Exception as e:
+            # 如果 user 已存在就忽略
+            pass
+        
+        return {"user": {"id": str(result.user.id), "email": result.user.email}}
     except Exception as e:
         error_msg = str(e)
-        # 加入更詳細的錯誤資訊
         if "Invalid API key" in error_msg:
             return {"error": f"API Key 錯誤 - 請檢查 Zeabur 環境變數 SUPABASE_KEY 是否正確"}
         return {"error": f"{error_msg}"}
