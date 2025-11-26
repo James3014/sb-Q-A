@@ -26,44 +26,36 @@ def init_session():
 
 def render_login_form():
     """登入/註冊表單"""
-    st.markdown("### 🔐 登入")
-    st.markdown("---")
+    st.markdown("### 🔐 登入 / 註冊")
     
-    mode = st.radio("選擇", ["登入", "註冊"], horizontal=True, label_visibility="collapsed")
+    mode = st.radio("", ["登入", "註冊"], horizontal=True, key="auth_mode")
+    
+    email = st.text_input("📧 Email", key=f"{mode}_email")
+    password = st.text_input("🔑 密碼", type="password", key=f"{mode}_pwd")
     
     if mode == "登入":
-        with st.form("login_form"):
-            email = st.text_input("📧 Email", placeholder="your@email.com")
-            password = st.text_input("🔑 密碼", type="password", placeholder="至少 6 個字元")
-            submitted = st.form_submit_button("登入", use_container_width=True, type="primary")
-            
-            if submitted:
-                if email and password:
-                    result = login(email, password)
-                    if "error" in result:
-                        st.error(f"❌ 登入失敗：{result['error']}")
-                    else:
-                        st.session_state.user = result.get("user")
-                        st.success("✅ 登入成功！")
-                        st.rerun()
+        if st.button("登入", use_container_width=True, type="primary"):
+            if email and password:
+                result = login(email, password)
+                if "error" in result:
+                    st.error(f"❌ {result['error']}")
                 else:
-                    st.warning("⚠️ 請輸入 Email 和密碼")
-    
-    else:  # 註冊
-        with st.form("signup_form"):
-            email = st.text_input("📧 Email", placeholder="your@email.com", key="signup_email")
-            password = st.text_input("🔑 密碼", type="password", placeholder="至少 6 個字元", key="signup_pwd")
-            submitted = st.form_submit_button("註冊", use_container_width=True, type="primary")
-            
-            if submitted:
-                if email and password:
-                    result = signup(email, password)
-                    if "error" in result:
-                        st.error(f"❌ 註冊失敗：{result['error']}")
-                    else:
-                        st.success("✅ 註冊成功！現在可以登入了")
+                    st.session_state.user = result.get("user")
+                    st.session_state.show_login = False
+                    st.success("✅ 登入成功！")
+                    st.rerun()
+            else:
+                st.warning("⚠️ 請輸入 Email 和密碼")
+    else:
+        if st.button("註冊", use_container_width=True, type="primary"):
+            if email and password:
+                result = signup(email, password)
+                if "error" in result:
+                    st.error(f"❌ {result['error']}")
                 else:
-                    st.warning("⚠️ 請輸入 Email 和密碼")
+                    st.success("✅ 註冊成功！請切換到「登入」")
+            else:
+                st.warning("⚠️ 請輸入 Email 和密碼")
 
 
 def render_user_info():
