@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
   title: '單板教學',
@@ -21,7 +22,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW">
-      <body className="bg-slate-900">{children}</body>
+      <body className="bg-slate-900">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }

@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { lessons } from '@/lib/lessons';
 import LessonCard from '@/components/LessonCard';
 import SearchBar from '@/components/SearchBar';
+import { useAuth } from '@/components/AuthProvider';
+import { signOut } from '@/lib/auth';
 
 // 問題分類
 const PROBLEM_CATEGORIES = [
@@ -51,6 +54,7 @@ export default function Home() {
 
   const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
   const hasMore = filteredLessons.length > 10 && !showAll;
+  const { user } = useAuth();
 
   const clearFilters = () => {
     setSearch('');
@@ -62,7 +66,14 @@ export default function Home() {
     <main className="min-h-screen bg-zinc-900 text-white">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
-        <h1 className="text-xl font-bold text-center mb-3">🏂 單板教學</h1>
+        <div className="flex justify-between items-center mb-3">
+          <h1 className="text-xl font-bold">🏂 單板教學</h1>
+          {user ? (
+            <button onClick={() => signOut()} className="text-sm text-zinc-400">登出</button>
+          ) : (
+            <Link href="/login" className="text-sm text-blue-400">登入</Link>
+          )}
+        </div>
         <SearchBar value={search} onChange={(v) => { setSearch(v); setShowAll(false); }} />
       </header>
 
