@@ -1,15 +1,38 @@
-import { getLessonById, getLessons } from '@/lib/lessons'
-import { notFound } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import { getLessonById, Lesson } from '@/lib/lessons'
 import LessonDetail from '@/components/LessonDetail'
 
-export function generateStaticParams() {
-  return getLessons().map(l => ({ id: l.id }))
-}
+export default function LessonPage() {
+  const params = useParams()
+  const id = params.id as string
+  const [lesson, setLesson] = useState<Lesson | null>(null)
+  const [loading, setLoading] = useState(true)
 
-export default async function LessonPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const lesson = getLessonById(id)
-  if (!lesson) notFound()
+  useEffect(() => {
+    getLessonById(id).then(data => {
+      setLesson(data)
+      setLoading(false)
+    })
+  }, [id])
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <p className="text-slate-400">載入中...</p>
+      </main>
+    )
+  }
+
+  if (!lesson) {
+    return (
+      <main className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <p className="text-slate-400">找不到課程</p>
+      </main>
+    )
+  }
 
   return <LessonDetail lesson={lesson} />
 }

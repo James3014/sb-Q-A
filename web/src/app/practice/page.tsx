@@ -4,25 +4,32 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { getPracticeLogs, PracticeLog } from '@/lib/practice'
-import { getLessonById } from '@/lib/lessons'
+import { getLessons, Lesson } from '@/lib/lessons'
 
 export default function PracticePage() {
   const { user, loading } = useAuth()
   const [logs, setLogs] = useState<PracticeLog[]>([])
-  const [loadingLogs, setLoadingLogs] = useState(true)
+  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
-    if (user) {
-      getPracticeLogs(user.id).then(data => {
+    const load = async () => {
+      const allLessons = await getLessons()
+      setLessons(allLessons)
+      
+      if (user) {
+        const data = await getPracticeLogs(user.id)
         setLogs(data)
-        setLoadingLogs(false)
-      })
-    } else if (!loading) {
-      setLoadingLogs(false)
+      }
+      setLoadingData(false)
     }
+    
+    if (!loading) load()
   }, [user, loading])
 
-  if (loading || loadingLogs) {
+  const getLesson = (id: string) => lessons.find(l => l.id === id)
+
+  if (loading || loadingData) {
     return <main className="min-h-screen bg-zinc-900 text-white p-4"><p className="text-center text-zinc-400 mt-20">載入中...</p></main>
   }
 
@@ -50,7 +57,7 @@ export default function PracticePage() {
         ) : (
           <div className="space-y-3">
             {logs.map(log => {
-              const lesson = getLessonById(log.lesson_id)
+              const lesson = getLesson(log.lesson_id)
               return (
                 <Link key={log.id} href={`/lesson/${log.lesson_id}`}>
                   <div className="bg-zinc-800 rounded-lg p-4">

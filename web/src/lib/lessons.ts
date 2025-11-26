@@ -1,4 +1,4 @@
-import lessonsData from '@/data/lessons.json'
+import { getSupabase } from './supabase'
 
 export interface Lesson {
   id: string
@@ -13,61 +13,56 @@ export interface Lesson {
   is_premium?: boolean
 }
 
-export const lessons = lessonsData as unknown as Lesson[]
+export async function getLessons(): Promise<Lesson[]> {
+  const supabase = getSupabase()
+  if (!supabase) return []
 
-export function getLessons(): Lesson[] {
-  return lessons
+  const { data, error } = await supabase
+    .from('lessons')
+    .select('*')
+    .order('id')
+
+  if (error) {
+    console.error('[getLessons]', error)
+    return []
+  }
+
+  return data || []
 }
 
-export function getLessonById(id: string): Lesson | null {
-  return lessons.find(l => l.id === id) || null
+export async function getLessonById(id: string): Promise<Lesson | null> {
+  const supabase = getSupabase()
+  if (!supabase) return null
+
+  const { data, error } = await supabase
+    .from('lessons')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('[getLessonById]', error)
+    return null
+  }
+
+  return data
 }
 
-export interface FilterOptions {
-  level?: string
-  slope?: string
-  skill?: string
-  search?: string
-}
+export async function searchLessons(query: string): Promise<Lesson[]> {
+  const supabase = getSupabase()
+  if (!supabase) return []
 
-export function filterLessons(options: FilterOptions): Lesson[] {
-  let result = lessons
+  const q = `%${query}%`
+  const { data, error } = await supabase
+    .from('lessons')
+    .select('*')
+    .or(`title.ilike.${q},what.ilike.${q}`)
+    .order('id')
 
-  if (options.level) {
-    result = result.filter(l => l.level_tags.includes(options.level!))
-  }
-  if (options.slope) {
-    result = result.filter(l => l.slope_tags.includes(options.slope!))
-  }
-  if (options.skill) {
-    result = result.filter(l => l.casi?.Primary_Skill === options.skill)
-  }
-  if (options.search) {
-    const s = options.search.toLowerCase()
-    result = result.filter(l =>
-      l.what?.toLowerCase().includes(s) ||
-      l.title?.toLowerCase().includes(s) ||
-      l.why?.some(w => w.toLowerCase().includes(s))
-    )
+  if (error) {
+    console.error('[searchLessons]', error)
+    return []
   }
 
-  return result
-}
-
-export function getAllTags() {
-  const levels = new Set<string>()
-  const slopes = new Set<string>()
-  const skills = new Set<string>()
-
-  lessons.forEach(l => {
-    l.level_tags?.forEach(t => levels.add(t))
-    l.slope_tags?.forEach(t => slopes.add(t))
-    if (l.casi?.Primary_Skill) skills.add(l.casi.Primary_Skill)
-  })
-
-  return {
-    levels: Array.from(levels),
-    slopes: Array.from(slopes),
-    skills: Array.from(skills)
-  }
+  return data || []
 }

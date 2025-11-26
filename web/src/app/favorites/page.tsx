@@ -4,28 +4,33 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { getFavorites } from '@/lib/favorites'
-import { lessons } from '@/lib/lessons'
+import { getLessons, Lesson } from '@/lib/lessons'
 import LessonCard from '@/components/LessonCard'
 
 export default function FavoritesPage() {
   const { user, loading } = useAuth()
   const [favIds, setFavIds] = useState<string[]>([])
-  const [loadingFavs, setLoadingFavs] = useState(true)
+  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
-    if (user) {
-      getFavorites(user.id).then(ids => {
+    const load = async () => {
+      const allLessons = await getLessons()
+      setLessons(allLessons)
+      
+      if (user) {
+        const ids = await getFavorites(user.id)
         setFavIds(ids)
-        setLoadingFavs(false)
-      })
-    } else if (!loading) {
-      setLoadingFavs(false)
+      }
+      setLoadingData(false)
     }
+    
+    if (!loading) load()
   }, [user, loading])
 
   const favLessons = lessons.filter(l => favIds.includes(l.id))
 
-  if (loading || loadingFavs) {
+  if (loading || loadingData) {
     return (
       <main className="min-h-screen bg-zinc-900 text-white p-4">
         <p className="text-center text-zinc-400 mt-20">載入中...</p>

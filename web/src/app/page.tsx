@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { lessons } from '@/lib/lessons';
+import { getLessons, Lesson } from '@/lib/lessons';
 import LessonCard from '@/components/LessonCard';
 import SearchBar from '@/components/SearchBar';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/auth';
 
-// 問題分類
 const PROBLEM_CATEGORIES = [
   { id: 'heel', label: '後刃問題', keywords: ['後刃', '後腳', '後膝'], emoji: '🦶' },
   { id: 'toe', label: '前刃問題', keywords: ['前刃', '前腳', '前膝', '前腿'], emoji: '👣' },
@@ -21,14 +20,23 @@ const PROBLEM_CATEGORIES = [
 ];
 
 export default function Home() {
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    getLessons().then(data => {
+      setLessons(data);
+      setLoading(false);
+    });
+  }, []);
 
   const filteredLessons = useMemo(() => {
     let result = lessons;
 
-    // 搜尋過濾
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(l =>
@@ -37,24 +45,20 @@ export default function Home() {
       );
     }
 
-    // 分類過濾
     if (selectedCategory) {
       const cat = PROBLEM_CATEGORIES.find(c => c.id === selectedCategory);
       if (cat) {
         result = result.filter(l =>
-          cat.keywords.some(k =>
-            l.title.includes(k) || l.what.includes(k)
-          )
+          cat.keywords.some(k => l.title.includes(k) || l.what.includes(k))
         );
       }
     }
 
     return result;
-  }, [search, selectedCategory]);
+  }, [lessons, search, selectedCategory]);
 
   const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
   const hasMore = filteredLessons.length > 10 && !showAll;
-  const { user } = useAuth();
 
   const clearFilters = () => {
     setSearch('');
@@ -64,7 +68,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white">
-      {/* Header */}
       <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
         <div className="flex justify-between items-center mb-3">
           <h1 className="text-xl font-bold">🏂 單板教學</h1>
@@ -82,14 +85,12 @@ export default function Home() {
       </header>
 
       <div className="p-4 space-y-6">
-        {/* 新用戶提示 */}
         {user && !search && !selectedCategory && (
           <div className="bg-zinc-800 rounded-lg p-3 text-sm text-zinc-300">
             💡 進入課程後，點 <span className="text-red-400">❤️</span> 收藏、點 <span className="text-blue-400">📝</span> 記錄練習
           </div>
         )}
 
-        {/* 問題分類按鈕 */}
         {!search && (
           <section>
             <h2 className="text-sm text-zinc-400 mb-3">你遇到什麼問題？</h2>
@@ -115,11 +116,10 @@ export default function Home() {
           </section>
         )}
 
-        {/* 結果區 */}
         <section>
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-sm text-zinc-400">
-              {search || selectedCategory
+              {loading ? '載入中...' : search || selectedCategory
                 ? `找到 ${filteredLessons.length} 筆`
                 : '熱門課程'}
             </h2>
@@ -130,7 +130,9 @@ export default function Home() {
             )}
           </div>
 
-          {filteredLessons.length === 0 ? (
+          {loading ? (
+            <p className="text-center text-zinc-500 py-8">載入課程中...</p>
+          ) : filteredLessons.length === 0 ? (
             <p className="text-center text-zinc-500 py-8">找不到相關課程</p>
           ) : (
             <div className="space-y-3">
@@ -140,7 +142,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* 載入更多 */}
           {hasMore && (
             <button
               onClick={() => setShowAll(true)}
