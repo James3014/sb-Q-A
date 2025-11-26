@@ -1,39 +1,22 @@
 """Auth 模組 - 登入/註冊/Premium 狀態"""
 from supabase_client import get_client
-import traceback
 
 _current_session = None
 
 
 def signup(email: str, password: str) -> dict:
-    """註冊新用戶"""
+    """註冊新用戶 - 只用 auth.users，不依賴 public.users"""
     client = get_client()
     if not client:
-        return {"error": "Supabase 未設定（環境變數缺失）"}
+        return {"error": "Supabase 未設定"}
     
     try:
-        # 1. 註冊 auth
         result = client.auth.sign_up({"email": email, "password": password})
-        if not result.user:
-            return {"error": "註冊失敗"}
-        
-        # 2. 直接在程式碼建立 user 記錄（不靠 trigger）
-        try:
-            client.table("users").insert({
-                "id": str(result.user.id),
-                "email": result.user.email,
-                "is_premium": False
-            }).execute()
-        except Exception as e:
-            # 如果 user 已存在就忽略
-            pass
-        
-        return {"user": {"id": str(result.user.id), "email": result.user.email}}
+        if result.user:
+            return {"user": {"id": str(result.user.id), "email": result.user.email}}
+        return {"error": "註冊失敗"}
     except Exception as e:
-        error_msg = str(e)
-        if "Invalid API key" in error_msg:
-            return {"error": f"API Key 錯誤 - 請檢查 Zeabur 環境變數 SUPABASE_KEY 是否正確"}
-        return {"error": f"{error_msg}"}
+        return {"error": str(e)}
 
 
 def login(email: str, password: str) -> dict:
@@ -41,18 +24,16 @@ def login(email: str, password: str) -> dict:
     global _current_session
     client = get_client()
     if not client:
-        return {"error": "Supabase 未設定（環境變數缺失）"}
+        return {"error": "Supabase 未設定"}
     
     try:
         result = client.auth.sign_in_with_password({"email": email, "password": password})
         _current_session = result.session
-        user_dict = {"id": result.user.id, "email": result.user.email} if result.user else None
-        return {"session": result.session, "user": user_dict}
+        if result.user:
+            return {"user": {"id": str(result.user.id), "email": result.user.email}}
+        return {"error": "登入失敗"}
     except Exception as e:
-        error_msg = str(e)
-        if "Invalid API key" in error_msg:
-            return {"error": f"API Key 錯誤 - 請檢查 Zeabur 環境變數 SUPABASE_KEY 是否正確"}
-        return {"error": f"{error_msg}"}
+        return {"error": str(e)}
 
 
 def logout() -> dict:
@@ -70,29 +51,22 @@ def logout() -> dict:
 
 def get_current_user() -> dict:
     """取得當前登入用戶"""
+    global _current_session
+    if not _current_session:
+        return None
     client = get_client()
-    if not client or not _current_session:
+    if not client:
         return None
     try:
         user = client.auth.get_user(_current_session.access_token)
-        return {"id": user.user.id, "email": user.user.email} if user.user else None
+        if user.user:
+            return {"id": str(user.user.id), "email": user.user.email}
     except Exception:
-        return None
+        pass
+    return None
 
 
 def is_premium(user_id: str = None) -> bool:
-    """檢查用戶是否為 Premium"""
-    if not user_id:
-        return False
-    
-    client = get_client()
-    if not client:
-        return False
-    
-    try:
-        result = client.table("users").select("is_premium, premium_until").eq("id", user_id).single().execute()
-        if result.data:
-            return result.data.get("is_premium", False)
-    except Exception:
-        pass
+    """檢查用戶是否為 Premium - 暫時回傳 False"""
+    # TODO: 之後再實作 premium 檢查
     return False

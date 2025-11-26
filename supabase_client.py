@@ -20,26 +20,18 @@ def get_client():
         return _client
     
     if not SUPABASE_AVAILABLE:
-        print("❌ Supabase 套件未安裝")
         return None
     
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_KEY")
     
-    print(f"🔍 環境變數檢查:")
-    print(f"  SUPABASE_URL: {'✅' if url else '❌'} {url[:30] if url else 'None'}...")
-    print(f"  SUPABASE_KEY: {'✅' if key else '❌'} {len(key) if key else 0} 字元")
-    
     if not url or not key:
-        print("❌ 環境變數未設定")
         return None
     
     try:
         _client = create_client(url, key)
-        print("✅ Supabase client 建立成功")
         return _client
-    except Exception as e:
-        print(f"❌ Client 建立失敗: {e}")
+    except Exception:
         return None
 
 
