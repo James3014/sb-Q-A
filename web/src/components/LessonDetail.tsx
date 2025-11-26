@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Lesson } from '@/lib/lessons'
 import { useAuth } from './AuthProvider'
-import { getFavorites, addFavorite, removeFavorite } from '@/lib/favorites'
+import { isFavorited, toggleFavorite } from '@/lib/favorites'
 import { addPracticeLog } from '@/lib/practice'
 
 const LEVEL_NAMES: Record<string, string> = {
@@ -18,24 +18,23 @@ const SLOPE_NAMES: Record<string, string> = {
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const { user } = useAuth()
   const [isFav, setIsFav] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [showNote, setShowNote] = useState(false)
   const [note, setNote] = useState('')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (user) {
-      getFavorites(user.id).then(favs => setIsFav(favs.includes(lesson.id)))
+      isFavorited(user.id, lesson.id).then(setIsFav)
     }
   }, [user, lesson.id])
 
-  const toggleFav = async () => {
-    if (!user) return
-    if (isFav) {
-      await removeFavorite(user.id, lesson.id)
-    } else {
-      await addFavorite(user.id, lesson.id)
-    }
-    setIsFav(!isFav)
+  const handleToggleFav = async () => {
+    if (!user || loading) return
+    setLoading(true)
+    const newState = await toggleFavorite(user.id, lesson.id)
+    setIsFav(newState)
+    setLoading(false)
   }
 
   const savePractice = async () => {
@@ -54,7 +53,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           {user && (
             <div className="flex gap-3 items-center">
               <button onClick={() => setShowNote(!showNote)} className="text-xl" title="記錄練習">📝</button>
-              <button onClick={toggleFav} className="text-2xl" title={isFav ? '取消收藏' : '加入收藏'}>{isFav ? '❤️' : '🤍'}</button>
+              <button onClick={handleToggleFav} disabled={loading} className="text-2xl" title={isFav ? '取消收藏' : '加入收藏'}>
+                {loading ? '⏳' : isFav ? '❤️' : '🤍'}
+              </button>
             </div>
           )}
         </div>
