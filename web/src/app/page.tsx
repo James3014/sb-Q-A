@@ -68,11 +68,14 @@ export default function Home() {
       <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
         <div className="flex justify-between items-center mb-3">
           <h1 className="text-xl font-bold">🏂 單板教學</h1>
-          {user ? (
-            <button onClick={() => signOut()} className="text-sm text-zinc-400">登出</button>
-          ) : (
-            <Link href="/login" className="text-sm text-blue-400">登入</Link>
-          )}
+          <div className="flex items-center gap-3">
+            {user && <Link href="/favorites" className="text-lg">❤️</Link>}
+            {user ? (
+              <button onClick={() => signOut()} className="text-sm text-zinc-400">登出</button>
+            ) : (
+              <Link href="/login" className="text-sm text-blue-400">登入</Link>
+            )}
+          </div>
         </div>
         <SearchBar value={search} onChange={(v) => { setSearch(v); setShowAll(false); }} />
       </header>
