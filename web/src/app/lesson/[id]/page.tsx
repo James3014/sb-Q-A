@@ -58,9 +58,16 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
         <section className="bg-slate-800 rounded-lg p-4 mb-4">
           <h2 className="font-semibold mb-2">🛠️ 怎麼練</h2>
           <div className="text-slate-300 space-y-2">
-            {lesson.how?.map((h, i) => (
-              <p key={i}><strong>{i + 1}.</strong> {h.text}</p>
-            ))}
+            {lesson.how?.map((h, i) => {
+              // 簡單處理 Markdown: **text** → <strong>text</strong>
+              const text = h.text
+                .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+                .replace(/^\d+\.\s*/, '') // 移除開頭數字
+                .replace(/^-\s*/, ''); // 移除開頭 -
+              return (
+                <p key={i} dangerouslySetInnerHTML={{ __html: `<strong>${i + 1}.</strong> ${text}` }} />
+              );
+            })}
           </div>
         </section>
 
