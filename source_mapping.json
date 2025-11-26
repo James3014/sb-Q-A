@@ -1,0 +1,1816 @@
+{
+  "total": 200,
+  "high_confidence": 17,
+  "medium_confidence": 165,
+  "low_confidence": 18,
+  "mapping": {
+    "1": {
+      "id": 1,
+      "cleaned_file": "01_滾刃快換刃__L-int__S-blue.md",
+      "cleaned_title": "滾刃快換刃",
+      "source_file": "01 如何增加换刃效率_Sam.txt",
+      "confidence": 0.692,
+      "checksum": "ec194754c8f766442fcf35b882cc97ef"
+    },
+    "2": {
+      "id": 2,
+      "cleaned_file": "02_微站膝換刃__L-beg-int__S-green-blue.md",
+      "cleaned_title": "微站膝換刃",
+      "source_file": "带转角度：“消失”的前刃.txt",
+      "confidence": 0.467,
+      "checksum": "72f57236d8c808f876c4137ad01fa184"
+    },
+    "3": {
+      "id": 3,
+      "cleaned_file": "03_站姿開閉__L-int-adv__S-blue-black.md",
+      "cleaned_title": "站姿開閉",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.333,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "4": {
+      "id": 4,
+      "cleaned_file": "04_即壓早變__L-int__S-blue.md",
+      "cleaned_title": "即壓早變",
+      "source_file": "04 让板子的形变：在弯型里早点发生_Sam.txt",
+      "confidence": 0.571,
+      "checksum": "835b27e13ccffc6c518f6f54f05e0ea0"
+    },
+    "5": {
+      "id": 5,
+      "cleaned_file": "05_後腿勿直__L-beg-int__S-green-blue.md",
+      "cleaned_title": "後腿勿直",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.583,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "6": {
+      "id": 6,
+      "cleaned_file": "06_起伏扭轉__L-int__S-blue.md",
+      "cleaned_title": "起伏扭轉",
+      "source_file": "81 你是否被朋友和教练说过：顿低点，弯膝盖？.txt",
+      "confidence": 0.538,
+      "checksum": "2725c50969985512f71a29e470027746"
+    },
+    "7": {
+      "id": 7,
+      "cleaned_file": "07_滾線前沉__L-beg-int__S-green-blue.md",
+      "cleaned_title": "滾線前沉",
+      "source_file": "蘑菇里你过度重心了么？.txt",
+      "confidence": 0.4,
+      "checksum": "ce3febe1e4c85eaf9cdaa70c102cb79d"
+    },
+    "8": {
+      "id": 8,
+      "cleaned_file": "08_蘑菇上轉__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇上轉",
+      "source_file": "40 不做这个你折叠无效（高级道和蘑菇）.txt",
+      "confidence": 0.273,
+      "checksum": "82d90111575160c3d26c58f5ed27436c"
+    },
+    "9": {
+      "id": 9,
+      "cleaned_file": "09_貼舌防駝__L-beg-int__S-green-blue.md",
+      "cleaned_title": "貼舌防駝",
+      "source_file": "进阶版牛仔站姿：帮助你更居中稳定.txt",
+      "confidence": 0.5,
+      "checksum": "ac138b23cc899e0a9889033c5d2b2281"
+    },
+    "100": {
+      "id": 100,
+      "cleaned_file": "100_後手拉臀夾防反擰__L-int__S-blue-black.md",
+      "cleaned_title": "後手拉臀夾防反擰",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.545,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "101": {
+      "id": 101,
+      "cleaned_file": "101_換刃後壓後腿提前介入__L-int__S-blue-black.md",
+      "cleaned_title": "換刃後壓後腿提前介入",
+      "source_file": "36 又烂又粘的雪： speed check plus.txt",
+      "confidence": 0.429,
+      "checksum": "cfabb3e8ac7f632b3e3ffc40741f1d7d"
+    },
+    "102": {
+      "id": 102,
+      "cleaned_file": "102_後刃腰捅感整板受力__L-int__S-blue.md",
+      "cleaned_title": "後刃腰捅感整板受力",
+      "source_file": "基础： 提前换刃 One.txt",
+      "confidence": 0.375,
+      "checksum": "4b344750a5f0dd6397b2d24001de3a5a"
+    },
+    "103": {
+      "id": 103,
+      "cleaned_file": "103_裝備調整減前刃疲勞__L-int__S-all.md",
+      "cleaned_title": "裝備調整減前刃疲勞",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.4,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "104": {
+      "id": 104,
+      "cleaned_file": "104_腳踝感知練習__L-beg-int__S-green-blue.md",
+      "cleaned_title": "腳踝感知練習",
+      "source_file": "进阶版牛仔站姿：帮助你更居中稳定.txt",
+      "confidence": 0.455,
+      "checksum": "ac138b23cc899e0a9889033c5d2b2281"
+    },
+    "105": {
+      "id": 105,
+      "cleaned_file": "105_膝蓋轉動輔助__L-int__S-blue.md",
+      "cleaned_title": "膝蓋轉動輔助",
+      "source_file": "浅聊：你其实转的不是你的膝盖，而是….txt",
+      "confidence": 0.429,
+      "checksum": "49d60be25f12582001db4fa5b49c8471"
+    },
+    "106": {
+      "id": 106,
+      "cleaned_file": "106_裝備調整前刃省力__L-beg-int__S-all.md",
+      "cleaned_title": "裝備調整前刃省力",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.636,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "107": {
+      "id": 107,
+      "cleaned_file": "107_膝踝緊致板吸身__L-beg-int__S-green-blue.md",
+      "cleaned_title": "膝踝緊致板吸身",
+      "source_file": "30 如何滑下午的冰面.txt",
+      "confidence": 0.444,
+      "checksum": "4ecc9d8d774d4d8b7fd0bd173b3d0318"
+    },
+    "108": {
+      "id": 108,
+      "cleaned_file": "108_膝跟髖轉非主動扭__L-int__S-blue.md",
+      "cleaned_title": "膝跟髖轉非主動扭",
+      "source_file": "浅聊：你其实转的不是你的膝盖，而是….txt",
+      "confidence": 0.429,
+      "checksum": "49d60be25f12582001db4fa5b49c8471"
+    },
+    "109": {
+      "id": 109,
+      "cleaned_file": "109_髖打開快換刃小彎__L-int__S-blue.md",
+      "cleaned_title": "髖打開快換刃小彎",
+      "source_file": "12 后刃进阶：你肯定有的问题_Sam.txt",
+      "confidence": 0.357,
+      "checksum": "41145a9cfa6f1e83241a5fdc610cf773"
+    },
+    "10": {
+      "id": 10,
+      "cleaned_file": "10_折疊降立刃__L-int__S-blue.md",
+      "cleaned_title": "折疊降立刃",
+      "source_file": "蘑菇里： 前刃换后刃更稳定.txt",
+      "confidence": 0.556,
+      "checksum": "46aa5b05e10f4bc6fef18dd27e2c471a"
+    },
+    "110": {
+      "id": 110,
+      "cleaned_file": "110_正確順序先下再轉__L-int__S-blue-black.md",
+      "cleaned_title": "正確順序先下再轉",
+      "source_file": "转弯时候的“转”先转还是后转？.txt",
+      "confidence": 0.286,
+      "checksum": "bddc2d15781c12e405e20f5fb98a7c5f"
+    },
+    "111": {
+      "id": 111,
+      "cleaned_file": "111_直跳收腿時機__L-int__S-green-blue-park.md",
+      "cleaned_title": "直跳收腿時機",
+      "source_file": "公园第一集｜直飞： 收腿的时机决定你稳不稳.txt",
+      "confidence": 0.636,
+      "checksum": "27a87d5513b0203b658813cc2016bb90"
+    },
+    "112": {
+      "id": 112,
+      "cleaned_file": "112_蹦床反擰多180__L-int__S-green-blue-park.md",
+      "cleaned_title": "蹦床反擰多180",
+      "source_file": "公园第三集：蹦床如何增加旋转.txt",
+      "confidence": 0.4,
+      "checksum": "a3f12aa438f39f31959b297aae4c4f14"
+    },
+    "113": {
+      "id": 113,
+      "cleaned_file": "113_抓板要彎腰__L-int__S-green-blue-park.md",
+      "cleaned_title": "抓板要彎腰",
+      "source_file": "公园第二集｜抓板： 收腿得配合“弯腰”.txt",
+      "confidence": 0.769,
+      "checksum": "b0bccad191c91561af52941a65a68839"
+    },
+    "114": {
+      "id": 114,
+      "cleaned_file": "114_後刃貼地刻滑上__L-adv__S-blue.md",
+      "cleaned_title": "後刃貼地刻滑上",
+      "source_file": "81 你是否被朋友和教练说过：顿低点，弯膝盖？.txt",
+      "confidence": 0.333,
+      "checksum": "2725c50969985512f71a29e470027746"
+    },
+    "115": {
+      "id": 115,
+      "cleaned_file": "115_視線看山下變小彎__L-int__S-blue.md",
+      "cleaned_title": "視線看山下變小彎",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.444,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "116": {
+      "id": 116,
+      "cleaned_file": "116_前刃中後段膝開踝勾__L-int__S-blue.md",
+      "cleaned_title": "前刃中後段膝開踝勾",
+      "source_file": "04 让板子的形变：在弯型里早点发生_Sam.txt",
+      "confidence": 0.571,
+      "checksum": "835b27e13ccffc6c518f6f54f05e0ea0"
+    },
+    "117": {
+      "id": 117,
+      "cleaned_file": "117_前換後腳踝關閉__L-int__S-blue.md",
+      "cleaned_title": "前換後腳踝關閉",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.545,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "118": {
+      "id": 118,
+      "cleaned_file": "118_膝頂板頭精準立刃__L-int__S-blue.md",
+      "cleaned_title": "膝頂板頭精準立刃",
+      "source_file": "06 会起伏之后：试试这个_Sam.txt",
+      "confidence": 0.444,
+      "checksum": "8634bbc420ed6a5a59b7435f03711980"
+    },
+    "119": {
+      "id": 119,
+      "cleaned_file": "119_前換後不後躺__L-int__S-blue-black.md",
+      "cleaned_title": "前換後不後躺",
+      "source_file": "前刃换后刃基础：如何不后“躺”.txt",
+      "confidence": 0.444,
+      "checksum": "ef73e709054034687bbe43faad2109a3"
+    },
+    "11": {
+      "id": 11,
+      "cleaned_file": "11_平板過渡防趴__L-beg-int__S-green-blue.md",
+      "cleaned_title": "平板過渡防趴",
+      "source_file": "52 平地小练习：感受重心居中.txt",
+      "confidence": 0.556,
+      "checksum": "ebc2bd168427e76a62e3c2440d865c38"
+    },
+    "120": {
+      "id": 120,
+      "cleaned_file": "120_前刃直立站姿練習__L-int__S-blue.md",
+      "cleaned_title": "前刃直立站姿練習",
+      "source_file": "进阶后刃过程中：你的身体还与板齐平？.txt",
+      "confidence": 0.455,
+      "checksum": "516b5c8faee0ee1b1ea24226d51b10cb"
+    },
+    "121": {
+      "id": 121,
+      "cleaned_file": "121_後換前行進方向壓__L-int__S-blue-black.md",
+      "cleaned_title": "後換前行進方向壓",
+      "source_file": "换前刃小技巧：别朝着前刃发力.txt",
+      "confidence": 0.444,
+      "checksum": "17c468f5c6c4901d6e97c90cf5a22619"
+    },
+    "122": {
+      "id": 122,
+      "cleaned_file": "122_後膝開回中防頂胯__L-int__S-blue.md",
+      "cleaned_title": "後膝開回中防頂胯",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.462,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "123": {
+      "id": 123,
+      "cleaned_file": "123_前手放後刃開肩__L-int__S-blue-black.md",
+      "cleaned_title": "前手放後刃開肩",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.667,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "124": {
+      "id": 124,
+      "cleaned_file": "124_換刃先髖回中別烙餅__L-int__S-blue-black.md",
+      "cleaned_title": "換刃先髖回中別烙餅",
+      "source_file": "37 上半弧（闭合弯）第一集：结束时拧板.txt",
+      "confidence": 0.375,
+      "checksum": "ac8f42ecb85c2b2f781f0625bc69455a"
+    },
+    "125": {
+      "id": 125,
+      "cleaned_file": "125_前刃彎末雙腳支撐__L-int__S-blue.md",
+      "cleaned_title": "前刃彎末雙腳支撐",
+      "source_file": "前刃：弯末增加抓地力.txt",
+      "confidence": 0.571,
+      "checksum": "9c69d18f6e67d4026c4be796e8354de7"
+    },
+    "126": {
+      "id": 126,
+      "cleaned_file": "126_前腳蓄力傳導__L-adv__S-blue-black.md",
+      "cleaned_title": "前腳蓄力傳導",
+      "source_file": "前刃换后刃基础：如何不后“躺”.txt",
+      "confidence": 0.333,
+      "checksum": "ef73e709054034687bbe43faad2109a3"
+    },
+    "127": {
+      "id": 127,
+      "cleaned_file": "127_髖壓過來防假開肩__L-int__S-blue-black.md",
+      "cleaned_title": "髖壓過來防假開肩",
+      "source_file": "前刃：弯末增加抓地力.txt",
+      "confidence": 0.4,
+      "checksum": "9c69d18f6e67d4026c4be796e8354de7"
+    },
+    "128": {
+      "id": 128,
+      "cleaned_file": "128_前腿疼重心只在前__L-int__S-blue.md",
+      "cleaned_title": "前腿疼重心只在前",
+      "source_file": "02 下半身带“不动”转弯的原因_Sam.txt",
+      "confidence": 0.5,
+      "checksum": "33d317343465aa344f3d33e0d159c4d2"
+    },
+    "129": {
+      "id": 129,
+      "cleaned_file": "129_前刃壓力勿集中最下__L-int__S-blue.md",
+      "cleaned_title": "前刃壓力勿集中最下",
+      "source_file": "前刃减速过多会导致弯形不对称.txt",
+      "confidence": 0.667,
+      "checksum": "a0d7c7420105072fb1cf424d25adf4b9"
+    },
+    "12": {
+      "id": 12,
+      "cleaned_file": "12_前換後張力刻滑__L-int-adv__S-blue-black.md",
+      "cleaned_title": "前換後張力刻滑",
+      "source_file": "12 后刃进阶：你肯定有的问题_Sam.txt",
+      "confidence": 0.5,
+      "checksum": "41145a9cfa6f1e83241a5fdc610cf773"
+    },
+    "130": {
+      "id": 130,
+      "cleaned_file": "130_前刃真正降重心__L-int__S-blue.md",
+      "cleaned_title": "前刃真正降重心",
+      "source_file": "04 让板子的形变：在弯型里早点发生_Sam.txt",
+      "confidence": 0.5,
+      "checksum": "835b27e13ccffc6c518f6f54f05e0ea0"
+    },
+    "131": {
+      "id": 131,
+      "cleaned_file": "131_低姿滾刃快轉__L-int__S-green-blue.md",
+      "cleaned_title": "低姿滾刃快轉",
+      "source_file": "滚刃练习：帮助你快速改变方向.txt",
+      "confidence": 0.556,
+      "checksum": "c32a9c5859adb3238347e9d0bf3e9d79"
+    },
+    "132": {
+      "id": 132,
+      "cleaned_file": "132_後刃髖開防撅__L-int-adv__S-blue-black.md",
+      "cleaned_title": "後刃髖開防撅",
+      "source_file": "进阶后刃过程中：你的身体还与板齐平？.txt",
+      "confidence": 0.417,
+      "checksum": "516b5c8faee0ee1b1ea24226d51b10cb"
+    },
+    "133": {
+      "id": 133,
+      "cleaned_file": "133_後刃小反擰換刃__L-int__S-blue-black.md",
+      "cleaned_title": "後刃小反擰換刃",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.556,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "134": {
+      "id": 134,
+      "cleaned_file": "134_陡坡失重換刃別擰__L-int-adv__S-blue-black.md",
+      "cleaned_title": "陡坡失重換刃別擰",
+      "source_file": "01 如何增加换刃效率_Sam.txt",
+      "confidence": 0.333,
+      "checksum": "ec194754c8f766442fcf35b882cc97ef"
+    },
+    "135": {
+      "id": 135,
+      "cleaned_file": "135_後刃卡雪站休息__L-beg-int__S-green-blue.md",
+      "cleaned_title": "後刃卡雪站休息",
+      "source_file": "28后刃换前刃拧不过来？试试这个.txt",
+      "confidence": 0.333,
+      "checksum": "f7d1616153392c0d17c523ffb389c4af"
+    },
+    "136": {
+      "id": 136,
+      "cleaned_file": "136_陡坡先壓再轉不墜__L-int-adv__S-blue-black.md",
+      "cleaned_title": "陡坡先壓再轉不墜",
+      "source_file": "陡坡换刃停止下“坠”.txt",
+      "confidence": 0.375,
+      "checksum": "decc5bbf9da6bf1852ea1676b89170e0"
+    },
+    "137": {
+      "id": 137,
+      "cleaned_file": "137_冰包點觸彈跳__L-adv__S-black-mogul.md",
+      "cleaned_title": "冰包點觸彈跳",
+      "source_file": "蘑菇第二集：过包顶之后“追身”.txt",
+      "confidence": 0.4,
+      "checksum": "e12c9c92e7877fb3d1a85dffb9638f0f"
+    },
+    "138": {
+      "id": 138,
+      "cleaned_file": "138_前刃手拉直立不倒__L-adv__S-black.md",
+      "cleaned_title": "前刃手拉直立不倒",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.462,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "139": {
+      "id": 139,
+      "cleaned_file": "139_板尾彈出彎換刃__L-int-adv__S-blue-black-powder.md",
+      "cleaned_title": "板尾彈出彎換刃",
+      "source_file": "前刃减速过多会导致弯形不对称.txt",
+      "confidence": 0.294,
+      "checksum": "a0d7c7420105072fb1cf424d25adf4b9"
+    },
+    "13": {
+      "id": 13,
+      "cleaned_file": "13_後跟外側導尾__L-beg-int__S-green-blue.md",
+      "cleaned_title": "後跟外側導尾",
+      "source_file": "52 平地小练习：感受重心居中.txt",
+      "confidence": 0.5,
+      "checksum": "ebc2bd168427e76a62e3c2440d865c38"
+    },
+    "140": {
+      "id": 140,
+      "cleaned_file": "140_前腳領先上半弧__L-int__S-blue-black.md",
+      "cleaned_title": "前腳領先上半弧",
+      "source_file": "07 一招教你绿道到蓝道控速_Sam.txt",
+      "confidence": 0.5,
+      "checksum": "331bad970c9e07cae275527d63bd094e"
+    },
+    "141": {
+      "id": 141,
+      "cleaned_file": "141_陡坡齊平雙腿承重__L-adv__S-black.md",
+      "cleaned_title": "陡坡齊平雙腿承重",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.417,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "142": {
+      "id": 142,
+      "cleaned_file": "142_直板入落地再橫__L-adv__S-black.md",
+      "cleaned_title": "直板入落地再橫",
+      "source_file": "换刃之后重心压的板位置不一样.txt",
+      "confidence": 0.333,
+      "checksum": "f7e9af3cf0a367048d7bb54ebd08bd2d"
+    },
+    "143": {
+      "id": 143,
+      "cleaned_file": "143_橫切通過極陡坡__L-adv__S-black.md",
+      "cleaned_title": "橫切通過極陡坡",
+      "source_file": "30 如何滑下午的冰面.txt",
+      "confidence": 0.4,
+      "checksum": "4ecc9d8d774d4d8b7fd0bd173b3d0318"
+    },
+    "144": {
+      "id": 144,
+      "cleaned_file": "144_上帶下時機重置__L-int-adv__S-blue-black.md",
+      "cleaned_title": "上帶下時機重置",
+      "source_file": "陡坡换刃第四集： 上带下.txt",
+      "confidence": 0.429,
+      "checksum": "bfeb8ff53603ef704e42b0c83704bb3b"
+    },
+    "145": {
+      "id": 145,
+      "cleaned_file": "145_黑道跳換釋刃__L-adv__S-black.md",
+      "cleaned_title": "黑道跳換釋刃",
+      "source_file": "陡坡换刃停止下“坠”.txt",
+      "confidence": 0.273,
+      "checksum": "decc5bbf9da6bf1852ea1676b89170e0"
+    },
+    "146": {
+      "id": 146,
+      "cleaned_file": "146_提前換刃保持方向__L-int__S-blue.md",
+      "cleaned_title": "提前換刃保持方向",
+      "source_file": "基础： 提前换刃 One.txt",
+      "confidence": 0.375,
+      "checksum": "4b344750a5f0dd6397b2d24001de3a5a"
+    },
+    "147": {
+      "id": 147,
+      "cleaned_file": "147_起才減速蹲為起__L-beg-int__S-green-blue.md",
+      "cleaned_title": "起才減速蹲為起",
+      "source_file": "重心如果一直压后：试试这个调整.txt",
+      "confidence": 0.429,
+      "checksum": "3c63060231ed47d4d7bc55615a82ed2f"
+    },
+    "148": {
+      "id": 148,
+      "cleaned_file": "148_提前換刃前腳抓地__L-int__S-blue.md",
+      "cleaned_title": "提前換刃前腳抓地",
+      "source_file": "86 改变你后刃“蹲坑”.txt",
+      "confidence": 0.375,
+      "checksum": "6fd8a501d03ea794925e22972073d328"
+    },
+    "149": {
+      "id": 149,
+      "cleaned_file": "149_側壁貼底練蘑菇__L-beg-int__S-green-blue-mogul.md",
+      "cleaned_title": "側壁貼底練蘑菇",
+      "source_file": "基础滑蘑菇小练习：板底走侧墙.txt",
+      "confidence": 0.467,
+      "checksum": "b01f078b3c31000ada83be061ee4c021"
+    },
+    "14": {
+      "id": 14,
+      "cleaned_file": "14_髖不停轉融下降__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "髖不停轉融下降",
+      "source_file": "浅聊：你其实转的不是你的膝盖，而是….txt",
+      "confidence": 0.286,
+      "checksum": "49d60be25f12582001db4fa5b49c8471"
+    },
+    "150": {
+      "id": 150,
+      "cleaned_file": "150_後腳送轉別掰髖__L-int__S-blue-black.md",
+      "cleaned_title": "後腳送轉別掰髖",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.417,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "151": {
+      "id": 151,
+      "cleaned_file": "151_板頭板尾重心動態__L-int__S-blue.md",
+      "cleaned_title": "板頭板尾重心動態",
+      "source_file": "板头板尾（前中后）重心转移.txt",
+      "confidence": 0.5,
+      "checksum": "e286a9cb52cbe6159754991252b662f1"
+    },
+    "152": {
+      "id": 152,
+      "cleaned_file": "152_新手後換前兩步走__L-beg-int__S-green-blue.md",
+      "cleaned_title": "新手後換前兩步走",
+      "source_file": "81 你是否被朋友和教练说过：顿低点，弯膝盖？.txt",
+      "confidence": 0.5,
+      "checksum": "2725c50969985512f71a29e470027746"
+    },
+    "153": {
+      "id": 153,
+      "cleaned_file": "153_密林反擰拖板__L-int-adv__S-blue-black-tree.md",
+      "cleaned_title": "密林反擰拖板",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.5,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "154": {
+      "id": 154,
+      "cleaned_file": "154_開閉彎受力位置__L-int-adv__S-blue-black.md",
+      "cleaned_title": "開閉彎受力位置",
+      "source_file": "看看你的后刃是否：转完.txt",
+      "confidence": 0.3,
+      "checksum": "3b9fe2b3d6bce2a49c59b70b3a84897a"
+    },
+    "155": {
+      "id": 155,
+      "cleaned_file": "155_上半弧四重點__L-int-adv__S-blue-black.md",
+      "cleaned_title": "上半弧四重點",
+      "source_file": "深聊上半弧.txt",
+      "confidence": 0.467,
+      "checksum": "b619638faaea3e6fef9bf46b6f52bc58"
+    },
+    "156": {
+      "id": 156,
+      "cleaned_file": "156_蘑菇轉彎選上半包__L-int__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇轉彎選上半包",
+      "source_file": "浅聊团身.txt",
+      "confidence": 0.273,
+      "checksum": "e66003322d8dcf46a941244287c810d2"
+    },
+    "157": {
+      "id": 157,
+      "cleaned_file": "157_蘑菇降低刃角防卡__L-int__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇降低刃角防卡",
+      "source_file": "32 🐍蛇道基础篇：如何在蛇道内换刃.txt",
+      "confidence": 0.3,
+      "checksum": "50a8e7d63f2cd15bec7a32cd594bc3de"
+    },
+    "158": {
+      "id": 158,
+      "cleaned_file": "158_初入蘑菇走側壁__L-beg-int__S-green-blue-mogul.md",
+      "cleaned_title": "初入蘑菇走側壁",
+      "source_file": "49 开放站姿｜第三集：过包抽拉板子.txt",
+      "confidence": 0.308,
+      "checksum": "375464137bc444f4f34cc66594acb437"
+    },
+    "159": {
+      "id": 159,
+      "cleaned_file": "159_下蹲量握手力__L-beg-int__S-green-blue.md",
+      "cleaned_title": "下蹲量握手力",
+      "source_file": "49 开放站姿｜第三集：过包抽拉板子.txt",
+      "confidence": 0.385,
+      "checksum": "375464137bc444f4f34cc66594acb437"
+    },
+    "15": {
+      "id": 15,
+      "cleaned_file": "15_粘雪抬頭搖板__L-int__S-blue.md",
+      "cleaned_title": "粘雪抬頭搖板",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.286,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "160": {
+      "id": 160,
+      "cleaned_file": "160_進階牛仔站姿調髖__L-int-adv__S-blue-black.md",
+      "cleaned_title": "進階牛仔站姿調髖",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.5,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "161": {
+      "id": 161,
+      "cleaned_file": "161_爛雪推不切降震__L-int__S-blue.md",
+      "cleaned_title": "爛雪推不切降震",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.286,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "162": {
+      "id": 162,
+      "cleaned_file": "162_彎末延後給壓__L-int-adv__S-blue.md",
+      "cleaned_title": "彎末延後給壓",
+      "source_file": "进阶后刃过程中：你的身体还与板齐平？.txt",
+      "confidence": 0.364,
+      "checksum": "516b5c8faee0ee1b1ea24226d51b10cb"
+    },
+    "163": {
+      "id": 163,
+      "cleaned_file": "163_彈力傳導腿不直__L-int__S-blue.md",
+      "cleaned_title": "彈力傳導腿不直",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.333,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "164": {
+      "id": 164,
+      "cleaned_file": "164_撬板頭上身跟進__L-int__S-blue-powder.md",
+      "cleaned_title": "撬板頭上身跟進",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.667,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "165": {
+      "id": 165,
+      "cleaned_file": "165_前腿抓地握手力__L-int-adv__S-blue-black.md",
+      "cleaned_title": "前腿抓地握手力",
+      "source_file": "板头抓地力进阶.txt",
+      "confidence": 0.429,
+      "checksum": "ff3f811837e8df1761b59c85ee47ef38"
+    },
+    "166": {
+      "id": 166,
+      "cleaned_file": "166_板頭板尾移重再強化__L-int__S-blue.md",
+      "cleaned_title": "板頭板尾移重再強化",
+      "source_file": "板头板尾（前中后）重心转移.txt",
+      "confidence": 0.5,
+      "checksum": "e286a9cb52cbe6159754991252b662f1"
+    },
+    "16": {
+      "id": 16,
+      "cleaned_file": "16_先彎前腿防軸轉__L-beg-int__S-green-blue.md",
+      "cleaned_title": "先彎前腿防軸轉",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.333,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "176": {
+      "id": 176,
+      "cleaned_file": "176_後刃蓄力轉完__L-int-adv__S-blue-black.md",
+      "cleaned_title": "後刃蓄力轉完",
+      "source_file": "看看你的后刃是否：转完.txt",
+      "confidence": 0.5,
+      "checksum": "3b9fe2b3d6bce2a49c59b70b3a84897a"
+    },
+    "177": {
+      "id": 177,
+      "cleaned_file": "177_後刃挺背防駝__L-int__S-blue.md",
+      "cleaned_title": "後刃挺背防駝",
+      "source_file": "看看你的后刃是否：驼背.txt",
+      "confidence": 0.545,
+      "checksum": "a8f6854667356a17b28158dca5d6a9ef"
+    },
+    "178": {
+      "id": 178,
+      "cleaned_file": "178_有蹲無起要釋壓__L-int__S-blue-black.md",
+      "cleaned_title": "有蹲無起要釋壓",
+      "source_file": "看看你的后刃是否：转完.txt",
+      "confidence": 0.333,
+      "checksum": "3b9fe2b3d6bce2a49c59b70b3a84897a"
+    },
+    "179": {
+      "id": 179,
+      "cleaned_file": "179_目標對準那裡轉那裡__L-int__S-blue-black.md",
+      "cleaned_title": "目標對準那裡轉那裡",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.3,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "17": {
+      "id": 17,
+      "cleaned_file": "17_髖幅減小穩搓雪__L-int__S-blue-black.md",
+      "cleaned_title": "髖幅減小穩搓雪",
+      "source_file": "蘑菇里： 前刃换后刃更稳定.txt",
+      "confidence": 0.417,
+      "checksum": "46aa5b05e10f4bc6fef18dd27e2c471a"
+    },
+    "180": {
+      "id": 180,
+      "cleaned_file": "180_進階路線與流程的思維方式__L-int-adv__S-blue-black.md",
+      "cleaned_title": "進階路線與流程的思維方式",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.333,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "181": {
+      "id": 181,
+      "cleaned_file": "181_前手換刃定位__L-int-adv__S-blue-black-mogul.md",
+      "cleaned_title": "前手換刃定位",
+      "source_file": "蘑菇第三集：手的位置很重要.txt",
+      "confidence": 0.636,
+      "checksum": "aeea359b3c7b36a2d8b08f60eb2d1803"
+    },
+    "182": {
+      "id": 182,
+      "cleaned_file": "182_過包頂追身前送__L-int__S-blue-black-mogul.md",
+      "cleaned_title": "過包頂追身前送",
+      "source_file": "换刃之后重心压的板位置不一样.txt",
+      "confidence": 0.273,
+      "checksum": "f7e9af3cf0a367048d7bb54ebd08bd2d"
+    },
+    "183": {
+      "id": 183,
+      "cleaned_file": "183_粉雪順序調整__L-adv__S-powder.md",
+      "cleaned_title": "粉雪順序調整",
+      "source_file": "粉雪里的顺序：换重心施压立刃轴转.txt",
+      "confidence": 0.333,
+      "checksum": "689f95ee21d09a1380463ebfb93a3a26"
+    },
+    "184": {
+      "id": 184,
+      "cleaned_file": "184_CASI2考試重點__L-int__S-blue.md",
+      "cleaned_title": "CASI2考試重點",
+      "source_file": "换刃之后重心压的板位置不一样.txt",
+      "confidence": 0.417,
+      "checksum": "f7e9af3cf0a367048d7bb54ebd08bd2d"
+    },
+    "185": {
+      "id": 185,
+      "cleaned_file": "185_別用膝扭轉用髖__L-int__S-blue.md",
+      "cleaned_title": "別用膝扭轉用髖",
+      "source_file": "46 髋关节这样做｜第二集：防止后腿扫.txt",
+      "confidence": 0.455,
+      "checksum": "942c77162743e19ab423da3e4e2d246c"
+    },
+    "186": {
+      "id": 186,
+      "cleaned_file": "186_團身是工具非終點__L-adv__S-all.md",
+      "cleaned_title": "團身是工具非終點",
+      "source_file": "浅聊团身.txt",
+      "confidence": 0.417,
+      "checksum": "e66003322d8dcf46a941244287c810d2"
+    },
+    "187": {
+      "id": 187,
+      "cleaned_file": "187_平地臀跳練習__L-beg-int__S-flat.md",
+      "cleaned_title": "平地臀跳練習",
+      "source_file": "能在平地练习的“豚跳”.txt",
+      "confidence": 0.417,
+      "checksum": "8a76259a5bdeb639c0fc924abb493ec2"
+    },
+    "188": {
+      "id": 188,
+      "cleaned_file": "188_前刃小角度帶轉__L-adv__S-blue-black.md",
+      "cleaned_title": "前刃小角度帶轉",
+      "source_file": "12 后刃进阶：你肯定有的问题_Sam.txt",
+      "confidence": 0.5,
+      "checksum": "41145a9cfa6f1e83241a5fdc610cf773"
+    },
+    "189": {
+      "id": 189,
+      "cleaned_file": "189_後刃帶轉角度__L-adv__S-blue-black.md",
+      "cleaned_title": "後刃帶轉角度",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.5,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "18": {
+      "id": 18,
+      "cleaned_file": "18_夾臀頂髖換刃__L-int__S-green-blue.md",
+      "cleaned_title": "夾臀頂髖換刃",
+      "source_file": "48 开放站姿｜第二集：换重心可以排在二三位.txt",
+      "confidence": 0.4,
+      "checksum": "a93f74edb8521ef44fa22182f98a0a90"
+    },
+    "190": {
+      "id": 190,
+      "cleaned_file": "190_前換後防卡小練__L-int__S-blue.md",
+      "cleaned_title": "前換後防卡小練",
+      "source_file": "12 后刃进阶：你肯定有的问题_Sam.txt",
+      "confidence": 0.357,
+      "checksum": "41145a9cfa6f1e83241a5fdc610cf773"
+    },
+    "191": {
+      "id": 191,
+      "cleaned_file": "191_換刃卡頓解法__L-int__S-blue-black.md",
+      "cleaned_title": "換刃卡頓解法",
+      "source_file": "换刃之后重心压的板位置不一样.txt",
+      "confidence": 0.286,
+      "checksum": "f7e9af3cf0a367048d7bb54ebd08bd2d"
+    },
+    "192": {
+      "id": 192,
+      "cleaned_file": "192_摔飛案例紀錄__L-beg-int__S-all.md",
+      "cleaned_title": "摔飛案例紀錄",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.429,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "193": {
+      "id": 193,
+      "cleaned_file": "193_蘑菇視線規劃路線__L-int-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇視線規劃路線",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.3,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "194": {
+      "id": 194,
+      "cleaned_file": "194_跳台直起不偷角__L-int-adv__S-park.md",
+      "cleaned_title": "跳台直起不偷角",
+      "source_file": "跳台起跳旋转”不偷角度”方法：强直.txt",
+      "confidence": 0.5,
+      "checksum": "21b1d635b88301858f5fb1d01f22a2e7"
+    },
+    "195": {
+      "id": 195,
+      "cleaned_file": "195_跳崖落地多蹲一秒__L-adv__S-black.md",
+      "cleaned_title": "跳崖落地多蹲一秒",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.333,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "196": {
+      "id": 196,
+      "cleaned_file": "196_反向軸轉控速__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "反向軸轉控速",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.333,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "197": {
+      "id": 197,
+      "cleaned_file": "197_肩膀起伏增抓地__L-int-adv__S-blue-black.md",
+      "cleaned_title": "肩膀起伏增抓地",
+      "source_file": "52 平地小练习：感受重心居中.txt",
+      "confidence": 0.357,
+      "checksum": "ebc2bd168427e76a62e3c2440d865c38"
+    },
+    "198": {
+      "id": 198,
+      "cleaned_file": "198_道內下帶上__L-int__S-blue.md",
+      "cleaned_title": "道內下帶上",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.6,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "199": {
+      "id": 199,
+      "cleaned_file": "199_蘑菇前換後板底落地__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇前換後板底落地",
+      "source_file": "蘑菇里： 前刃换后刃更稳定.txt",
+      "confidence": 0.455,
+      "checksum": "46aa5b05e10f4bc6fef18dd27e2c471a"
+    },
+    "19": {
+      "id": 19,
+      "cleaned_file": "19_樓梯包放鬆選壓__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "樓梯包放鬆選壓",
+      "source_file": "68 团身过蘑菇：解决忽快忽慢.txt",
+      "confidence": 0.667,
+      "checksum": "eb50323cacc75a031d2fdf31883f4a9e"
+    },
+    "200": {
+      "id": 200,
+      "cleaned_file": "200_蘑菇換重心上包完成__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇換重心上包完成",
+      "source_file": "蘑菇里你过度重心了么？.txt",
+      "confidence": 0.7,
+      "checksum": "ce3febe1e4c85eaf9cdaa70c102cb79d"
+    },
+    "201": {
+      "id": 201,
+      "cleaned_file": "201_上包先換重心__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "上包先換重心",
+      "source_file": "31 “Early Pressure”之后的全程施压.txt",
+      "confidence": 0.429,
+      "checksum": "e8287f0086bbb91f3f76dbde07b20858"
+    },
+    "202": {
+      "id": 202,
+      "cleaned_file": "202_後換前腳踝三步練__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "後換前腳踝三步練",
+      "source_file": "84 别老蹲着滑：会累.txt",
+      "confidence": 0.556,
+      "checksum": "da86f7073b0867fbb923ed950adec60c"
+    },
+    "203": {
+      "id": 203,
+      "cleaned_file": "203_蘑菇後換前壓板底__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇後換前壓板底",
+      "source_file": "70 如果你害怕蘑菇里后刃换前刃.txt",
+      "confidence": 0.333,
+      "checksum": "bba8891c309806f4ce2e23b513788c7a"
+    },
+    "204": {
+      "id": 204,
+      "cleaned_file": "204_彎中板頭板尾移重__L-int-adv__S-blue-black.md",
+      "cleaned_title": "彎中板頭板尾移重",
+      "source_file": "前刃过度顶胯：用膝盖解决.txt",
+      "confidence": 0.444,
+      "checksum": "c8d8737eee5ab1a0cdb187e0f48826f3"
+    },
+    "206": {
+      "id": 206,
+      "cleaned_file": "206_前腿壓力破後座__L-int__S-green-blue.md",
+      "cleaned_title": "前腿壓力破後座",
+      "source_file": "52 平地小练习：感受重心居中.txt",
+      "confidence": 0.4,
+      "checksum": "ebc2bd168427e76a62e3c2440d865c38"
+    },
+    "207": {
+      "id": 207,
+      "cleaned_file": "207_前重過猛後腿介入__L-int__S-blue-black.md",
+      "cleaned_title": "前重過猛後腿介入",
+      "source_file": "75 你入弯如果是这样：你得看看这个视频.txt",
+      "confidence": 0.4,
+      "checksum": "57c4f7c1d9b05777722fd32f43b48082"
+    },
+    "208": {
+      "id": 208,
+      "cleaned_file": "208_感受腳外側破後重__L-int__S-blue.md",
+      "cleaned_title": "感受腳外側破後重",
+      "source_file": "重心如果一直压后：试试这个调整.txt",
+      "confidence": 0.571,
+      "checksum": "3c63060231ed47d4d7bc55615a82ed2f"
+    },
+    "209": {
+      "id": 209,
+      "cleaned_file": "209_搓雪立刃別太高__L-int__S-blue.md",
+      "cleaned_title": "搓雪立刃別太高",
+      "source_file": "23小回转刃立多了，容易被板带着走.txt",
+      "confidence": 0.25,
+      "checksum": "88fb3bfe367176116633c73dee8c60f8"
+    },
+    "20": {
+      "id": 20,
+      "cleaned_file": "20_五步前刃貼地刻__L-adv__S-blue.md",
+      "cleaned_title": "五步前刃貼地刻",
+      "source_file": "20 5步教会你：前刃摸地刻滑.txt",
+      "confidence": 0.364,
+      "checksum": "3f00c7088fc702ed88dd5d85c06a7bcf"
+    },
+    "210": {
+      "id": 210,
+      "cleaned_file": "210_粘雪前腳酸後手拉回中__L-int__S-blue.md",
+      "cleaned_title": "粘雪前腳酸後手拉回中",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.364,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "211": {
+      "id": 211,
+      "cleaned_file": "211_後刃摸鞋降速防抖__L-int-adv__S-blue-black.md",
+      "cleaned_title": "後刃摸鞋降速防抖",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.5,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "21": {
+      "id": 21,
+      "cleaned_file": "21_Apex跳戒肩轉__L-int__S-blue.md",
+      "cleaned_title": "Apex跳戒肩轉",
+      "source_file": "02 下半身带“不动”转弯的原因_Sam.txt",
+      "confidence": 0.429,
+      "checksum": "33d317343465aa344f3d33e0d159c4d2"
+    },
+    "22": {
+      "id": 22,
+      "cleaned_file": "22_立刃高低看坡度__L-int__S-green-blue-black.md",
+      "cleaned_title": "立刃高低看坡度",
+      "source_file": "22刃的角度： 该高？该低？.txt",
+      "confidence": 0.417,
+      "checksum": "2da191020f963bd318a069bfdbf48afe"
+    },
+    "23": {
+      "id": 23,
+      "cleaned_file": "23_小彎推板降立刃__L-int__S-blue.md",
+      "cleaned_title": "小彎推板降立刃",
+      "source_file": "基础： 提前换刃 One.txt",
+      "confidence": 0.5,
+      "checksum": "4b344750a5f0dd6397b2d24001de3a5a"
+    },
+    "24": {
+      "id": 24,
+      "cleaned_file": "24_窄道髖開快換刃__L-int__S-green-blue.md",
+      "cleaned_title": "窄道髖開快換刃",
+      "source_file": "12 后刃进阶：你肯定有的问题_Sam.txt",
+      "confidence": 0.312,
+      "checksum": "41145a9cfa6f1e83241a5fdc610cf773"
+    },
+    "25": {
+      "id": 25,
+      "cleaned_file": "25_冰蘑菇居中挺棱__L-adv__S-black-mogul.md",
+      "cleaned_title": "冰蘑菇居中挺棱",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.412,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "26": {
+      "id": 26,
+      "cleaned_file": "26_冰包頂撞減速__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "冰包頂撞減速",
+      "source_file": "26 冰蘑菇基础：下个包顶“撞”.txt",
+      "confidence": 0.429,
+      "checksum": "36430ddc1fb291b28e03373cab3086a1"
+    },
+    "27": {
+      "id": 27,
+      "cleaned_file": "27_後刃開髖護膝__L-int__S-blue-black.md",
+      "cleaned_title": "後刃開髖護膝",
+      "source_file": "46 髋关节这样做｜第二集：防止后腿扫.txt",
+      "confidence": 0.417,
+      "checksum": "942c77162743e19ab423da3e4e2d246c"
+    },
+    "28": {
+      "id": 28,
+      "cleaned_file": "28_換到板底順勢前刃__L-int__S-blue-black.md",
+      "cleaned_title": "換到板底順勢前刃",
+      "source_file": "28后刃换前刃拧不过来？试试这个.txt",
+      "confidence": 0.4,
+      "checksum": "f7d1616153392c0d17c523ffb389c4af"
+    },
+    "29": {
+      "id": 29,
+      "cleaned_file": "29_手不入視野挺背__L-beg-int__S-green-blue.md",
+      "cleaned_title": "手不入視野挺背",
+      "source_file": "换刃之后重心压的板位置不一样.txt",
+      "confidence": 0.375,
+      "checksum": "f7e9af3cf0a367048d7bb54ebd08bd2d"
+    },
+    "30": {
+      "id": 30,
+      "cleaned_file": "30_冰面膝前壓穩板底__L-int__S-blue-black.md",
+      "cleaned_title": "冰面膝前壓穩板底",
+      "source_file": "30 如何滑下午的冰面.txt",
+      "confidence": 0.583,
+      "checksum": "4ecc9d8d774d4d8b7fd0bd173b3d0318"
+    },
+    "31": {
+      "id": 31,
+      "cleaned_file": "31_全程分段施壓__L-int-adv__S-blue-black.md",
+      "cleaned_title": "全程分段施壓",
+      "source_file": "31 “Early Pressure”之后的全程施压.txt",
+      "confidence": 0.6,
+      "checksum": "e8287f0086bbb91f3f76dbde07b20858"
+    },
+    "32": {
+      "id": 32,
+      "cleaned_file": "32_蛇道換刃四步__L-beg-int__S-green-blue.md",
+      "cleaned_title": "蛇道換刃四步",
+      "source_file": "32 🐍蛇道基础篇：如何在蛇道内换刃.txt",
+      "confidence": 0.5,
+      "checksum": "50a8e7d63f2cd15bec7a32cd594bc3de"
+    },
+    "33": {
+      "id": 33,
+      "cleaned_file": "33_後刃發力平噴雪__L-int__S-blue.md",
+      "cleaned_title": "後刃發力平噴雪",
+      "source_file": "基础： 提前换刃 One.txt",
+      "confidence": 0.429,
+      "checksum": "4b344750a5f0dd6397b2d24001de3a5a"
+    },
+    "34": {
+      "id": 34,
+      "cleaned_file": "34_窄平道後腿踢槳__L-beg-int__S-green-blue.md",
+      "cleaned_title": "窄平道後腿踢槳",
+      "source_file": "34又平又窄的连接道怎么办.txt",
+      "confidence": 0.364,
+      "checksum": "6f2d6390aa511cb43e147a2770b3b516"
+    },
+    "35": {
+      "id": 35,
+      "cleaned_file": "35_混粉壓力轉向__L-int__S-blue.md",
+      "cleaned_title": "混粉壓力轉向",
+      "source_file": "35 又软又硬的粉雪怎么办.txt",
+      "confidence": 0.571,
+      "checksum": "17d5c58497caaf7d1660edae3a41d9e8"
+    },
+    "36": {
+      "id": 36,
+      "cleaned_file": "36_SpeedCheck厚雪減速__L-int__S-blue.md",
+      "cleaned_title": "SpeedCheck厚雪減速",
+      "source_file": "34又平又窄的连接道怎么办.txt",
+      "confidence": 0.333,
+      "checksum": "6f2d6390aa511cb43e147a2770b3b516"
+    },
+    "37": {
+      "id": 37,
+      "cleaned_file": "37_後腳擰板造上弧__L-int-adv__S-blue-black.md",
+      "cleaned_title": "後腳擰板造上弧",
+      "source_file": "76 你有上半弧吗？这个有存在的必要么？.txt",
+      "confidence": 0.5,
+      "checksum": "c9de0ab040ef8699ff2c89b5c7a1eaaa"
+    },
+    "38": {
+      "id": 38,
+      "cleaned_file": "38_後腳推時機閉合彎__L-int__S-blue.md",
+      "cleaned_title": "後腳推時機閉合彎",
+      "source_file": "蘑菇里面“包顶” 换刃.txt",
+      "confidence": 0.667,
+      "checksum": "d7087cdff68bbdf807a805cfaba059f6"
+    },
+    "39": {
+      "id": 39,
+      "cleaned_file": "39_平板過渡折疊控速__L-int__S-blue.md",
+      "cleaned_title": "平板過渡折疊控速",
+      "source_file": "进阶后刃过程中：你的身体还与板齐平？.txt",
+      "confidence": 0.3,
+      "checksum": "516b5c8faee0ee1b1ea24226d51b10cb"
+    },
+    "40": {
+      "id": 40,
+      "cleaned_file": "40_高級道折疊範圍控__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "高級道折疊範圍控",
+      "source_file": "48 开放站姿｜第二集：换重心可以排在二三位.txt",
+      "confidence": 0.385,
+      "checksum": "a93f74edb8521ef44fa22182f98a0a90"
+    },
+    "41": {
+      "id": 41,
+      "cleaned_file": "41_傾倒折疊立刃選法__L-int__S-green-blue.md",
+      "cleaned_title": "傾倒折疊立刃選法",
+      "source_file": "41 什么是立刃？如何立刃？你需要哪种立刃方式.txt",
+      "confidence": 0.333,
+      "checksum": "12626c2e983dd893ec4fa0dd3a99499e"
+    },
+    "42": {
+      "id": 42,
+      "cleaned_file": "42_小彎三要素調整__L-int__S-blue.md",
+      "cleaned_title": "小彎三要素調整",
+      "source_file": "前手让后刃带转更顺.txt",
+      "confidence": 0.3,
+      "checksum": "8aa0bd9c3940d79d3ae890c666422bf3"
+    },
+    "43": {
+      "id": 43,
+      "cleaned_file": "43_拉長Ollie抗顛__L-int__S-blue-black.md",
+      "cleaned_title": "拉長Ollie抗顛",
+      "source_file": "80 你的搓雪转弯不小：看看这个.txt",
+      "confidence": 0.429,
+      "checksum": "91475e1626d402e6dad831dc86466396"
+    },
+    "44": {
+      "id": 44,
+      "cleaned_file": "44_Deflection雙側推回彈__L-int__S-blue.md",
+      "cleaned_title": "Deflection雙側推回彈",
+      "source_file": "03 开放站姿还是闭合站姿？讲清楚_Sam.txt",
+      "confidence": 0.4,
+      "checksum": "ce01df43651edb126645d1c09c562948"
+    },
+    "45": {
+      "id": 45,
+      "cleaned_file": "45_滾後髖開結束彎__L-int__S-blue.md",
+      "cleaned_title": "滾後髖開結束彎",
+      "source_file": "76 你有上半弧吗？这个有存在的必要么？.txt",
+      "confidence": 0.455,
+      "checksum": "c9de0ab040ef8699ff2c89b5c7a1eaaa"
+    },
+    "46": {
+      "id": 46,
+      "cleaned_file": "46_後髖前推防卡__L-int__S-blue.md",
+      "cleaned_title": "後髖前推防卡",
+      "source_file": "06 会起伏之后：试试这个_Sam.txt",
+      "confidence": 0.429,
+      "checksum": "8634bbc420ed6a5a59b7435f03711980"
+    },
+    "47": {
+      "id": 47,
+      "cleaned_file": "47_開放站姿基礎腳壓__L-int__S-blue.md",
+      "cleaned_title": "開放站姿基礎腳壓",
+      "source_file": "48 开放站姿｜第二集：换重心可以排在二三位.txt",
+      "confidence": 0.444,
+      "checksum": "a93f74edb8521ef44fa22182f98a0a90"
+    },
+    "48": {
+      "id": 48,
+      "cleaned_file": "48_開放站姿換重心序__L-int-adv__S-blue-black.md",
+      "cleaned_title": "開放站姿換重心序",
+      "source_file": "48 开放站姿｜第二集：换重心可以排在二三位.txt",
+      "confidence": 0.364,
+      "checksum": "a93f74edb8521ef44fa22182f98a0a90"
+    },
+    "49": {
+      "id": 49,
+      "cleaned_file": "49_開放站姿抽拉板__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "開放站姿抽拉板",
+      "source_file": "49 开放站姿｜第三集：过包抽拉板子.txt",
+      "confidence": 0.364,
+      "checksum": "375464137bc444f4f34cc66594acb437"
+    },
+    "50": {
+      "id": 50,
+      "cleaned_file": "50_後刃膝頂前刃降立刃__L-int__S-blue.md",
+      "cleaned_title": "後刃膝頂前刃降立刃",
+      "source_file": "蘑菇里： 前刃换后刃更稳定.txt",
+      "confidence": 0.444,
+      "checksum": "46aa5b05e10f4bc6fef18dd27e2c471a"
+    },
+    "51": {
+      "id": 51,
+      "cleaned_file": "51_引申釋刃換刃__L-int__S-blue.md",
+      "cleaned_title": "引申釋刃換刃",
+      "source_file": "51 引申：释放板刃去换刃.txt",
+      "confidence": 0.25,
+      "checksum": "872413fe494861eeb382da113bcf7cf7"
+    },
+    "52": {
+      "id": 52,
+      "cleaned_file": "52_平地推滑居中__L-beg-int__S-green.md",
+      "cleaned_title": "平地推滑居中",
+      "source_file": "52 平地小练习：感受重心居中.txt",
+      "confidence": 0.5,
+      "checksum": "ebc2bd168427e76a62e3c2440d865c38"
+    },
+    "53": {
+      "id": 53,
+      "cleaned_file": "53_企鵝步__L-beg__S-green.md",
+      "cleaned_title": "企鵝步",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.5,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "54": {
+      "id": 54,
+      "cleaned_file": "54_企鵝步進階盪板__L-beg-int__S-green.md",
+      "cleaned_title": "企鵝步進階盪板",
+      "source_file": "重心如果一直压后：试试这个调整.txt",
+      "confidence": 0.429,
+      "checksum": "3c63060231ed47d4d7bc55615a82ed2f"
+    },
+    "55": {
+      "id": 55,
+      "cleaned_file": "55_蘑菇先學減速停點__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇先學減速停點",
+      "source_file": "55 先学会在蘑菇里减速.txt",
+      "confidence": 0.286,
+      "checksum": "0c4ca6d7485eb83856297461487df7b1"
+    },
+    "56": {
+      "id": 56,
+      "cleaned_file": "56_後刃膝踝同彎防鎖__L-int__S-blue.md",
+      "cleaned_title": "後刃膝踝同彎防鎖",
+      "source_file": "前刃降重心.txt",
+      "confidence": 0.455,
+      "checksum": "b016d4f90a41d3b046970b557ac26a45"
+    },
+    "57": {
+      "id": 57,
+      "cleaned_file": "57_髖配膝方向增抓地__L-int__S-blue-black.md",
+      "cleaned_title": "髖配膝方向增抓地",
+      "source_file": "75 你入弯如果是这样：你得看看这个视频.txt",
+      "confidence": 0.571,
+      "checksum": "57c4f7c1d9b05777722fd32f43b48082"
+    },
+    "58": {
+      "id": 58,
+      "cleaned_file": "58_彎轉完控速包用__L-int-adv__S-blue-black-mogul.md",
+      "cleaned_title": "彎轉完控速包用",
+      "source_file": "蘑菇第二集：过包顶之后“追身”.txt",
+      "confidence": 0.4,
+      "checksum": "e12c9c92e7877fb3d1a85dffb9638f0f"
+    },
+    "59": {
+      "id": 59,
+      "cleaned_file": "59_前手背後胸開__L-int__S-blue.md",
+      "cleaned_title": "前手背後胸開",
+      "source_file": "基础：转弯别“掰”弯.txt",
+      "confidence": 0.556,
+      "checksum": "5228e24fb1fad69d71c00ed628c7f99e"
+    },
+    "60": {
+      "id": 60,
+      "cleaned_file": "60_延長加速段防僵__L-int__S-blue.md",
+      "cleaned_title": "延長加速段防僵",
+      "source_file": "19 “楼梯”包：别使劲给压力.txt",
+      "confidence": 0.333,
+      "checksum": "036b418a6b6cc1baefae5b4ad3418b3d"
+    },
+    "61": {
+      "id": 61,
+      "cleaned_file": "61_雙黑前刃髖壓__L-adv__S-black.md",
+      "cleaned_title": "雙黑前刃髖壓",
+      "source_file": "61 双黑前刃站姿：决定了你是否能继续转.txt",
+      "confidence": 0.556,
+      "checksum": "b3a61598747d3d66cd2e11e83a262845"
+    },
+    "62": {
+      "id": 62,
+      "cleaned_file": "62_碾轉360步驟__L-int__S-green-blue.md",
+      "cleaned_title": "碾轉360步驟",
+      "source_file": "62 平花粉雪通用小技巧：碾转360.txt",
+      "confidence": 0.6,
+      "checksum": "b90ed2ce1bc15cbc454b6f536e07a087"
+    },
+    "63": {
+      "id": 63,
+      "cleaned_file": "63_前刃結束全閉合__L-int__S-blue.md",
+      "cleaned_title": "前刃結束全閉合",
+      "source_file": "12 后刃进阶：你肯定有的问题_Sam.txt",
+      "confidence": 0.357,
+      "checksum": "41145a9cfa6f1e83241a5fdc610cf773"
+    },
+    "64": {
+      "id": 64,
+      "cleaned_file": "64_團身換刃維穩__L-int__S-blue-mogul.md",
+      "cleaned_title": "團身換刃維穩",
+      "source_file": "64 团身 Down- Unweighting.txt",
+      "confidence": 0.5,
+      "checksum": "0177f1beee436b854e3641ce132cec97"
+    },
+    "66": {
+      "id": 66,
+      "cleaned_file": "66_冰面搓雪小彎__L-int-adv__S-blue-black.md",
+      "cleaned_title": "冰面搓雪小彎",
+      "source_file": "30 如何滑下午的冰面.txt",
+      "confidence": 0.312,
+      "checksum": "4ecc9d8d774d4d8b7fd0bd173b3d0318"
+    },
+    "67": {
+      "id": 67,
+      "cleaned_file": "67_前肩視線收胯__L-int__S-blue-black.md",
+      "cleaned_title": "前肩視線收胯",
+      "source_file": "67 如果你过度开肩开胯：试试这个动作.txt",
+      "confidence": 0.333,
+      "checksum": "77d678f82e8c3890099c7ef0b404a2f5"
+    },
+    "68": {
+      "id": 68,
+      "cleaned_file": "68_預彎團身過包__L-int-adv__S-blue-black-mogul.md",
+      "cleaned_title": "預彎團身過包",
+      "source_file": "64 团身 Down- Unweighting.txt",
+      "confidence": 0.333,
+      "checksum": "0177f1beee436b854e3641ce132cec97"
+    },
+    "69": {
+      "id": 69,
+      "cleaned_file": "69_慢順序換重立壓轉__L-beg-int__S-green-blue.md",
+      "cleaned_title": "慢順序換重立壓轉",
+      "source_file": "69 如果你弯转的急：试试这个顺序.txt",
+      "confidence": 0.6,
+      "checksum": "f68ab292eb03f2e527d9cec6201c68c7"
+    },
+    "70": {
+      "id": 70,
+      "cleaned_file": "70_蘑菇前刃信心直推__L-adv__S-blue-black-mogul.md",
+      "cleaned_title": "蘑菇前刃信心直推",
+      "source_file": "70 如果你害怕蘑菇里后刃换前刃.txt",
+      "confidence": 0.364,
+      "checksum": "bba8891c309806f4ce2e23b513788c7a"
+    },
+    "71": {
+      "id": 71,
+      "cleaned_file": "71_陡坡後刃開髖下蹲__L-adv__S-black.md",
+      "cleaned_title": "陡坡後刃開髖下蹲",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.778,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "72": {
+      "id": 72,
+      "cleaned_file": "72_窄平連接道刃到刃__L-beg-int__S-green-blue.md",
+      "cleaned_title": "窄平連接道刃到刃",
+      "source_file": "72 安全通过连接道：只用刃，别平板.txt",
+      "confidence": 0.5,
+      "checksum": "c465ea2558e8fbd27f0c8d1baa8c558e"
+    },
+    "73": {
+      "id": 73,
+      "cleaned_file": "73_提前施壓噴雪練習__L-int__S-blue-black.md",
+      "cleaned_title": "提前施壓噴雪練習",
+      "source_file": "看看你的后刃是否：转完.txt",
+      "confidence": 0.286,
+      "checksum": "3b9fe2b3d6bce2a49c59b70b3a84897a"
+    },
+    "74": {
+      "id": 74,
+      "cleaned_file": "74_用重心換刃防節奏變形__L-int-adv__S-blue-black.md",
+      "cleaned_title": "用重心換刃防節奏變形",
+      "source_file": "02 下半身带“不动”转弯的原因_Sam.txt",
+      "confidence": 0.286,
+      "checksum": "33d317343465aa344f3d33e0d159c4d2"
+    },
+    "75": {
+      "id": 75,
+      "cleaned_file": "75_板尾回彈重心回中__L-int__S-blue.md",
+      "cleaned_title": "板尾回彈重心回中",
+      "source_file": "弯里的板头板尾移动.txt",
+      "confidence": 0.455,
+      "checksum": "dbe8184b61a99a0538d78699e09d9df6"
+    },
+    "76": {
+      "id": 76,
+      "cleaned_file": "76_上半弧必要性__L-int-adv__S-blue-black.md",
+      "cleaned_title": "上半弧必要性",
+      "source_file": "76 你有上半弧吗？这个有存在的必要么？.txt",
+      "confidence": 0.5,
+      "checksum": "c9de0ab040ef8699ff2c89b5c7a1eaaa"
+    },
+    "77": {
+      "id": 77,
+      "cleaned_file": "77_前刃噴雪過大修正__L-int__S-blue-black.md",
+      "cleaned_title": "前刃噴雪過大修正",
+      "source_file": "基础： 提前换刃 One.txt",
+      "confidence": 0.429,
+      "checksum": "4b344750a5f0dd6397b2d24001de3a5a"
+    },
+    "78": {
+      "id": 78,
+      "cleaned_file": "78_前後移動放慢控抖__L-int__S-blue-black.md",
+      "cleaned_title": "前後移動放慢控抖",
+      "source_file": "78 你的前中后移动太快了.txt",
+      "confidence": 0.444,
+      "checksum": "9d606f7c4a5e3da591e2a251f26d5c7d"
+    },
+    "79": {
+      "id": 79,
+      "cleaned_file": "79_閉髖雙腳跳轉__L-int__S-green-blue.md",
+      "cleaned_title": "閉髖雙腳跳轉",
+      "source_file": "79 你的外转起跳Ollie是自愿的么？.txt",
+      "confidence": 0.4,
+      "checksum": "faf68912b54888545934977837cf4c28"
+    },
+    "80": {
+      "id": 80,
+      "cleaned_file": "80_搓雪小彎提前施壓__L-int__S-blue.md",
+      "cleaned_title": "搓雪小彎提前施壓",
+      "source_file": "建立“早抓地力”的必经之路.txt",
+      "confidence": 0.429,
+      "checksum": "8cc850c1c40017a2ea5b3fd0df7479c0"
+    },
+    "81": {
+      "id": 81,
+      "cleaned_file": "81_開髖降低重心區間__L-int__S-blue-black.md",
+      "cleaned_title": "開髖降低重心區間",
+      "source_file": "70 如果你害怕蘑菇里后刃换前刃.txt",
+      "confidence": 0.417,
+      "checksum": "bba8891c309806f4ce2e23b513788c7a"
+    },
+    "82": {
+      "id": 82,
+      "cleaned_file": "82_開放站姿vs軸轉順序__L-int__S-blue.md",
+      "cleaned_title": "開放站姿vs軸轉順序",
+      "source_file": "滚刃练习：帮助你快速改变方向.txt",
+      "confidence": 0.4,
+      "checksum": "c32a9c5859adb3238347e9d0bf3e9d79"
+    },
+    "83": {
+      "id": 83,
+      "cleaned_file": "83_固定器角度間距設定__L-int__S-all.md",
+      "cleaned_title": "固定器角度間距設定",
+      "source_file": "83 我是这么设置我固定器的角度和间距.txt",
+      "confidence": 0.4,
+      "checksum": "70693017829f3cfbcd31aecbb75d8ac8"
+    },
+    "84": {
+      "id": 84,
+      "cleaned_file": "84_別一直蹲起伏換重__L-int__S-blue.md",
+      "cleaned_title": "別一直蹲起伏換重",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.375,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "85": {
+      "id": 85,
+      "cleaned_file": "85_極限折疊控速練習__L-int__S-blue-black.md",
+      "cleaned_title": "極限折疊控速練習",
+      "source_file": "85 折叠的极限，陡坡控速.txt",
+      "confidence": 0.529,
+      "checksum": "aa0c65f413de4d3617a4a9474d8016e1"
+    },
+    "86": {
+      "id": 86,
+      "cleaned_file": "86_後刃開髖下蹲減速__L-int-adv__S-blue-black.md",
+      "cleaned_title": "後刃開髖下蹲減速",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.5,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "87": {
+      "id": 87,
+      "cleaned_file": "87_刻滑先傾後折__L-int-adv__S-blue.md",
+      "cleaned_title": "刻滑先傾後折",
+      "source_file": "89 刻滑后刃： 如何入弯不下坠或者扫出去.txt",
+      "confidence": 0.3,
+      "checksum": "5eebdeb61b6d78102f05ba610e4f0b85"
+    },
+    "88": {
+      "id": 88,
+      "cleaned_file": "88_刻滑RailToRail蓄力__L-int-adv__S-blue.md",
+      "cleaned_title": "刻滑RailToRail蓄力",
+      "source_file": "进阶后刃过程中：你的身体还与板齐平？.txt",
+      "confidence": 0.357,
+      "checksum": "516b5c8faee0ee1b1ea24226d51b10cb"
+    },
+    "89": {
+      "id": 89,
+      "cleaned_file": "89_後刃先平板耐心細線__L-int-adv__S-blue-black.md",
+      "cleaned_title": "後刃先平板耐心細線",
+      "source_file": "89 刻滑后刃： 如何入弯不下坠或者扫出去.txt",
+      "confidence": 0.3,
+      "checksum": "5eebdeb61b6d78102f05ba610e4f0b85"
+    },
+    "90": {
+      "id": 90,
+      "cleaned_file": "90_小回轉開肩角度__L-int__S-blue.md",
+      "cleaned_title": "小回轉開肩角度",
+      "source_file": "90 单板开肩：小回转.txt",
+      "confidence": 0.5,
+      "checksum": "ce91b51a63baebd8d645876f9211e64f"
+    },
+    "91": {
+      "id": 91,
+      "cleaned_file": "91_開肩底層邏輯__L-int__S-blue.md",
+      "cleaned_title": "開肩底層邏輯",
+      "source_file": "71 如果陡坡后刃弯腰撅屁股：试试这个.txt",
+      "confidence": 0.214,
+      "checksum": "dadbe0da662691025217fb2f3772612c"
+    },
+    "92": {
+      "id": 92,
+      "cleaned_file": "92_後刃防突突保餘地__L-int__S-blue-black.md",
+      "cleaned_title": "後刃防突突保餘地",
+      "source_file": "94 单板重心转换第一课：前刃后刃的重心位置.txt",
+      "confidence": 0.5,
+      "checksum": "c6fad6fde90232b7f1ad6545f9e451b2"
+    },
+    "93": {
+      "id": 93,
+      "cleaned_file": "93_爛雪少立刃多推壓__L-int__S-blue.md",
+      "cleaned_title": "爛雪少立刃多推壓",
+      "source_file": "69 如果你弯转的急：试试这个顺序.txt",
+      "confidence": 0.375,
+      "checksum": "f68ab292eb03f2e527d9cec6201c68c7"
+    },
+    "94": {
+      "id": 94,
+      "cleaned_file": "94_前後刃重心位置__L-beg-int__S-green-blue.md",
+      "cleaned_title": "前後刃重心位置",
+      "source_file": "84 别老蹲着滑：会累.txt",
+      "confidence": 0.5,
+      "checksum": "da86f7073b0867fbb923ed950adec60c"
+    },
+    "95": {
+      "id": 95,
+      "cleaned_file": "95_刃間卡頓拧板彈接__L-int-adv__S-blue-black-mogul.md",
+      "cleaned_title": "刃間卡頓拧板彈接",
+      "source_file": "68 团身过蘑菇：解决忽快忽慢.txt",
+      "confidence": 0.4,
+      "checksum": "eb50323cacc75a031d2fdf31883f4a9e"
+    },
+    "96": {
+      "id": 96,
+      "cleaned_file": "96_Backside180反腳視山__L-int__S-green-blue.md",
+      "cleaned_title": "Backside180反腳視山",
+      "source_file": "撬板头时候上半身跟上.txt",
+      "confidence": 0.333,
+      "checksum": "fa69619bb706bd8048b3a986304eb0ec"
+    },
+    "97": {
+      "id": 97,
+      "cleaned_file": "97_CASI3提速表現力__L-adv__S-blue-black.md",
+      "cleaned_title": "CASI3提速表現力",
+      "source_file": "换刃之后重心压的板位置不一样.txt",
+      "confidence": 0.286,
+      "checksum": "f7e9af3cf0a367048d7bb54ebd08bd2d"
+    },
+    "98": {
+      "id": 98,
+      "cleaned_file": "98_CASI3評分邏輯__L-adv__S-blue-black.md",
+      "cleaned_title": "CASI3評分邏輯",
+      "source_file": "浅聊团身.txt",
+      "confidence": 0.273,
+      "checksum": "e66003322d8dcf46a941244287c810d2"
+    },
+    "99": {
+      "id": 99,
+      "cleaned_file": "99_三步從綠到藍控速__L-beg-int__S-green-blue.md",
+      "cleaned_title": "三步從綠到藍控速",
+      "source_file": "这三步：帮你由平到陡控速和方向.txt",
+      "confidence": 0.615,
+      "checksum": "3cf4708aac1ddae959289b71ea454ccb"
+    }
+  },
+  "summary": {
+    "high": [
+      1,
+      106,
+      111,
+      113,
+      123,
+      129,
+      164,
+      181,
+      198,
+      19,
+      200,
+      31,
+      38,
+      62,
+      69,
+      71,
+      99
+    ],
+    "medium": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      107,
+      108,
+      109,
+      10,
+      112,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      11,
+      120,
+      121,
+      122,
+      124,
+      125,
+      126,
+      127,
+      128,
+      12,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      13,
+      140,
+      141,
+      142,
+      143,
+      144,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      157,
+      158,
+      159,
+      160,
+      162,
+      163,
+      165,
+      166,
+      16,
+      176,
+      177,
+      178,
+      179,
+      17,
+      180,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      18,
+      190,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      199,
+      201,
+      202,
+      203,
+      204,
+      206,
+      207,
+      208,
+      20,
+      210,
+      211,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      52,
+      53,
+      54,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      63,
+      64,
+      66,
+      67,
+      68,
+      70,
+      72,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      92,
+      93,
+      94,
+      95,
+      96
+    ],
+    "low": [
+      8,
+      110,
+      139,
+      145,
+      14,
+      156,
+      15,
+      161,
+      182,
+      191,
+      209,
+      51,
+      55,
+      73,
+      74,
+      91,
+      97,
+      98
+    ]
+  }
+}

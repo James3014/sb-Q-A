@@ -37,3 +37,8 @@ Thumbs.db
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Next.js
+web/.next/
+web/node_modules/
+web/out/
