@@ -75,3 +75,43 @@ def get_lesson_by_id(lesson_id: str):
     # Fallback
     lessons = fetch_lessons()
     return next((l for l in lessons if l["id"] == lesson_id), None)
+
+
+# ============================================
+# 收藏功能
+# ============================================
+
+def add_favorite(user_id: str, lesson_id: str):
+    """加入收藏"""
+    client = get_client()
+    if not client:
+        return {"error": "需要登入"}
+    try:
+        client.table("favorites").insert({"user_id": user_id, "lesson_id": lesson_id}).execute()
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def remove_favorite(user_id: str, lesson_id: str):
+    """移除收藏"""
+    client = get_client()
+    if not client:
+        return {"error": "需要登入"}
+    try:
+        client.table("favorites").delete().eq("user_id", user_id).eq("lesson_id", lesson_id).execute()
+        return {"success": True}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def get_favorites(user_id: str):
+    """取得用戶的收藏列表（回傳 lesson_id 列表）"""
+    client = get_client()
+    if not client:
+        return []
+    try:
+        result = client.table("favorites").select("lesson_id").eq("user_id", user_id).execute()
+        return [f["lesson_id"] for f in result.data]
+    except Exception:
+        return []

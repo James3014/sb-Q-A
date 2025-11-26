@@ -4,7 +4,7 @@ import streamlit as st
 from dotenv import load_dotenv
 load_dotenv()
 
-from supabase_client import fetch_lessons, get_lesson_by_id
+from supabase_client import fetch_lessons, get_lesson_by_id, add_favorite, remove_favorite, get_favorites
 from app_logic import filter_lessons, get_all_tags
 from auth import login, signup, logout, get_current_user
 
@@ -20,6 +20,8 @@ def init_session():
         st.session_state.user = None
     if "show_login" not in st.session_state:
         st.session_state.show_login = False
+    if "favorites" not in st.session_state:
+        st.session_state.favorites = []
 
 
 def render_login_form():
@@ -106,6 +108,11 @@ def main():
     
     # 載入資料
     lessons = fetch_lessons()
+    
+    # 載入用戶收藏
+    if st.session_state.user and not st.session_state.favorites:
+        user_id = st.session_state.user.get("id")
+        st.session_state.favorites = get_favorites(user_id)
     all_levels, all_slopes, all_skills = get_all_tags(lessons)
     
     # 檢查是否在詳情頁
@@ -179,9 +186,23 @@ def render_card(lesson: dict):
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button(f"查看詳情", key=f"btn_{lesson['id']}", use_container_width=True):
-        st.query_params["selected_id"] = lesson["id"]
-        st.rerun()
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        if st.button(f"查看詳情", key=f"btn_{lesson['id']}", use_container_width=True):
+            st.query_params["selected_id"] = lesson["id"]
+            st.rerun()
+    with col2:
+        if st.session_state.user:
+            is_fav = lesson["id"] in st.session_state.favorites
+            if st.button("❤️" if is_fav else "🤍", key=f"fav_{lesson['id']}", use_container_width=True):
+                user_id = st.session_state.user.get("id")
+                if is_fav:
+                    remove_favorite(user_id, lesson["id"])
+                    st.session_state.favorites.remove(lesson["id"])
+                else:
+                    add_favorite(user_id, lesson["id"])
+                    st.session_state.favorites.append(lesson["id"])
+                st.rerun()
 
 
 def render_detail(lessons: list, lesson_id: str):
@@ -191,9 +212,23 @@ def render_detail(lessons: list, lesson_id: str):
         st.error("找不到此練習")
         return
     
-    if st.button("← 返回列表"):
-        st.query_params.clear()
-        st.rerun()
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        if st.button("← 返回列表"):
+            st.query_params.clear()
+            st.rerun()
+    with col2:
+        if st.session_state.user:
+            is_fav = lesson["id"] in st.session_state.favorites
+            if st.button("❤️ 已收藏" if is_fav else "🤍 收藏", use_container_width=True):
+                user_id = st.session_state.user.get("id")
+                if is_fav:
+                    remove_favorite(user_id, lesson["id"])
+                    st.session_state.favorites.remove(lesson["id"])
+                else:
+                    add_favorite(user_id, lesson["id"])
+                    st.session_state.favorites.append(lesson["id"])
+                st.rerun()
     
     # 標題和標籤
     st.title(lesson.get("title", ""))
