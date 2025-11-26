@@ -24,30 +24,37 @@ def init_session():
 
 def render_login_form():
     """登入/註冊表單"""
-    st.subheader("🔐 登入")
+    st.markdown("### 🔐 登入")
+    st.markdown("---")
     
     tab1, tab2 = st.tabs(["登入", "註冊"])
     
     with tab1:
-        email = st.text_input("Email", key="login_email")
-        password = st.text_input("密碼", type="password", key="login_pwd")
-        if st.button("登入", use_container_width=True):
-            if email and password:
-                result = login(email, password)
-                if "error" in result:
-                    st.error(f"登入失敗：{result['error']}")
+        with st.form("login_form"):
+            email = st.text_input("📧 Email", placeholder="your@email.com")
+            password = st.text_input("🔑 密碼", type="password", placeholder="至少 6 個字元")
+            submitted = st.form_submit_button("登入", use_container_width=True, type="primary")
+            
+            if submitted:
+                if email and password:
+                    result = login(email, password)
+                    if "error" in result:
+                        st.error(f"❌ 登入失敗：{result['error']}")
+                    else:
+                        st.session_state.user = result.get("user")
+                        st.success("✅ 登入成功！")
+                        st.rerun()
                 else:
-                    st.session_state.user = result.get("user")
-                    st.success("登入成功！")
-                    st.rerun()
-            else:
-                st.warning("請輸入 Email 和密碼")
+                    st.warning("⚠️ 請輸入 Email 和密碼")
     
     with tab2:
-        email = st.text_input("Email", key="signup_email")
-        password = st.text_input("密碼", type="password", key="signup_pwd")
-        if st.button("註冊", use_container_width=True):
-            if email and password:
+        with st.form("signup_form"):
+            email = st.text_input("📧 Email", placeholder="your@email.com", key="signup_email")
+            password = st.text_input("🔑 密碼", type="password", placeholder="至少 6 個字元", key="signup_pwd")
+            submitted = st.form_submit_button("註冊", use_container_width=True, type="primary")
+            
+            if submitted:
+                if email and password:
                 result = signup(email, password)
                 if "error" in result:
                     st.error(f"註冊失敗：{result['error']}")
