@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Lesson } from '@/lib/lessons'
 import { useAuth } from './AuthProvider'
-import { isFavorited, toggleFavorite } from '@/lib/favorites'
+import { isFavorited, addFavorite, removeFavorite } from '@/lib/favorites'
 import { addPracticeLog } from '@/lib/practice'
 
 const LEVEL_NAMES: Record<string, string> = {
@@ -18,10 +18,12 @@ const SLOPE_NAMES: Record<string, string> = {
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const { user } = useAuth()
   const [isFav, setIsFav] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [favLoading, setFavLoading] = useState(false)
+  const [favError, setFavError] = useState('')
   const [showNote, setShowNote] = useState(false)
   const [note, setNote] = useState('')
-  const [saved, setSaved] = useState(false)
+  const [noteStatus, setNoteStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [noteError, setNoteError] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -30,19 +32,37 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   }, [user, lesson.id])
 
   const handleToggleFav = async () => {
-    if (!user || loading) return
-    setLoading(true)
-    const newState = await toggleFavorite(user.id, lesson.id)
-    setIsFav(newState)
-    setLoading(false)
+    if (!user || favLoading) return
+    setFavLoading(true)
+    setFavError('')
+    
+    const result = isFav 
+      ? await removeFavorite(user.id, lesson.id)
+      : await addFavorite(user.id, lesson.id)
+    
+    if (result.success) {
+      setIsFav(!isFav)
+    } else {
+      setFavError(result.error || '操作失敗')
+    }
+    setFavLoading(false)
   }
 
   const savePractice = async () => {
-    if (!user) return
-    await addPracticeLog(user.id, lesson.id, note)
-    setSaved(true)
-    setNote('')
-    setTimeout(() => { setSaved(false); setShowNote(false) }, 1500)
+    if (!user || !note.trim()) return
+    setNoteStatus('saving')
+    setNoteError('')
+    
+    const result = await addPracticeLog(user.id, lesson.id, note)
+    
+    if (result.success) {
+      setNoteStatus('saved')
+      setNote('')
+      setTimeout(() => { setNoteStatus('idle'); setShowNote(false) }, 1500)
+    } else {
+      setNoteStatus('error')
+      setNoteError(result.error || '儲存失敗')
+    }
   }
 
   return (
@@ -53,12 +73,14 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           {user && (
             <div className="flex gap-3 items-center">
               <button onClick={() => setShowNote(!showNote)} className="text-xl" title="記錄練習">📝</button>
-              <button onClick={handleToggleFav} disabled={loading} className="text-2xl" title={isFav ? '取消收藏' : '加入收藏'}>
-                {loading ? '⏳' : isFav ? '❤️' : '🤍'}
+              <button onClick={handleToggleFav} disabled={favLoading} className="text-2xl" title={isFav ? '取消收藏' : '加入收藏'}>
+                {favLoading ? '⏳' : isFav ? '❤️' : '🤍'}
               </button>
             </div>
           )}
         </div>
+
+        {favError && <p className="text-red-400 text-sm mb-2">{favError}</p>}
 
         {showNote && user && (
           <div className="bg-slate-800 rounded-lg p-4 mb-4">
@@ -68,8 +90,13 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               placeholder="記錄今天的練習心得..."
               className="w-full bg-slate-700 rounded p-2 text-sm mb-2 h-20"
             />
-            <button onClick={savePractice} className="bg-blue-600 px-4 py-2 rounded text-sm">
-              {saved ? '✓ 已儲存' : '儲存紀錄'}
+            {noteError && <p className="text-red-400 text-sm mb-2">{noteError}</p>}
+            <button 
+              onClick={savePractice} 
+              disabled={noteStatus === 'saving' || !note.trim()}
+              className="bg-blue-600 px-4 py-2 rounded text-sm disabled:opacity-50"
+            >
+              {noteStatus === 'saving' ? '儲存中...' : noteStatus === 'saved' ? '✓ 已儲存' : '儲存紀錄'}
             </button>
           </div>
         )}

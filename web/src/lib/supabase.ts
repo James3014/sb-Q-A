@@ -1,15 +1,22 @@
+'use client'
+
 import { createBrowserClient } from '@supabase/ssr'
+import { SupabaseClient } from '@supabase/supabase-js'
 
-let client: ReturnType<typeof createBrowserClient> | null = null
+let client: SupabaseClient | null = null
 
-export function createClient() {
-  if (client) return client
-  
+export function getSupabase(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
-  if (!url || !key) return null as any
+  if (!url || !key) {
+    console.error('[Supabase] Missing env vars')
+    return null
+  }
   
-  client = createBrowserClient(url, key)
+  if (!client) {
+    client = createBrowserClient(url, key)
+  }
+  
   return client
 }
