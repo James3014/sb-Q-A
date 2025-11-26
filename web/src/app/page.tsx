@@ -1,51 +1,134 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { getLessons, filterLessons } from '@/lib/lessons'
-import LessonCard from '@/components/LessonCard'
-import SearchBar from '@/components/SearchBar'
-import FilterBar from '@/components/FilterBar'
+import { useState, useMemo } from 'react';
+import { lessons } from '@/lib/lessons';
+import LessonCard from '@/components/LessonCard';
+import SearchBar from '@/components/SearchBar';
+
+// 問題分類
+const PROBLEM_CATEGORIES = [
+  { id: 'heel', label: '後刃問題', keywords: ['後刃', '後腳', '後膝'], emoji: '🦶' },
+  { id: 'toe', label: '前刃問題', keywords: ['前刃', '前腳', '前膝', '前腿'], emoji: '👣' },
+  { id: 'edge', label: '換刃卡卡', keywords: ['換刃', '換邊', '轉換'], emoji: '🔄' },
+  { id: 'balance', label: '重心不穩', keywords: ['重心', '平衡', '居中'], emoji: '⚖️' },
+  { id: 'speed', label: '速度控制', keywords: ['控速', '減速', '煞車', '太快'], emoji: '🎿' },
+  { id: 'mogul', label: '蘑菇地形', keywords: ['蘑菇', '包', 'mogul'], emoji: '🍄' },
+  { id: 'steep', label: '陡坡技巧', keywords: ['陡坡', '黑道', '陡'], emoji: '⛷️' },
+  { id: 'stance', label: '站姿調整', keywords: ['站姿', '姿勢', '站直'], emoji: '🧍' },
+];
 
 export default function Home() {
-  const allLessons = getLessons()
-  const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState({ level: '', slope: '', skill: '' })
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
-  const lessons = useMemo(() => {
-    return filterLessons({
-      search: search || undefined,
-      level: filters.level || undefined,
-      slope: filters.slope || undefined,
-      skill: filters.skill || undefined
-    })
-  }, [search, filters])
+  const filteredLessons = useMemo(() => {
+    let result = lessons;
+
+    // 搜尋過濾
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(l =>
+        l.title.toLowerCase().includes(q) ||
+        l.what.toLowerCase().includes(q)
+      );
+    }
+
+    // 分類過濾
+    if (selectedCategory) {
+      const cat = PROBLEM_CATEGORIES.find(c => c.id === selectedCategory);
+      if (cat) {
+        result = result.filter(l =>
+          cat.keywords.some(k =>
+            l.title.includes(k) || l.what.includes(k)
+          )
+        );
+      }
+    }
+
+    return result;
+  }, [search, selectedCategory]);
+
+  const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
+  const hasMore = filteredLessons.length > 10 && !showAll;
+
+  const clearFilters = () => {
+    setSearch('');
+    setSelectedCategory(null);
+    setShowAll(false);
+  };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white">
-      <div className="max-w-lg mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6">🏂 單板教學</h1>
+    <main className="min-h-screen bg-zinc-900 text-white">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
+        <h1 className="text-xl font-bold text-center mb-3">🏂 單板教學</h1>
+        <SearchBar value={search} onChange={(v) => { setSearch(v); setShowAll(false); }} />
+      </header>
 
-        <div className="mb-4">
-          <SearchBar value={search} onChange={setSearch} />
-        </div>
+      <div className="p-4 space-y-6">
+        {/* 問題分類按鈕 */}
+        {!search && (
+          <section>
+            <h2 className="text-sm text-zinc-400 mb-3">你遇到什麼問題？</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {PROBLEM_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setSelectedCategory(selectedCategory === cat.id ? null : cat.id);
+                    setShowAll(false);
+                  }}
+                  className={`p-3 rounded-lg text-left transition-all ${
+                    selectedCategory === cat.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-zinc-800 hover:bg-zinc-700'
+                  }`}
+                >
+                  <span className="text-lg mr-2">{cat.emoji}</span>
+                  <span className="text-sm font-medium">{cat.label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
-        <FilterBar
-          level={filters.level}
-          slope={filters.slope}
-          skill={filters.skill}
-          onChange={setFilters}
-        />
+        {/* 結果區 */}
+        <section>
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-sm text-zinc-400">
+              {search || selectedCategory
+                ? `找到 ${filteredLessons.length} 筆`
+                : '熱門課程'}
+            </h2>
+            {(search || selectedCategory) && (
+              <button onClick={clearFilters} className="text-xs text-blue-400">
+                清除篩選
+              </button>
+            )}
+          </div>
 
-        <p className="text-slate-400 text-sm mb-4">
-          找到 {lessons.length} 個練習
-        </p>
+          {filteredLessons.length === 0 ? (
+            <p className="text-center text-zinc-500 py-8">找不到相關課程</p>
+          ) : (
+            <div className="space-y-3">
+              {displayLessons.map(lesson => (
+                <LessonCard key={lesson.id} lesson={lesson} />
+              ))}
+            </div>
+          )}
 
-        <div>
-          {lessons.map(lesson => (
-            <LessonCard key={lesson.id} lesson={lesson} />
-          ))}
-        </div>
+          {/* 載入更多 */}
+          {hasMore && (
+            <button
+              onClick={() => setShowAll(true)}
+              className="w-full mt-4 py-3 bg-zinc-800 rounded-lg text-sm text-zinc-300 hover:bg-zinc-700"
+            >
+              顯示全部 {filteredLessons.length} 筆
+            </button>
+          )}
+        </section>
       </div>
     </main>
-  )
+  );
 }

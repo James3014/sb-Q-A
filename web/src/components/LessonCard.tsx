@@ -1,54 +1,38 @@
-import Link from 'next/link'
-import { Lesson } from '@/lib/lessons'
+import Link from 'next/link';
+import { Lesson } from '@/lib/lessons';
 
-const LEVEL_NAMES: Record<string, string> = {
+interface LessonCardProps {
+  lesson: Lesson;
+}
+
+const levelMap: Record<string, string> = {
   beginner: '初級',
   intermediate: '中級',
-  advanced: '進階'
-}
+  advanced: '進階',
+};
 
-const SLOPE_NAMES: Record<string, string> = {
-  green: '綠道',
-  blue: '藍道',
-  black: '黑道',
-  mogul: '蘑菇',
-  powder: '粉雪',
-  park: '公園',
-  tree: '樹林',
-  flat: '平地',
-  all: '全地形'
-}
-
-export default function LessonCard({ lesson }: { lesson: Lesson }) {
-  const what = lesson.what?.slice(0, 80) + (lesson.what?.length > 80 ? '...' : '')
-
+export default function LessonCard({ lesson }: LessonCardProps) {
+  const levels = lesson.level_tags.map(t => levelMap[t] || t).join('/');
+  
   return (
     <Link href={`/lesson/${lesson.id}`}>
-      <div className="bg-slate-800 rounded-xl p-4 mb-3 border-l-4 border-amber-400 active:bg-slate-700">
-        <div className="text-amber-400 font-semibold mb-2 leading-relaxed">
-          🎯 {what}
-        </div>
-        <div className="text-slate-100 mb-2">
-          {lesson.title}
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {lesson.level_tags?.map(t => (
-            <span key={t} className="px-2 py-1 text-xs rounded-full bg-green-600 text-white">
-              {LEVEL_NAMES[t] || t}
-            </span>
-          ))}
-          {lesson.slope_tags?.map(t => (
-            <span key={t} className="px-2 py-1 text-xs rounded-full bg-blue-600 text-white">
-              {SLOPE_NAMES[t] || t}
-            </span>
-          ))}
-          {lesson.casi?.Primary_Skill && (
-            <span className="px-2 py-1 text-xs rounded-full bg-purple-600 text-white">
-              {lesson.casi.Primary_Skill}
-            </span>
-          )}
+      <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-750 active:bg-zinc-700 transition-colors">
+        {/* 問題（最重要） */}
+        <p className="text-zinc-300 text-sm line-clamp-2 mb-2">
+          😰 {lesson.what.slice(0, 80)}{lesson.what.length > 80 ? '...' : ''}
+        </p>
+        
+        {/* 標題 */}
+        <h3 className="font-medium text-white mb-2">{lesson.title}</h3>
+        
+        {/* 標籤 */}
+        <div className="flex gap-2 text-xs">
+          <span className="px-2 py-0.5 bg-zinc-700 rounded text-zinc-300">{levels}</span>
+          <span className="px-2 py-0.5 bg-zinc-700 rounded text-zinc-300">
+            {lesson.casi?.Primary_Skill || '技能'}
+          </span>
         </div>
       </div>
     </Link>
-  )
+  );
 }

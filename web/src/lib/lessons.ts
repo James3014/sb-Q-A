@@ -13,7 +13,7 @@ export interface Lesson {
   is_premium?: boolean
 }
 
-const lessons = lessonsData as unknown as Lesson[]
+export const lessons = lessonsData as unknown as Lesson[]
 
 export function getLessons(): Lesson[] {
   return lessons

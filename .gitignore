@@ -42,3 +42,7 @@ Thumbs.db
 web/.next/
 web/node_modules/
 web/out/
+
+# Next.js
+web/.next/
+web/node_modules/
