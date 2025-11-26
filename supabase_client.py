@@ -36,22 +36,8 @@ def get_client():
 
 
 def fetch_lessons(premium_only=None):
-    """取得 lessons，優先 Supabase，fallback 到本地 JSON"""
-    client = get_client()
-    
-    if client:
-        try:
-            query = client.table("lessons").select("*")
-            if premium_only is True:
-                query = query.eq("is_premium", True)
-            elif premium_only is False:
-                query = query.eq("is_premium", False)
-            result = query.execute()
-            return result.data
-        except Exception:
-            pass  # fallback 到本地
-    
-    # Fallback: 讀取本地 JSON
+    """取得 lessons - 直接用本地 JSON（Supabase lessons 表暫不使用）"""
+    # 直接讀取本地 JSON
     path = Path(__file__).parent / "lessons.json"
     if path.exists():
         data = json.loads(path.read_text(encoding="utf-8"))
