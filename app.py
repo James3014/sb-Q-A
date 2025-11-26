@@ -57,13 +57,13 @@ def render_login_form():
             
             if submitted:
                 if email and password:
-                result = signup(email, password)
-                if "error" in result:
-                    st.error(f"註冊失敗：{result['error']}")
+                    result = signup(email, password)
+                    if "error" in result:
+                        st.error(f"❌ 註冊失敗：{result['error']}")
+                    else:
+                        st.success("✅ 註冊成功！請查收驗證信")
                 else:
-                    st.success("註冊成功！請查收驗證信")
-            else:
-                st.warning("請輸入 Email 和密碼")
+                    st.warning("⚠️ 請輸入 Email 和密碼")
 
 
 def render_user_info():
