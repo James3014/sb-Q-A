@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.zeabur.app/template.json",
+  "name": "snowboard-teaching",
+  "description": "單板教學 App",
+  "template": "streamlit",
+  "build": {
+    "command": "pip install -r requirements.txt"
+  },
+  "start": {
+    "command": "streamlit run app.py --server.port $PORT --server.address 0.0.0.0"
+  },
+  "env": {
+    "SUPABASE_URL": {
+      "description": "Supabase Project URL",
+      "required": false
+    },
+    "SUPABASE_KEY": {
+      "description": "Supabase Anon Key",
+      "required": false
+    }
+  }
+}

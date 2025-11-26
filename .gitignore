@@ -1,0 +1,39 @@
+# Audio/Video files
+*.m4a
+*.mp3
+*.wav
+*.mp4
+*.avi
+
+# PDF files (reference materials)
+*.pdf
+
+# Large folders
+黄嘉蓝单板教学*/
+CASI/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
