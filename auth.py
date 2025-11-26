@@ -1,5 +1,6 @@
 """Auth 模組 - 登入/註冊/Premium 狀態"""
 from supabase_client import get_client
+import traceback
 
 _current_session = None
 
@@ -8,13 +9,17 @@ def signup(email: str, password: str) -> dict:
     """註冊新用戶"""
     client = get_client()
     if not client:
-        return {"error": "Supabase 未設定"}
+        return {"error": "Supabase 未設定（環境變數缺失）"}
     
     try:
         result = client.auth.sign_up({"email": email, "password": password})
         return {"user": result.user.__dict__ if result.user else None}
     except Exception as e:
-        return {"error": str(e)}
+        error_msg = str(e)
+        # 加入更詳細的錯誤資訊
+        if "Invalid API key" in error_msg:
+            return {"error": f"API Key 錯誤 - 請檢查 Zeabur 環境變數 SUPABASE_KEY 是否正確"}
+        return {"error": f"{error_msg}"}
 
 
 def login(email: str, password: str) -> dict:
@@ -22,7 +27,7 @@ def login(email: str, password: str) -> dict:
     global _current_session
     client = get_client()
     if not client:
-        return {"error": "Supabase 未設定"}
+        return {"error": "Supabase 未設定（環境變數缺失）"}
     
     try:
         result = client.auth.sign_in_with_password({"email": email, "password": password})
@@ -30,7 +35,10 @@ def login(email: str, password: str) -> dict:
         user_dict = {"id": result.user.id, "email": result.user.email} if result.user else None
         return {"session": result.session, "user": user_dict}
     except Exception as e:
-        return {"error": str(e)}
+        error_msg = str(e)
+        if "Invalid API key" in error_msg:
+            return {"error": f"API Key 錯誤 - 請檢查 Zeabur 環境變數 SUPABASE_KEY 是否正確"}
+        return {"error": f"{error_msg}"}
 
 
 def logout() -> dict:
