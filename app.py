@@ -29,9 +29,9 @@ def render_login_form():
     st.markdown("### 🔐 登入")
     st.markdown("---")
     
-    tab1, tab2 = st.tabs(["登入", "註冊"])
+    mode = st.radio("選擇", ["登入", "註冊"], horizontal=True, label_visibility="collapsed")
     
-    with tab1:
+    if mode == "登入":
         with st.form("login_form"):
             email = st.text_input("📧 Email", placeholder="your@email.com")
             password = st.text_input("🔑 密碼", type="password", placeholder="至少 6 個字元")
@@ -49,7 +49,7 @@ def render_login_form():
                 else:
                     st.warning("⚠️ 請輸入 Email 和密碼")
     
-    with tab2:
+    else:  # 註冊
         with st.form("signup_form"):
             email = st.text_input("📧 Email", placeholder="your@email.com", key="signup_email")
             password = st.text_input("🔑 密碼", type="password", placeholder="至少 6 個字元", key="signup_pwd")
@@ -61,7 +61,7 @@ def render_login_form():
                     if "error" in result:
                         st.error(f"❌ 註冊失敗：{result['error']}")
                     else:
-                        st.success("✅ 註冊成功！請查收驗證信")
+                        st.success("✅ 註冊成功！現在可以登入了")
                 else:
                     st.warning("⚠️ 請輸入 Email 和密碼")
 
