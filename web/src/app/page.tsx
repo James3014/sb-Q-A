@@ -8,7 +8,7 @@ import LessonCard from '@/components/LessonCard';
 import SearchBar from '@/components/SearchBar';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/auth';
-import { LEVEL_NAMES, PROBLEM_CATEGORIES } from '@/lib/constants';
+import { LEVEL_NAMES, SLOPE_NAMES, PROBLEM_CATEGORIES } from '@/lib/constants';
 import { useFilteredLessons } from '@/lib/useFilteredLessons';
 import { trackEvent } from '@/lib/analytics';
 
@@ -101,7 +101,7 @@ function HomeContent() {
             )}
             {slopeFilter && (
               <span className="px-2 py-1 text-xs rounded-full bg-blue-600">
-                {slopeFilter === 'green' ? '綠道' : slopeFilter === 'blue' ? '藍道' : slopeFilter === 'black' ? '黑道' : slopeFilter}
+                {SLOPE_NAMES[slopeFilter] || slopeFilter}
               </span>
             )}
             {skillFilter && (

@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { getDashboardStats } from '@/lib/admin'
+import { StatCard } from '@/components/ui'
+import { formatDate } from '@/lib/constants'
 
 interface Stats {
   dau: number
@@ -13,15 +15,6 @@ interface Stats {
   subscriptions: { subscription_type: string; count: number }[]
   recentFeedback: { id: string; type: string; content: string; created_at: string }[]
   topKeywords: { keyword: string; count: number }[]
-}
-
-function StatCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="bg-zinc-800 rounded-lg p-4">
-      <p className="text-zinc-400 text-sm">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
-  )
 }
 
 function TopLessons({ lessons, loading }: { lessons?: Stats['topLessons']; loading: boolean }) {
@@ -71,7 +64,7 @@ function RecentFeedback({ feedback }: { feedback?: Stats['recentFeedback'] }) {
           <div key={f.id} className="border-b border-zinc-700 pb-2">
             <div className="flex justify-between text-xs text-zinc-500 mb-1">
               <span>{f.type}</span>
-              <span>{new Date(f.created_at).toLocaleDateString('zh-TW')}</span>
+              <span>{formatDate(f.created_at)}</span>
             </div>
             <p className="text-sm text-zinc-300">{f.content.slice(0, 100)}</p>
           </div>

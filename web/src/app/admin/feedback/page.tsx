@@ -4,13 +4,7 @@ import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { getAllFeedback } from '@/lib/admin'
-
-const TYPE_LABELS: Record<string, string> = {
-  bug: '🐛 問題',
-  lesson_request: '📚 課程許願',
-  feature_request: '✨ 功能許願',
-  other: '💬 其他',
-}
+import { FEEDBACK_TYPE_LABELS, formatDate } from '@/lib/constants'
 
 interface Feedback {
   id: string
@@ -52,7 +46,7 @@ export default function FeedbackPage() {
                 onClick={() => setFilter(t)}
                 className={`px-3 py-1 rounded text-sm whitespace-nowrap ${filter === t ? 'bg-blue-600' : 'bg-zinc-800'}`}
               >
-                {t === 'all' ? '全部' : TYPE_LABELS[t]}
+                {t === 'all' ? '全部' : FEEDBACK_TYPE_LABELS[t]}
               </button>
             ))}
           </div>
@@ -69,10 +63,10 @@ export default function FeedbackPage() {
                 <div key={f.id} className="bg-zinc-800 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-sm px-2 py-0.5 bg-zinc-700 rounded">
-                      {TYPE_LABELS[f.type] || f.type}
+                      {FEEDBACK_TYPE_LABELS[f.type] || f.type}
                     </span>
                     <span className="text-xs text-zinc-500">
-                      {new Date(f.created_at).toLocaleString('zh-TW')}
+                      {formatDate(f.created_at)}
                     </span>
                   </div>
                   <p className="text-zinc-200 mb-2">{f.content}</p>

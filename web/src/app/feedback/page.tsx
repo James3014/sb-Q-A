@@ -4,13 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import { PageHeader } from '@/components/ui'
 import { getSupabase } from '@/lib/supabase'
-
-const TYPES = [
-  { id: 'bug', label: '🐛 我遇到問題' },
-  { id: 'lesson_request', label: '📚 希望新增課程' },
-  { id: 'feature_request', label: '✨ 希望新增功能' },
-  { id: 'other', label: '💬 其他建議' },
-]
+import { FEEDBACK_TYPES } from '@/lib/constants'
 
 export default function FeedbackPage() {
   const { user } = useAuth()
@@ -60,13 +54,11 @@ export default function FeedbackPage() {
             <p className="text-zinc-400 text-sm mb-4">你想提供什麼？</p>
             
             <div className="space-y-2 mb-6">
-              {TYPES.map(t => (
+              {FEEDBACK_TYPES.map(t => (
                 <button
                   key={t.id}
                   onClick={() => setType(t.id)}
-                  className={`w-full p-3 rounded-lg text-left ${
-                    type === t.id ? 'bg-blue-600' : 'bg-zinc-800'
-                  }`}
+                  className={`w-full p-3 rounded-lg text-left ${type === t.id ? 'bg-blue-600' : 'bg-zinc-800'}`}
                 >
                   {t.label}
                 </button>
