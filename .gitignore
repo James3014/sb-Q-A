@@ -104,3 +104,9 @@ sam_cleaned/corrections/
 !web/tsconfig.json
 !zeabur.json
 !web/public/manifest.json
+docs/lessons_parsed.json
+docs/update_lessons.sql
+sam_cleaned/
+sam_cleaned_reference/
+scripts/parse_lessons.py
+sam_cleaned_new/
