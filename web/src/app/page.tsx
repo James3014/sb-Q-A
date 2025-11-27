@@ -77,6 +77,7 @@ function HomeContent() {
         <div className="flex justify-between items-center mb-3">
           <h1 className="text-xl font-bold">🏂 單板教學</h1>
           <div className="flex items-center gap-3">
+            <Link href="/feedback" className="text-lg" title="意見回報">💬</Link>
             {user && <Link href="/practice" className="text-lg">📝</Link>}
             {user && <Link href="/favorites" className="text-lg">❤️</Link>}
             {user ? (

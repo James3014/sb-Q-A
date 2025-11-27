@@ -47,7 +47,7 @@ export async function getLessonStats() {
   if (!supabase) return []
 
   // 取得所有課程的統計
-  const { data: lessons } = await supabase.from('lessons').select('id, title, is_premium')
+  const { data: lessons } = await supabase.from('lessons').select('id, title, is_premium, level_tags')
   const { data: views } = await supabase
     .from('event_log')
     .select('lesson_id')

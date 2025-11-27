@@ -47,6 +47,12 @@ export function useFilteredLessons({
       }
     }
 
+    // 排序：免費課程在前，PRO 在後
+    result = result.sort((a, b) => {
+      if (a.is_premium === b.is_premium) return 0
+      return a.is_premium ? 1 : -1
+    })
+
     return result
   }, [lessons, search, selectedCategory, levelFilter, slopeFilter, skillFilter])
 }
