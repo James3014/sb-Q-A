@@ -80,7 +80,7 @@ export async function addPracticeLog(
   }
 
   const avgRating = ratings 
-    ? Math.round((ratings.rating1 + ratings.rating2 + ratings.rating3) / 3 * 10) / 10
+    ? Math.round((ratings.rating1 + ratings.rating2 + ratings.rating3) / 3)
     : null
   
   const { error } = await supabase

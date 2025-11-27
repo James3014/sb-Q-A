@@ -113,3 +113,4 @@ sam_cleaned_new/
 docs/migration_prerequisites.sql
 docs/prerequisites_analysis.json
 scripts/analyze_prerequisites.py
+give/

@@ -94,7 +94,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const handlePracticeComplete = async (note: string, ratings: PracticeRatings) => {
     if (!user) return
     setSaving(true)
+    console.log('[Practice] Adding log:', { userId: user.id, lessonId: lesson.id, note, ratings })
     const result = await addPracticeLog(user.id, lesson.id, note, ratings)
+    console.log('[Practice] Result:', result)
     if (result.success) {
       const [logs, improvement] = await Promise.all([
         getLessonPracticeLogs(user.id, lesson.id),
