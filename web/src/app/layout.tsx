@@ -3,9 +3,15 @@ import './globals.css'
 import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
-  title: '單板教學',
-  description: '滑雪板教學內容管理系統',
+  title: '單板教學 | CASI 認證滑雪教學',
+  description: '200+ 堂滑雪板教學課程，基於 CASI 認證教學框架。雪場即時查找問題解法，戴手套也能操作。',
   manifest: '/manifest.json',
+  openGraph: {
+    title: '單板教學 | CASI 認證滑雪教學',
+    description: '200+ 堂滑雪板教學課程，雪場即時查找問題解法',
+    type: 'website',
+    locale: 'zh_TW',
+  },
 }
 
 export const viewport: Viewport = {

@@ -37,9 +37,13 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <Link href="/" className="text-zinc-400 text-sm mb-6 block">← 返回首頁</Link>
         
-        <h1 className="text-2xl font-bold text-center mb-6">
+        <h1 className="text-2xl font-bold text-center mb-2">
           🏂 {isLogin ? '登入' : '註冊'}
         </h1>
+        
+        <p className="text-center text-zinc-400 text-sm mb-6">
+          登入後可收藏課程、記錄練習進度
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
