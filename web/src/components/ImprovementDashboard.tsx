@@ -34,10 +34,10 @@ export function ImprovementDashboard({ data, lessons }: { data: ImprovementData;
 
       {/* 久未練習提示 */}
       {daysSinceLastPractice !== null && daysSinceLastPractice >= 5 && (
-        <div className="bg-zinc-800 rounded-lg p-4 border border-blue-600/30">
-          <p className="text-sm">🏂 已經 <span className="text-blue-400 font-bold">{daysSinceLastPractice}</span> 天沒練習囉！</p>
-          <p className="text-xs text-zinc-500 mt-1">試試看回到雪場核心技巧的習題吧</p>
-          <Link href="/" className="inline-block mt-2 text-sm text-blue-400">開始練習 →</Link>
+        <div className="glass-panel rounded-lg p-4 border-l-4 border-l-brand-red">
+          <p className="text-sm">🏂 已經 <span className="text-brand-red font-bold text-lg">{daysSinceLastPractice}</span> 天沒練習囉！</p>
+          <p className="text-xs text-zinc-400 mt-1">試試看回到雪場核心技巧的習題吧</p>
+          <Link href="/" className="inline-block mt-3 text-sm text-brand-red hover:text-red-400 transition-colors font-medium">開始練習 →</Link>
         </div>
       )}
 

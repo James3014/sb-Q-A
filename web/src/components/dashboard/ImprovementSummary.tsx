@@ -10,8 +10,8 @@ export function ImprovementSummary({ data }: ImprovementSummaryProps) {
     const hasEnoughData = data.totalPractices >= 6;
 
     return (
-        <div className="bg-zinc-800 rounded-lg p-4">
-            <h3 className="font-bold text-sm mb-3">📈 技能改善度</h3>
+        <div className="glass-panel rounded-lg p-4">
+            <h3 className="font-bold text-sm mb-3 text-white">📈 技能改善度</h3>
             {hasEnoughData ? (
                 <>
                     <div className="flex items-center gap-2 mb-2">
@@ -25,8 +25,8 @@ export function ImprovementSummary({ data }: ImprovementSummaryProps) {
             ) : (
                 <div className="text-center py-4">
                     <p className="text-zinc-400 text-sm mb-2">尚未累積足夠資料（{data.totalPractices}/6 次）</p>
-                    <div className="w-full bg-zinc-700 rounded-full h-2 mb-2">
-                        <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${(data.totalPractices / 6) * 100}%` }} />
+                    <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
+                        <div className="bg-brand-red h-2 rounded-full transition-all" style={{ width: `${(data.totalPractices / 6) * 100}%` }} />
                     </div>
                     <p className="text-xs text-zinc-500">完成 6 次練習後解鎖改善趨勢</p>
                 </div>
