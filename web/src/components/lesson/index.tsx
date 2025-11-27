@@ -96,7 +96,7 @@ export function LessonWhy({ why }: { why: string[] }) {
 }
 
 // ============================================
-// Steps（How）- 卡片化 + 圖片槽位
+// Steps（How）- 卡片化
 // ============================================
 export function LessonSteps({ steps }: { steps: { text: string; image?: string | null }[] }) {
   if (!steps?.length) return null
@@ -117,15 +117,10 @@ export function LessonSteps({ steps }: { steps: { text: string; image?: string |
                   {i + 1}
                 </span>
                 <div className="flex-1">
-                  {/* 圖片槽位 */}
+                  {/* 只有有圖片時才顯示 */}
                   {step.image && (
                     <div className="mb-2 rounded-lg overflow-hidden bg-zinc-600">
                       <img src={step.image} alt={`步驟 ${i + 1}`} className="w-full" />
-                    </div>
-                  )}
-                  {!step.image && (
-                    <div className="mb-2 h-24 rounded-lg bg-zinc-600/30 flex items-center justify-center text-zinc-500 text-xs">
-                      示意圖（即將推出）
                     </div>
                   )}
                   <p className="text-zinc-300 text-sm" dangerouslySetInnerHTML={{ __html: text }} />
@@ -168,24 +163,31 @@ export function LessonSignals({ correct, wrong }: { correct?: string[]; wrong?: 
 }
 
 // ============================================
-// Practice CTA + 三項評分彈窗
+// Practice CTA + 三項評分彈窗 + 正向回饋
 // ============================================
 export function LessonPracticeCTA({ 
   onComplete,
   lastPractice,
-  saving 
+  saving,
+  totalPractices,
+  improvement
 }: { 
   onComplete: (note: string, ratings: PracticeRatings) => void
   lastPractice?: PracticeLog | null
   saving: boolean
+  totalPractices?: number
+  improvement?: number | null
 }) {
   const [showModal, setShowModal] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
   const [note, setNote] = useState('')
   const [ratings, setRatings] = useState<PracticeRatings>({ rating1: 3, rating2: 3, rating3: 3 })
 
   const handleSubmit = () => {
     onComplete(note, ratings)
     setShowModal(false)
+    setShowSuccess(true)
+    setTimeout(() => setShowSuccess(false), 2500)
     setNote('')
     setRatings({ rating1: 3, rating2: 3, rating3: 3 })
   }
@@ -195,6 +197,24 @@ export function LessonPracticeCTA({
 
   return (
     <>
+      {/* 成功動畫 */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="text-center animate-bounce">
+            <div className="text-6xl mb-4">✓</div>
+            <p className="text-xl font-bold text-green-400 mb-2">做得好！</p>
+            <p className="text-zinc-300">+1 次練習（累計 {(totalPractices || 0) + 1} 次）</p>
+            {improvement !== null && improvement !== undefined && (
+              <p className="text-sm text-zinc-400 mt-2">
+                改善度：<span className={improvement >= 0 ? 'text-green-400' : 'text-red-400'}>
+                  {improvement >= 0 ? '↑' : '↓'} {Math.abs(improvement).toFixed(1)}
+                </span>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       <section className="bg-gradient-to-r from-blue-900/50 to-zinc-800 rounded-lg p-4 mb-4 border border-blue-600/30">
         {isToday && avgRating ? (
           <div className="text-center">
@@ -327,6 +347,47 @@ export function LessonRecommendations({
             className="block bg-zinc-700/50 rounded p-2 text-sm hover:bg-zinc-700 transition"
           >
             {r.title}
+          </Link>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// ============================================
+// Sequence（次序式練習建議）
+// ============================================
+export function LessonSequence({ 
+  prerequisite, 
+  next, 
+  similar 
+}: { 
+  prerequisite: { id: string; title: string } | null
+  next: { id: string; title: string } | null
+  similar: { id: string; title: string }[]
+}) {
+  if (!prerequisite && !next && !similar.length) return null
+
+  return (
+    <section className="bg-zinc-800 rounded-lg p-4 mb-4">
+      <h2 className="font-semibold mb-3">📚 學習路徑</h2>
+      <div className="space-y-2">
+        {prerequisite && (
+          <Link href={`/lesson/${prerequisite.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
+            <span className="text-xs bg-blue-600 px-2 py-0.5 rounded">先看</span>
+            <span className="text-sm text-zinc-300 truncate">{prerequisite.title}</span>
+          </Link>
+        )}
+        {next && (
+          <Link href={`/lesson/${next.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
+            <span className="text-xs bg-green-600 px-2 py-0.5 rounded">下一步</span>
+            <span className="text-sm text-zinc-300 truncate">{next.title}</span>
+          </Link>
+        )}
+        {similar.map(s => (
+          <Link key={s.id} href={`/lesson/${s.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
+            <span className="text-xs bg-zinc-600 px-2 py-0.5 rounded">相似</span>
+            <span className="text-sm text-zinc-300 truncate">{s.title}</span>
           </Link>
         ))}
       </div>

@@ -66,3 +66,35 @@ export async function searchLessons(query: string): Promise<Lesson[]> {
 
   return data || []
 }
+
+
+// 取得相關課程（基於技能和程度）
+export function getRelatedLessons(
+  currentLesson: Lesson, 
+  allLessons: Lesson[]
+): { prerequisite: Lesson | null; next: Lesson | null; similar: Lesson[] } {
+  const skill = currentLesson.casi?.Primary_Skill
+  const level = currentLesson.level_tags?.[0]
+  
+  const sameSkill = allLessons.filter(l => 
+    l.id !== currentLesson.id && l.casi?.Primary_Skill === skill
+  )
+  
+  const levelOrder = { beginner: 0, intermediate: 1, advanced: 2 }
+  const currentLevelOrder = levelOrder[level as keyof typeof levelOrder] ?? 1
+  
+  // 前置課程：同技能、較低程度
+  const prerequisite = sameSkill
+    .filter(l => (levelOrder[l.level_tags?.[0] as keyof typeof levelOrder] ?? 1) < currentLevelOrder)
+    .sort((a, b) => (levelOrder[b.level_tags?.[0] as keyof typeof levelOrder] ?? 1) - (levelOrder[a.level_tags?.[0] as keyof typeof levelOrder] ?? 1))[0] || null
+
+  // 下一步課程：同技能、較高程度
+  const next = sameSkill
+    .filter(l => (levelOrder[l.level_tags?.[0] as keyof typeof levelOrder] ?? 1) > currentLevelOrder)
+    .sort((a, b) => (levelOrder[a.level_tags?.[0] as keyof typeof levelOrder] ?? 1) - (levelOrder[b.level_tags?.[0] as keyof typeof levelOrder] ?? 1))[0] || null
+
+  // 相似課程：同技能、同程度
+  const similar = sameSkill.filter(l => l.level_tags?.[0] === level).slice(0, 2)
+
+  return { prerequisite, next, similar }
+}

@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Lesson, getLessons } from '@/lib/lessons'
+import { Lesson, getLessons, getRelatedLessons } from '@/lib/lessons'
 import { useAuth } from './AuthProvider'
 import { isFavorited, addFavorite, removeFavorite } from '@/lib/favorites'
 import { addPracticeLog, getLessonPracticeLogs, PracticeLog, PracticeRatings } from '@/lib/practice'
-import { getImprovementData } from '@/lib/improvement'
+import { getImprovementData, ImprovementData } from '@/lib/improvement'
 import { SKILL_RECOMMENDATIONS } from '@/lib/constants'
 import {
   LessonHeader,
@@ -17,6 +17,7 @@ import {
   LessonPracticeCTA,
   LessonPracticeHistory,
   LessonRecommendations,
+  LessonSequence,
   LessonUnlockPRO,
 } from './lesson'
 
@@ -28,31 +29,46 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const [practiceLogs, setPracticeLogs] = useState<PracticeLog[]>([])
   const [weakSkill, setWeakSkill] = useState<string | null>(null)
   const [recommendations, setRecommendations] = useState<{ id: string; title: string }[]>([])
+  const [improvementData, setImprovementData] = useState<ImprovementData | null>(null)
+  const [relatedLessons, setRelatedLessons] = useState<{
+    prerequisite: { id: string; title: string } | null
+    next: { id: string; title: string } | null
+    similar: { id: string; title: string }[]
+  }>({ prerequisite: null, next: null, similar: [] })
 
   const isLocked = lesson.is_premium && !subscription.isActive
   const showActions = !!user && !isLocked
 
-  // 載入收藏狀態、練習紀錄、弱項推薦
   useEffect(() => {
-    if (!user) return
-    
-    isFavorited(user.id, lesson.id).then(setIsFav)
-    getLessonPracticeLogs(user.id, lesson.id).then(setPracticeLogs)
-    
-    // 取得弱項推薦
-    Promise.all([getImprovementData(user.id), getLessons()]).then(([improvement, allLessons]) => {
-      if (improvement && improvement.skills.length > 0) {
-        const weak = improvement.skills.reduce((min, s) => s.score < min.score ? s : min, improvement.skills[0])
-        if (weak.score < 4) {
-          setWeakSkill(weak.skill)
-          const keywords = SKILL_RECOMMENDATIONS[weak.skill] || []
-          const recs = allLessons
-            .filter(l => l.id !== lesson.id && keywords.some(k => l.title.includes(k) || l.what?.includes(k)))
-            .slice(0, 3)
-            .map(l => ({ id: l.id, title: l.title }))
-          setRecommendations(recs)
+    // 載入相關課程（不需登入）
+    getLessons().then(allLessons => {
+      const related = getRelatedLessons(lesson, allLessons)
+      setRelatedLessons({
+        prerequisite: related.prerequisite ? { id: related.prerequisite.id, title: related.prerequisite.title } : null,
+        next: related.next ? { id: related.next.id, title: related.next.title } : null,
+        similar: related.similar.map(l => ({ id: l.id, title: l.title }))
+      })
+
+      if (!user) return
+      
+      isFavorited(user.id, lesson.id).then(setIsFav)
+      getLessonPracticeLogs(user.id, lesson.id).then(setPracticeLogs)
+      
+      getImprovementData(user.id).then(improvement => {
+        setImprovementData(improvement)
+        if (improvement && improvement.skills.length > 0) {
+          const weak = improvement.skills.reduce((min, s) => s.score < min.score ? s : min, improvement.skills[0])
+          if (weak.score < 4) {
+            setWeakSkill(weak.skill)
+            const keywords = SKILL_RECOMMENDATIONS[weak.skill] || []
+            const recs = allLessons
+              .filter(l => l.id !== lesson.id && keywords.some(k => l.title.includes(k) || l.what?.includes(k)))
+              .slice(0, 3)
+              .map(l => ({ id: l.id, title: l.title }))
+            setRecommendations(recs)
+          }
         }
-      }
+      })
     })
   }, [user, lesson.id])
 
@@ -67,15 +83,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const handleShare = async () => {
     const url = window.location.href
     const text = `${lesson.title} - 單板教學`
-    
     if (navigator.share) {
-      try {
-        await navigator.share({ title: text, url })
-      } catch (e) {
-        // 使用者取消分享
-      }
+      try { await navigator.share({ title: text, url }) } catch {}
     } else {
-      // Fallback: 複製連結
       await navigator.clipboard.writeText(url)
       alert('已複製連結！')
     }
@@ -86,9 +96,12 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
     setSaving(true)
     const result = await addPracticeLog(user.id, lesson.id, note, ratings)
     if (result.success) {
-      // 重新載入練習紀錄
-      const logs = await getLessonPracticeLogs(user.id, lesson.id)
+      const [logs, improvement] = await Promise.all([
+        getLessonPracticeLogs(user.id, lesson.id),
+        getImprovementData(user.id)
+      ])
       setPracticeLogs(logs)
+      setImprovementData(improvement)
     }
     setSaving(false)
   }
@@ -105,7 +118,6 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         />
 
         <LessonTitle lesson={lesson} />
-        
         <LessonWhat what={lesson.what} />
 
         {isLocked ? (
@@ -113,13 +125,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         ) : (
           <>
             <LessonWhy why={lesson.why || []} />
-            
             <LessonSteps steps={lesson.how || []} />
-            
-            <LessonSignals 
-              correct={lesson.signals?.correct} 
-              wrong={lesson.signals?.wrong} 
-            />
+            <LessonSignals correct={lesson.signals?.correct} wrong={lesson.signals?.wrong} />
 
             {user && subscription.isActive && (
               <>
@@ -127,18 +134,20 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
                   onComplete={handlePracticeComplete}
                   lastPractice={practiceLogs[0]}
                   saving={saving}
+                  totalPractices={improvementData?.totalPractices}
+                  improvement={improvementData?.improvement}
                 />
-                
                 <LessonPracticeHistory logs={practiceLogs} />
-                
-                <LessonRecommendations 
-                  weakSkill={weakSkill}
-                  recommendations={recommendations}
-                />
+                <LessonRecommendations weakSkill={weakSkill} recommendations={recommendations} />
               </>
             )}
 
-            {/* CASI 資訊 */}
+            <LessonSequence 
+              prerequisite={relatedLessons.prerequisite}
+              next={relatedLessons.next}
+              similar={relatedLessons.similar}
+            />
+
             {(lesson.casi?.Primary_Skill || lesson.casi?.Core_Competency) && (
               <section className="bg-zinc-800 rounded-lg p-4 mb-4">
                 <h2 className="font-semibold mb-2">📚 CASI 分類</h2>
