@@ -4,6 +4,8 @@ type EventType =
   | 'view_lesson'
   | 'search_keyword'
   | 'pricing_view'
+  | 'plan_selected'      // 新增：選擇方案
+  | 'purchase_success'   // 新增：購買成功
   | 'favorite_add'
   | 'favorite_remove'
   | 'practice_complete'
@@ -26,7 +28,6 @@ export async function trackEvent(
       metadata: metadata || {},
     })
   } catch (e) {
-    // 靜默失敗，不影響用戶體驗
     console.error('[trackEvent]', e)
   }
 }

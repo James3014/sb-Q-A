@@ -5,6 +5,48 @@ import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { trackEvent } from '@/lib/analytics'
 
+function PlanCard({ 
+  plan, 
+  price, 
+  label, 
+  features, 
+  highlight,
+  badge 
+}: { 
+  plan: string
+  price: string
+  label?: string
+  features: string[]
+  highlight?: boolean
+  badge?: string
+}) {
+  const handleSelect = () => {
+    trackEvent('plan_selected', undefined, { plan })
+  }
+
+  return (
+    <div 
+      onClick={handleSelect}
+      className={`rounded-lg p-4 mb-4 cursor-pointer transition-all hover:scale-[1.02] ${
+        highlight 
+          ? 'bg-gradient-to-b from-amber-900/50 to-zinc-800 border border-amber-600/50' 
+          : 'bg-zinc-800'
+      }`}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <h3 className={`font-bold ${highlight ? 'text-amber-400' : ''}`}>{label || plan}</h3>
+        {badge && <span className="text-xs bg-amber-600 px-2 py-0.5 rounded">{badge}</span>}
+      </div>
+      <p className="text-2xl font-bold mb-3">{price}</p>
+      <ul className="text-sm space-y-1">
+        {features.map((f, i) => (
+          <li key={i} className={highlight ? 'text-amber-200' : 'text-zinc-300'}>{f}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function PricingPage() {
   const { user } = useAuth()
 
@@ -23,19 +65,16 @@ export default function PricingPage() {
 
       <div className="p-4 max-w-lg mx-auto">
         
-        {/* Free */}
-        <div className="bg-zinc-800 rounded-lg p-4 mb-4">
-          <h3 className="font-bold mb-2">免費版</h3>
-          <p className="text-2xl font-bold mb-3">$0</p>
-          <ul className="text-sm text-zinc-400 space-y-1">
-            <li>✓ 28 堂初級課程</li>
-            <li>✓ 搜尋 / 篩選</li>
-            <li>✓ 試閱中級課程（僅問題區塊）</li>
-            <li className="text-zinc-600">✗ PRO 課程完整內容</li>
-            <li className="text-zinc-600">✗ 收藏功能</li>
-            <li className="text-zinc-600">✗ 練習紀錄</li>
-          </ul>
-        </div>
+        <PlanCard 
+          plan="free"
+          price="$0"
+          label="免費版"
+          features={[
+            '✓ 28 堂初級課程',
+            '✓ 搜尋 / 篩選',
+            '✓ 試閱中級課程（僅問題區塊）',
+          ]}
+        />
 
         {/* 短期 PASS */}
         <div className="bg-gradient-to-b from-blue-900/50 to-zinc-800 rounded-lg p-4 mb-4 border border-blue-600/50">
@@ -43,11 +82,17 @@ export default function PricingPage() {
           <p className="text-zinc-400 text-sm mb-3">適合短期雪旅</p>
           
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="bg-zinc-700/50 rounded p-3 text-center">
+            <div 
+              onClick={() => trackEvent('plan_selected', undefined, { plan: '7day' })}
+              className="bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition"
+            >
               <p className="text-lg font-bold">$180</p>
               <p className="text-xs text-zinc-400">7 天</p>
             </div>
-            <div className="bg-zinc-700/50 rounded p-3 text-center">
+            <div 
+              onClick={() => trackEvent('plan_selected', undefined, { plan: '30day' })}
+              className="bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition"
+            >
               <p className="text-lg font-bold">$290</p>
               <p className="text-xs text-zinc-400">30 天</p>
             </div>
@@ -60,22 +105,20 @@ export default function PricingPage() {
           </ul>
         </div>
 
-        {/* PRO 年費 */}
-        <div className="bg-gradient-to-b from-amber-900/50 to-zinc-800 rounded-lg p-4 mb-6 border border-amber-600/50">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="font-bold text-amber-400">PRO 年費</h3>
-            <span className="text-xs bg-amber-600 px-2 py-0.5 rounded">最划算</span>
-          </div>
-          <p className="text-2xl font-bold mb-3">$690<span className="text-sm font-normal text-zinc-400">/年</span></p>
-          
-          <ul className="text-sm space-y-1">
-            <li className="text-amber-200">✓ 全部課程（213+）</li>
-            <li className="text-amber-200">✓ 雪季更新內容</li>
-            <li>✓ 收藏功能</li>
-            <li>✓ 練習紀錄 + 改善曲線</li>
-            <li>✓ 課程組合推薦（未來）</li>
-          </ul>
-        </div>
+        <PlanCard 
+          plan="year"
+          price="$690/年"
+          label="PRO 年費"
+          badge="最划算"
+          highlight
+          features={[
+            '✓ 全部課程（213+）',
+            '✓ 雪季更新內容',
+            '✓ 收藏功能',
+            '✓ 練習紀錄 + 改善曲線',
+            '✓ 課程組合推薦（未來）',
+          ]}
+        />
 
         {/* 開通說明 */}
         <div className="bg-zinc-800 rounded-lg p-4 mb-6">
