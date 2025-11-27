@@ -135,3 +135,12 @@ export async function getUserSubscriptions(userId: string) {
 
   return data || []
 }
+
+// 課程有效度排行
+export async function getLessonEffectiveness() {
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  const { data } = await supabase.rpc('get_lesson_effectiveness')
+  return data || []
+}

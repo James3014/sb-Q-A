@@ -124,6 +124,32 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
           <p className="text-xs text-zinc-500 mt-1">從課程詳情頁點擊「已完成」開始累積</p>
         </div>
       )}
+
+      {/* 最近練習 */}
+      {data.recentPractice && data.recentPractice.length > 0 && (
+        <div className="bg-zinc-800 rounded-lg p-4">
+          <h3 className="font-bold text-sm mb-3">📅 最近練習</h3>
+          <div className="space-y-2">
+            {data.recentPractice.slice(0, 5).map((p, i) => (
+              <Link 
+                key={i} 
+                href={`/lesson/${p.lesson_id}`}
+                className="flex justify-between items-center text-sm hover:bg-zinc-700 rounded p-2 -mx-2"
+              >
+                <span className="text-zinc-300 truncate flex-1">{p.title}</span>
+                <div className="flex items-center gap-2">
+                  {p.score > 0 && (
+                    <span className="text-xs bg-blue-600 px-2 py-0.5 rounded">{p.score}分</span>
+                  )}
+                  <span className="text-xs text-zinc-500">
+                    {new Date(p.date).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
