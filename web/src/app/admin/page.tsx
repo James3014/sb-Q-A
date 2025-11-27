@@ -99,6 +99,7 @@ export default function AdminPage() {
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">📊 後台 Dashboard</h1>
           <div className="flex gap-4 text-sm">
+            <Link href="/admin/users" className="text-blue-400">用戶</Link>
             <Link href="/admin/feedback" className="text-blue-400">回報</Link>
             <Link href="/admin/lessons" className="text-blue-400">課程</Link>
             <Link href="/admin/monetization" className="text-blue-400">付費</Link>

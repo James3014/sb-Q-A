@@ -66,7 +66,7 @@ export default function PricingPage() {
             <h3 className="font-bold text-amber-400">PRO 年費</h3>
             <span className="text-xs bg-amber-600 px-2 py-0.5 rounded">最划算</span>
           </div>
-          <p className="text-2xl font-bold mb-3">$490-690<span className="text-sm font-normal text-zinc-400">/年</span></p>
+          <p className="text-2xl font-bold mb-3">$690<span className="text-sm font-normal text-zinc-400">/年</span></p>
           
           <ul className="text-sm space-y-1">
             <li className="text-amber-200">✓ 全部課程（213+）</li>
@@ -77,35 +77,16 @@ export default function PricingPage() {
           </ul>
         </div>
 
-        {/* 付款方式 */}
-        <div className="bg-zinc-800 rounded-lg p-4 mb-6">
-          <h3 className="font-bold mb-3">💳 付款方式</h3>
-          
-          <div className="space-y-4">
-            <div className="bg-zinc-700/50 rounded p-3">
-              <p className="font-medium mb-2">銀行轉帳</p>
-              <p className="text-sm text-zinc-400">銀行：國泰世華 (013)</p>
-              <p className="text-sm text-zinc-400">帳號：123-456789-0</p>
-              <p className="text-sm text-zinc-400">戶名：單板教學</p>
-            </div>
-
-            <div className="bg-zinc-700/50 rounded p-3">
-              <p className="font-medium mb-2">Line Pay / 街口</p>
-              <p className="text-sm text-zinc-400">ID：@snowboard-qa</p>
-            </div>
-          </div>
-        </div>
-
         {/* 開通說明 */}
         <div className="bg-zinc-800 rounded-lg p-4 mb-6">
-          <h3 className="font-bold mb-3">📝 開通流程</h3>
+          <h3 className="font-bold mb-3">📝 如何購買</h3>
           <ol className="text-sm text-zinc-300 space-y-2">
-            <li>1. 選擇方案並完成付款</li>
-            <li>2. 截圖付款證明</li>
-            <li>3. 傳送到 Line：@snowboard-qa</li>
-            <li>4. 附上註冊 Email：<span className="text-amber-400">{user?.email || '請先登入'}</span></li>
-            <li>5. 24 小時內開通</li>
+            <li>1. 選擇方案</li>
+            <li>2. 聯繫我們完成付款</li>
+            <li>3. 提供註冊 Email：<span className="text-amber-400">{user?.email || '請先登入'}</span></li>
+            <li>4. 24 小時內開通</li>
           </ol>
+          <p className="text-zinc-500 text-xs mt-3">付款方式請洽客服</p>
         </div>
 
         {!user && (
