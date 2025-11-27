@@ -11,6 +11,7 @@
 # Large folders
 黄嘉蓝单板教学*/
 CASI/
+sam_backup*/
 
 # Python
 __pycache__/
@@ -43,6 +44,63 @@ web/.next/
 web/node_modules/
 web/out/
 
-# Next.js
-web/.next/
-web/node_modules/
+# === 開發過程臨時檔案 ===
+
+# 臨時 Python 腳本
+add_*.py
+build_*.py
+find_*.py
+match_*.py
+move_*.py
+parse_*.py
+process_*.py
+rename_*.py
+update_*.py
+verify_*.py
+check_*.py
+compare_*.py
+deep_*.py
+identify_*.py
+create_source*.py
+quick_*.py
+rebuild_*.py
+manual_mapping.py
+unmapped_list.py
+
+# JSON 中間產物
+*_mapping.json
+*_result.json
+*_log.json
+truly_*.json
+unmatched*.json
+unprocessed*.json
+verified_mapping.json
+source_mapping.json
+
+# CSV 中間產物
+*_mapping.csv
+
+# 批次處理紀錄
+processed/
+
+# 舊版資料
+data/
+archive/
+
+# 臨時報告
+FILE_AUDIT_REPORT.md
+TRACEABILITY_SOLUTION.md
+unmapped.txt
+
+# sam_cleaned 內部開發檔案
+sam_cleaned/*.json
+sam_cleaned/*.py
+sam_cleaned/*.md
+sam_cleaned/corrections/
+
+# 保留核心檔案
+!web/package.json
+!web/package-lock.json
+!web/tsconfig.json
+!zeabur.json
+!web/public/manifest.json
