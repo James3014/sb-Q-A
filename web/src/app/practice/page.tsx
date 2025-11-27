@@ -36,7 +36,17 @@ export default function PracticePage() {
     return (
       <main className="min-h-screen bg-zinc-900 text-white p-4">
         <Link href="/" className="text-zinc-400 text-sm">← 返回首頁</Link>
-        <p className="text-center text-zinc-400 mt-20">請先登入</p>
+        <div className="text-center mt-20">
+          <p className="text-5xl mb-4">🔒</p>
+          <p className="text-zinc-400 mb-2">練習紀錄為付費功能</p>
+          <p className="text-zinc-500 text-sm mb-6">升級後可記錄練習進度</p>
+          <Link href="/pricing" className="inline-block bg-amber-600 px-6 py-3 rounded-lg mr-3">
+            查看方案
+          </Link>
+          <Link href="/login" className="inline-block bg-zinc-700 px-6 py-3 rounded-lg">
+            登入
+          </Link>
+        </div>
       </main>
     )
   }
