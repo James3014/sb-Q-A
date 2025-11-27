@@ -74,9 +74,21 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         </div>
 
         <div className="flex flex-wrap gap-1 mb-6">
-          {lesson.level_tags?.map(t => <span key={t} className="px-2 py-1 text-xs rounded-full bg-green-600">{LEVEL_NAMES[t] || t}</span>)}
-          {lesson.slope_tags?.map(t => <span key={t} className="px-2 py-1 text-xs rounded-full bg-blue-600">{SLOPE_NAMES[t] || t}</span>)}
-          {lesson.casi?.Primary_Skill && <span className="px-2 py-1 text-xs rounded-full bg-purple-600">{lesson.casi.Primary_Skill}</span>}
+          {lesson.level_tags?.map(t => (
+            <Link key={t} href={`/?level=${t}`} className="px-2 py-1 text-xs rounded-full bg-green-600 hover:bg-green-500">
+              {LEVEL_NAMES[t] || t}
+            </Link>
+          ))}
+          {lesson.slope_tags?.map(t => (
+            <Link key={t} href={`/?slope=${t}`} className="px-2 py-1 text-xs rounded-full bg-blue-600 hover:bg-blue-500">
+              {SLOPE_NAMES[t] || t}
+            </Link>
+          ))}
+          {lesson.casi?.Primary_Skill && (
+            <Link href={`/?skill=${lesson.casi.Primary_Skill}`} className="px-2 py-1 text-xs rounded-full bg-purple-600 hover:bg-purple-500">
+              {lesson.casi.Primary_Skill}
+            </Link>
+          )}
         </div>
 
         <section className="bg-slate-800 rounded-lg p-4 mb-4">

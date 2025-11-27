@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getLessons, Lesson } from '@/lib/lessons';
 import LessonCard from '@/components/LessonCard';
@@ -20,12 +21,27 @@ const PROBLEM_CATEGORIES = [
 ];
 
 export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-zinc-900 text-white p-4 text-center">載入中...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
+  const searchParams = useSearchParams();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const { user } = useAuth();
+
+  // URL 參數篩選
+  const levelFilter = searchParams.get('level');
+  const slopeFilter = searchParams.get('slope');
+  const skillFilter = searchParams.get('skill');
+  const hasTagFilter = levelFilter || slopeFilter || skillFilter;
 
   useEffect(() => {
     getLessons().then(data => {
@@ -36,6 +52,17 @@ export default function Home() {
 
   const filteredLessons = useMemo(() => {
     let result = lessons;
+
+    // URL 標籤篩選
+    if (levelFilter) {
+      result = result.filter(l => l.level_tags?.includes(levelFilter));
+    }
+    if (slopeFilter) {
+      result = result.filter(l => l.slope_tags?.includes(slopeFilter));
+    }
+    if (skillFilter) {
+      result = result.filter(l => l.casi?.Primary_Skill === skillFilter);
+    }
 
     if (search) {
       const q = search.toLowerCase();
@@ -55,7 +82,7 @@ export default function Home() {
     }
 
     return result;
-  }, [lessons, search, selectedCategory]);
+  }, [lessons, search, selectedCategory, levelFilter, slopeFilter, skillFilter]);
 
   const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
   const hasMore = filteredLessons.length > 10 && !showAll;
@@ -85,7 +112,28 @@ export default function Home() {
       </header>
 
       <div className="p-4 space-y-6">
-        {user && !search && !selectedCategory && (
+        {/* 標籤篩選提示 */}
+        {hasTagFilter && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-zinc-400">篩選：</span>
+            {levelFilter && (
+              <span className="px-2 py-1 text-xs rounded-full bg-green-600">
+                {levelFilter === 'beginner' ? '初級' : levelFilter === 'intermediate' ? '中級' : '進階'}
+              </span>
+            )}
+            {slopeFilter && (
+              <span className="px-2 py-1 text-xs rounded-full bg-blue-600">
+                {slopeFilter === 'green' ? '綠道' : slopeFilter === 'blue' ? '藍道' : slopeFilter === 'black' ? '黑道' : slopeFilter}
+              </span>
+            )}
+            {skillFilter && (
+              <span className="px-2 py-1 text-xs rounded-full bg-purple-600">{skillFilter}</span>
+            )}
+            <Link href="/" className="text-xs text-blue-400 ml-2">清除</Link>
+          </div>
+        )}
+
+        {user && !search && !selectedCategory && !hasTagFilter && (
           <div className="bg-zinc-800 rounded-lg p-3 text-sm text-zinc-300">
             💡 進入課程後，點 <span className="text-red-400">❤️</span> 收藏、點 <span className="text-blue-400">📝</span> 記錄練習
           </div>
@@ -119,7 +167,7 @@ export default function Home() {
         <section>
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-sm text-zinc-400">
-              {loading ? '載入中...' : search || selectedCategory
+              {loading ? '載入中...' : search || selectedCategory || hasTagFilter
                 ? `找到 ${filteredLessons.length} 筆`
                 : '熱門課程'}
             </h2>
