@@ -11,7 +11,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
   const levels = lesson.level_tags.map(t => levelMap[t] || t).join('/');
   
   return (
-    <Link href={`/lesson/${lesson.id}`}>
+    <Link href={`/lesson/${lesson.id}`} className="block">
       <div className="bg-zinc-800 rounded-xl p-4 hover:bg-zinc-750 active:bg-zinc-700 transition-colors">
         <p className="text-zinc-300 text-sm line-clamp-2 mb-2">
           😰 {lesson.what.slice(0, 80)}{lesson.what.length > 80 ? '...' : ''}
