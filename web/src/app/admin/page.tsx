@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
 import { isAdmin, getDashboardStats } from '@/lib/admin'
 
+// 後台密碼（你可以改成更複雜的）
+const ADMIN_PASSWORD = 'sb2025admin'
+
 interface Stats {
   dau: number
   wau: number
@@ -18,15 +21,67 @@ export default function AdminPage() {
   const { user, loading } = useAuth()
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
+  const [password, setPassword] = useState('')
+  const [authenticated, setAuthenticated] = useState(false)
 
   useEffect(() => {
-    if (!loading && user && isAdmin(user.email)) {
+    // 檢查 sessionStorage 是否已驗證
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('admin_auth')
+      if (saved === 'true') setAuthenticated(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!loading && user && isAdmin(user.email) && authenticated) {
       getDashboardStats().then(data => {
         setStats(data)
         setLoadingStats(false)
       })
     }
-  }, [user, loading])
+  }, [user, loading, authenticated])
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === ADMIN_PASSWORD) {
+      setAuthenticated(true)
+      sessionStorage.setItem('admin_auth', 'true')
+    } else {
+      alert('密碼錯誤')
+    }
+  }
+
+  if (loading) return <div className="min-h-screen bg-zinc-900 text-white p-4">載入中...</div>
+
+  if (!user || !isAdmin(user.email)) {
+    return (
+      <div className="min-h-screen bg-zinc-900 text-white p-4">
+        <p className="text-center mt-20 text-zinc-400">無權限存取</p>
+      </div>
+    )
+  }
+
+  // 密碼驗證
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center p-4">
+        <form onSubmit={handlePasswordSubmit} className="w-full max-w-xs">
+          <h1 className="text-xl font-bold text-center mb-6">🔐 後台驗證</h1>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="請輸入後台密碼"
+            className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg mb-4"
+            autoFocus
+          />
+          <button type="submit" className="w-full py-3 bg-blue-600 rounded-lg font-medium">
+            進入後台
+          </button>
+        </form>
+      </div>
+    )
+  }
 
   if (loading) return <div className="min-h-screen bg-zinc-900 text-white p-4">載入中...</div>
 
