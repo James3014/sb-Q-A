@@ -29,6 +29,29 @@
 
 ---
 
+## 課程詳情頁增強版（2025-11-27）
+
+### Schema 變更
+- [x] 22. practice_logs 新增 rating1/rating2/rating3 欄位（migration_rating_v2.sql）
+
+### 組件拆分
+- [x] 23. LessonHeader（返回、收藏、分享）
+- [x] 24. LessonWhat（問題區塊重新排版）
+- [x] 25. LessonWhy（目標區塊重新排版）
+- [x] 26. LessonSteps（How 步驟卡片化 + 圖片槽位）
+- [x] 27. LessonSignals（做對/做錯訊號）
+- [x] 28. LessonPracticeCTA（練習按鈕 + 三項評分彈窗）
+- [x] 29. LessonPracticeHistory（課程級別練習紀錄）
+- [x] 30. LessonRecommendations（弱項推薦課程）
+- [x] 31. LessonUnlockPRO（柔性付費引導）
+
+### 整合
+- [x] 32. 重寫 LessonDetail.tsx 使用新組件
+- [x] 33. 更新 practice.ts API 支援三項評分
+- [x] 34. 驗證 build ✅
+
+---
+
 ## ✅ 已完成
 
 ### Clean Code 第五輪 (2025-11-27)
