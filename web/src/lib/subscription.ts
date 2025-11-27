@@ -1,30 +1,36 @@
 import { getSupabase } from './supabase'
 
-export type SubscriptionType = 'free' | 'pass_7' | 'pass_30' | 'pro_yearly'
+export type PlanType = 'free' | '7day' | '30day' | 'year'
 
 export interface Subscription {
-  type: SubscriptionType
-  expiresAt: Date | null
+  plan: PlanType
+  endDate: Date | null
   isActive: boolean
 }
 
 export async function getSubscription(userId: string): Promise<Subscription> {
   const supabase = getSupabase()
-  if (!supabase) return { type: 'free', expiresAt: null, isActive: false }
+  if (!supabase) return { plan: 'free', endDate: null, isActive: false }
 
+  // 使用新的 subscriptions 表
   const { data } = await supabase
-    .from('users')
-    .select('subscription_type, subscription_expires_at')
-    .eq('id', userId)
-    .single()
+    .rpc('get_user_subscription', { p_user_id: userId })
 
-  if (!data) return { type: 'free', expiresAt: null, isActive: false }
+  if (!data || data.length === 0) {
+    return { plan: 'free', endDate: null, isActive: false }
+  }
 
-  const type = (data.subscription_type || 'free') as SubscriptionType
-  const expiresAt = data.subscription_expires_at ? new Date(data.subscription_expires_at) : null
-  
-  // 檢查是否有效
-  const isActive = type !== 'free' && (!expiresAt || expiresAt > new Date())
+  const { plan, end_date } = data[0]
+  const endDate = end_date ? new Date(end_date) : null
+  const isActive = endDate ? endDate > new Date() : false
 
-  return { type, expiresAt, isActive }
+  return { plan: plan as PlanType, endDate, isActive }
+}
+
+export async function hasActiveSubscription(userId: string): Promise<boolean> {
+  const supabase = getSupabase()
+  if (!supabase) return false
+
+  const { data } = await supabase.rpc('has_active_subscription', { p_user_id: userId })
+  return data === true
 }

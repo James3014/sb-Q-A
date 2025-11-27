@@ -1,43 +1,37 @@
 'use client'
-
 import { useState, useEffect } from 'react'
-import { useAuth } from '@/components/AuthProvider'
-import { isAdmin } from './admin'
-
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sb2025admin'
+import { getSupabase } from './supabase'
 
 export function useAdminAuth() {
-  const { user, loading } = useAuth()
-  const [authenticated, setAuthenticated] = useState(false)
-  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [isAuthorized, setIsAuthorized] = useState(false)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('admin_auth')
-      if (saved === 'true') setAuthenticated(true)
+    async function check() {
+      const supabase = getSupabase()
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoading(false)
+        return
+      }
+
+      // 從資料庫檢查 is_admin
+      const { data } = await supabase
+        .from('users')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+
+      setIsAuthorized(data?.is_admin === true)
+      setLoading(false)
     }
+    check()
   }, [])
 
-  const isAuthorized = !loading && user && isAdmin(user.email)
-  const isReady = !loading && isAuthorized && authenticated
-
-  const submitPassword = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true)
-      sessionStorage.setItem('admin_auth', 'true')
-      return true
-    }
-    return false
-  }
-
-  return {
-    loading,
-    user,
-    isAuthorized,
-    isReady,
-    authenticated,
-    password,
-    setPassword,
-    submitPassword,
-  }
+  return { loading, isAuthorized, isReady: !loading && isAuthorized }
 }

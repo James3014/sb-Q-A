@@ -11,7 +11,7 @@ interface AuthContextType {
   subscription: Subscription
 }
 
-const defaultSubscription: Subscription = { type: 'free', expiresAt: null, isActive: false }
+const defaultSubscription: Subscription = { plan: 'free', endDate: null, isActive: false }
 
 const AuthContext = createContext<AuthContextType>({ 
   user: null, 

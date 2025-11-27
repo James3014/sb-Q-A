@@ -1,12 +1,23 @@
 import { getSupabase } from './supabase'
 
-// 管理員 email 列表
-const ADMIN_EMAILS = ['liligogo523@gmail.com']
+// 檢查是否為管理員（從資料庫）
+export async function checkIsAdmin(): Promise<boolean> {
+  const supabase = getSupabase()
+  if (!supabase) return false
 
-export function isAdmin(email?: string | null): boolean {
-  return !!email && ADMIN_EMAILS.includes(email)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
+
+  const { data } = await supabase
+    .from('users')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+
+  return data?.is_admin === true
 }
 
+// 後台 Dashboard 統計
 export async function getDashboardStats() {
   const supabase = getSupabase()
   if (!supabase) return null
@@ -30,6 +41,7 @@ export async function getDashboardStats() {
   }
 }
 
+// 取得所有回報
 export async function getAllFeedback() {
   const supabase = getSupabase()
   if (!supabase) return []
@@ -42,11 +54,11 @@ export async function getAllFeedback() {
   return data || []
 }
 
+// 課程統計
 export async function getLessonStats() {
   const supabase = getSupabase()
   if (!supabase) return []
 
-  // 取得所有課程的統計
   const { data: lessons } = await supabase.from('lessons').select('id, title, is_premium, level_tags')
   const { data: views } = await supabase
     .from('event_log')
@@ -63,21 +75,15 @@ export async function getLessonStats() {
 
   if (!lessons) return []
 
-  // 計算每堂課的統計
-  const viewCount = (views || []).reduce((acc, v) => {
-    acc[v.lesson_id] = (acc[v.lesson_id] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const count = (arr: { lesson_id: string }[] | null) =>
+    (arr || []).reduce((acc, v) => {
+      acc[v.lesson_id] = (acc[v.lesson_id] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
 
-  const practiceCount = (practices || []).reduce((acc, p) => {
-    acc[p.lesson_id] = (acc[p.lesson_id] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-
-  const favoriteCount = (favorites || []).reduce((acc, f) => {
-    acc[f.lesson_id] = (acc[f.lesson_id] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const viewCount = count(views)
+  const practiceCount = count(practices)
+  const favoriteCount = count(favorites)
 
   return lessons.map(l => ({
     ...l,
@@ -85,4 +91,47 @@ export async function getLessonStats() {
     practices: practiceCount[l.id] || 0,
     favorites: favoriteCount[l.id] || 0,
   })).sort((a, b) => b.views - a.views)
+}
+
+// 搜尋用戶
+export async function searchUsers(query: string) {
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  const { data } = await supabase
+    .from('users')
+    .select('id, email, created_at, is_admin')
+    .ilike('email', `%${query}%`)
+    .limit(20)
+
+  return data || []
+}
+
+// 開通訂閱
+export async function grantSubscription(userId: string, plan: string, days: number) {
+  const supabase = getSupabase()
+  if (!supabase) return null
+
+  const { data, error } = await supabase.rpc('admin_grant_subscription', {
+    p_user_id: userId,
+    p_plan: plan,
+    p_days: days,
+  })
+
+  if (error) throw error
+  return data
+}
+
+// 取得用戶訂閱歷史
+export async function getUserSubscriptions(userId: string) {
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  const { data } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  return data || []
 }
