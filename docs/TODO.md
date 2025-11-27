@@ -107,6 +107,19 @@
 
 ---
 
+## Clean Code 第六輪重構（2025-11-27）
+
+- [x] 66. 拆分 lesson/index.tsx 為獨立檔案（414→6 個檔案）
+- [x] 67. 精簡 computeClientPath.ts（304→47 行）
+- [x] 68. ImprovementDashboard.tsx 已是單一職責，保留
+- [x] 69. 首頁 page.tsx 已使用 useFilteredLessons，保留
+- [x] 70. admin/lessons/page.tsx 結構清晰，保留
+- [x] 71. LoadingState 已存在，新增 LoadingText
+- [x] 72. types/index.ts 已整合匯出
+- [x] 73. 驗證 build ✅
+
+---
+
 ## ✅ 已完成
 
 ### Clean Code 第五輪 (2025-11-27)
