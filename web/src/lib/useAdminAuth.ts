@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react'
 import { getSupabase } from './supabase'
 
+// 管理員 email 白名單
+const ADMIN_EMAILS = ['liligogo523@gmail.com']
+
 export function useAdminAuth() {
   const [loading, setLoading] = useState(true)
   const [isAuthorized, setIsAuthorized] = useState(false)
@@ -20,18 +23,12 @@ export function useAdminAuth() {
         return
       }
 
-      // 從資料庫檢查 is_admin
-      const { data } = await supabase
-        .from('users')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single()
-
-      setIsAuthorized(data?.is_admin === true)
+      setIsAuthorized(ADMIN_EMAILS.includes(user.email || ''))
       setLoading(false)
     }
     check()
   }, [])
 
+  // isReady = 已載入完成 + 是管理員
   return { loading, isAuthorized, isReady: !loading && isAuthorized }
 }
