@@ -27,11 +27,12 @@ export default function UsersPage() {
       const supabase = getSupabase()
       if (!supabase) return
 
-      const { data } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false })
-
+      const { data, error } = await supabase.rpc('get_all_users')
+      
+      if (error) {
+        console.error('get_all_users error:', error)
+      }
+      
       setUsers(data || [])
       setLoadingData(false)
     }
