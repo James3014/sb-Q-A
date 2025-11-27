@@ -1,10 +1,16 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/AuthProvider'
+import { trackEvent } from '@/lib/analytics'
 
 export default function PricingPage() {
   const { user } = useAuth()
+
+  useEffect(() => {
+    trackEvent('pricing_view')
+  }, [])
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white">

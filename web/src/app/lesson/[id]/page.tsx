@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { getLessonById, Lesson } from '@/lib/lessons'
 import LessonDetail from '@/components/LessonDetail'
+import { trackEvent } from '@/lib/analytics'
 
 export default function LessonPage() {
   const params = useParams()
@@ -15,6 +16,7 @@ export default function LessonPage() {
     getLessonById(id).then(data => {
       setLesson(data)
       setLoading(false)
+      if (data) trackEvent('view_lesson', id)
     })
   }, [id])
 

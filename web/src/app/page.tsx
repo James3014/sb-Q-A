@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getLessons, Lesson } from '@/lib/lessons';
@@ -10,6 +10,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/auth';
 import { LEVEL_NAMES, PROBLEM_CATEGORIES } from '@/lib/constants';
 import { useFilteredLessons } from '@/lib/useFilteredLessons';
+import { trackEvent } from '@/lib/analytics';
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ function HomeContent() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const { user } = useAuth();
+  const searchTimer = useRef<NodeJS.Timeout>(null);
 
   const levelFilter = searchParams.get('level');
   const slopeFilter = searchParams.get('slope');
@@ -39,6 +41,17 @@ function HomeContent() {
       setLoading(false);
     });
   }, []);
+
+  // 搜尋追蹤 (debounce 1秒)
+  useEffect(() => {
+    if (search.length >= 2) {
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+      searchTimer.current = setTimeout(() => {
+        trackEvent('search_keyword', undefined, { keyword: search });
+      }, 1000);
+    }
+    return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
+  }, [search]);
 
   const filteredLessons = useFilteredLessons({
     lessons,
@@ -157,6 +170,13 @@ function HomeContent() {
             </button>
           )}
         </section>
+
+        {/* 回報入口 */}
+        <div className="text-center pt-4 pb-8">
+          <Link href="/feedback" className="text-zinc-500 text-sm hover:text-zinc-300">
+            💬 意見回報
+          </Link>
+        </div>
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 'use client'
 
 import { getSupabase } from './supabase'
+import { trackEvent } from './analytics'
 
 export async function getFavorites(userId: string): Promise<string[]> {
   const supabase = getSupabase()
@@ -60,6 +61,7 @@ export async function addFavorite(userId: string, lessonId: string): Promise<{ s
     return { success: false, error: error.message }
   }
   
+  trackEvent('favorite_add', lessonId)
   return { success: true }
 }
 
@@ -87,5 +89,6 @@ export async function removeFavorite(userId: string, lessonId: string): Promise<
     return { success: false, error: error.message }
   }
   
+  trackEvent('favorite_remove', lessonId)
   return { success: true }
 }

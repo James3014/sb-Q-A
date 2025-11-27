@@ -1,6 +1,7 @@
 'use client'
 
 import { getSupabase } from './supabase'
+import { trackEvent } from './analytics'
 
 export interface PracticeLog {
   id: string
@@ -49,5 +50,6 @@ export async function addPracticeLog(userId: string, lessonId: string, note: str
     return { success: false, error: error.message }
   }
   
+  trackEvent('practice_complete', lessonId)
   return { success: true }
 }
