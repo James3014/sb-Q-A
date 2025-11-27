@@ -69,6 +69,38 @@
 - [ ] 42. 建立 Prompt 標準化模板（簡筆畫風格）
 - [ ] 43. 定義圖片風格指南
 
+---
+
+## Schema v3 + Learning Path Engine（2025-11-27）
+
+### Phase 1：Schema v3 Migration
+- [x] 46. 建立 skills 表 + 初始資料（5 個 CASI 技能）
+- [x] 47. 建立 competencies 表 + 初始資料
+- [x] 48. 擴充 lessons 表（新增欄位）
+- [x] 49. 建立 lesson_skills 多對多表
+- [x] 50. 建立 lesson_prerequisites 表
+- [x] 51. 建立 tags + lesson_tags 表
+- [x] 52. 資料遷移腳本（casi → casi_raw + primary_skill_code）
+
+### Phase 2：TypeScript Types
+- [x] 53. 建立 types/lesson.ts
+- [x] 54. 建立 types/rider.ts
+- [x] 55. 建立 types/path.ts
+- [x] 56. 更新現有 API 使用新型別（待整合）
+
+### Phase 3：Learning Path Engine v1
+- [x] 57. filterCandidates() - 候選課程過濾
+- [x] 58. scoreLessons() - 多維度評分
+- [x] 59. schedulePath() - 排程邏輯
+- [x] 60. buildSummary() - 產生人類可讀說明
+- [ ] 61. Supabase Edge Function: recommend-path
+
+### Phase 4：症狀 → 課程映射
+- [x] 62. 定義 Symptom codes
+- [x] 63. AI 分析產生 symptom → lesson mapping（284 個）
+- [x] 64. AI 分析產生 lesson prerequisites（9 個）
+- [x] 65. 建立 goal → skill/tag mapping
+
 ### 其他調整
 - [x] 44. 步驟卡片圖片槽位預設不展開
 - [x] 45. 驗證 build ✅

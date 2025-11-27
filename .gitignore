@@ -110,3 +110,6 @@ sam_cleaned/
 sam_cleaned_reference/
 scripts/parse_lessons.py
 sam_cleaned_new/
+docs/migration_prerequisites.sql
+docs/prerequisites_analysis.json
+scripts/analyze_prerequisites.py
