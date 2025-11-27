@@ -1,41 +1,38 @@
 # TODO
 
-## ✅ 後台 Dashboard - 已完成
+## 重構清單（Clean Code + Linus 原則）
 
-### Phase 1 - 基本數據
-- [x] 1. 建立 `/admin` 路由 + 管理員驗證
-- [x] 2. 總覽頁：DAU/WAU 統計
-- [x] 3. 總覽頁：熱門課程 TOP 10
-- [x] 4. 總覽頁：最新回報 5 筆
-- [x] 5. `/admin/feedback` 回報列表頁
-
-### Phase 2 - 進階分析
-- [x] 6. `/admin/lessons` 課程分析頁
-- [x] 7. `/admin/monetization` 付費分析頁
-
----
-
-## ⏳ 待執行 SQL
-
-需要在 Supabase SQL Editor 執行：
-- `docs/migration_admin.sql` (後台統計函數)
+- [x] 1. 統一後台頁面使用 AdminLayout（消除重複驗證邏輯）
+- [x] 2. 移除 admin/page.tsx 重複的 loading/權限檢查
+- [x] 3. 後台密碼統一用環境變數
+- [x] 4. 刪除空的 web/src/data 資料夾
+- [x] 5. admin/page.tsx 拆分子組件（StatCard、TopLessons、TopKeywords、RecentFeedback）
 
 ---
 
 ## ✅ 已完成
 
-### 事件追蹤系統
-- [x] event_log 資料表
-- [x] trackEvent() 函數
-- [x] 埋點：view_lesson, search_keyword, pricing_view, favorite, practice
+### Clean Code 第二輪 (2025-11-27)
+- [x] 5 個 admin 頁面統一使用 AdminLayout + AdminHeader
+- [x] 移除所有重複的權限驗證邏輯（約 -150 行）
+- [x] useAdminAuth hook 統一管理驗證狀態
+- [x] 環境變數 NEXT_PUBLIC_ADMIN_PASSWORD
+- [x] admin/page.tsx 拆分 4 個子組件
 
-### 回報系統
-- [x] feedback 資料表
-- [x] /feedback 回報頁面
-- [x] 首頁回報入口
+### 後台 Dashboard
+- [x] 總覽頁
+- [x] 用戶管理（搜尋、開通）
+- [x] 回報管理
+- [x] 課程分析
+- [x] 付費分析
 
-### Clean Code 重構
-- [x] constants.ts 統一常數
-- [x] 共用組件 ui.tsx
+### 事件追蹤
+- [x] event_log 表
+- [x] trackEvent 函數
+- [x] 埋點完成
+
+### Clean Code 第一輪
+- [x] constants.ts
+- [x] ui.tsx 共用組件
 - [x] useFilteredLessons hook
-- [x] LessonDetail 子組件拆分
+- [x] LessonDetail 拆分子組件

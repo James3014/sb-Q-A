@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useAuth } from '@/components/AuthProvider'
-import { isAdmin } from '@/lib/admin'
+import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
+import { useAdminAuth } from '@/lib/useAdminAuth'
 import { getSupabase } from '@/lib/supabase'
 
 interface User {
@@ -33,7 +32,7 @@ function getStatus(user: User): { label: string; color: string } {
 }
 
 export default function UsersPage() {
-  const { user, loading } = useAuth()
+  const { isReady } = useAdminAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [search, setSearch] = useState('')
@@ -52,10 +51,8 @@ export default function UsersPage() {
   }
 
   useEffect(() => {
-    if (!loading && user && isAdmin(user.email)) {
-      loadUsers()
-    }
-  }, [user, loading])
+    if (isReady) loadUsers()
+  }, [isReady])
 
   const activateUser = async () => {
     if (!selectedUser || activating) return
@@ -95,28 +92,14 @@ export default function UsersPage() {
     setSelectedUser(null)
   }
 
-  if (loading) return <div className="min-h-screen bg-zinc-900 text-white p-4">載入中...</div>
-
-  if (!user || !isAdmin(user.email)) {
-    return (
-      <div className="min-h-screen bg-zinc-900 text-white p-4">
-        <p className="text-center mt-20 text-zinc-400">無權限存取</p>
-      </div>
-    )
-  }
-
   const filtered = search
     ? users.filter(u => u.email?.toLowerCase().includes(search.toLowerCase()))
     : users
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
-      <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">👥 用戶管理</h1>
-          <Link href="/admin" className="text-sm text-zinc-400">← 返回</Link>
-        </div>
-      </header>
+    <AdminLayout>
+      <main className="min-h-screen bg-zinc-900 text-white">
+        <AdminHeader title="👥 用戶管理" />
 
       <div className="p-4 max-w-2xl mx-auto">
         {/* 搜尋 */}
@@ -237,5 +220,6 @@ export default function UsersPage() {
         )}
       </div>
     </main>
+    </AdminLayout>
   )
 }
