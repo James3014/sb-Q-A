@@ -1,14 +1,9 @@
 import Link from 'next/link';
 import { Lesson } from '@/lib/lessons';
-
-const levelMap: Record<string, string> = {
-  beginner: '初級',
-  intermediate: '中級',
-  advanced: '進階',
-};
+import { LEVEL_NAMES } from '@/lib/constants';
 
 export default function LessonCard({ lesson }: { lesson: Lesson }) {
-  const levels = lesson.level_tags.map(t => levelMap[t] || t).join('/');
+  const levels = lesson.level_tags.map(t => LEVEL_NAMES[t] || t).join('/');
   
   return (
     <Link href={`/lesson/${lesson.id}`} className="block">

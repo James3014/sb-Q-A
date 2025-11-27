@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getLessons, Lesson } from '@/lib/lessons';
@@ -8,17 +8,8 @@ import LessonCard from '@/components/LessonCard';
 import SearchBar from '@/components/SearchBar';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/auth';
-
-const PROBLEM_CATEGORIES = [
-  { id: 'heel', label: '後刃問題', keywords: ['後刃', '後腳', '後膝'], emoji: '🦶' },
-  { id: 'toe', label: '前刃問題', keywords: ['前刃', '前腳', '前膝', '前腿'], emoji: '👣' },
-  { id: 'edge', label: '換刃卡卡', keywords: ['換刃', '換邊', '轉換'], emoji: '🔄' },
-  { id: 'balance', label: '重心不穩', keywords: ['重心', '平衡', '居中'], emoji: '⚖️' },
-  { id: 'speed', label: '速度控制', keywords: ['控速', '減速', '煞車', '太快'], emoji: '🎿' },
-  { id: 'mogul', label: '蘑菇地形', keywords: ['蘑菇', '包', 'mogul'], emoji: '🍄' },
-  { id: 'steep', label: '陡坡技巧', keywords: ['陡坡', '黑道', '陡'], emoji: '⛷️' },
-  { id: 'stance', label: '站姿調整', keywords: ['站姿', '姿勢', '站直'], emoji: '🧍' },
-];
+import { LEVEL_NAMES, PROBLEM_CATEGORIES } from '@/lib/constants';
+import { useFilteredLessons } from '@/lib/useFilteredLessons';
 
 export default function Home() {
   return (
@@ -37,7 +28,6 @@ function HomeContent() {
   const [showAll, setShowAll] = useState(false);
   const { user } = useAuth();
 
-  // URL 參數篩選
   const levelFilter = searchParams.get('level');
   const slopeFilter = searchParams.get('slope');
   const skillFilter = searchParams.get('skill');
@@ -50,39 +40,14 @@ function HomeContent() {
     });
   }, []);
 
-  const filteredLessons = useMemo(() => {
-    let result = lessons;
-
-    // URL 標籤篩選
-    if (levelFilter) {
-      result = result.filter(l => l.level_tags?.includes(levelFilter));
-    }
-    if (slopeFilter) {
-      result = result.filter(l => l.slope_tags?.includes(slopeFilter));
-    }
-    if (skillFilter) {
-      result = result.filter(l => l.casi?.Primary_Skill === skillFilter);
-    }
-
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(l =>
-        l.title.toLowerCase().includes(q) ||
-        l.what.toLowerCase().includes(q)
-      );
-    }
-
-    if (selectedCategory) {
-      const cat = PROBLEM_CATEGORIES.find(c => c.id === selectedCategory);
-      if (cat) {
-        result = result.filter(l =>
-          cat.keywords.some(k => l.title.includes(k) || l.what.includes(k))
-        );
-      }
-    }
-
-    return result;
-  }, [lessons, search, selectedCategory, levelFilter, slopeFilter, skillFilter]);
+  const filteredLessons = useFilteredLessons({
+    lessons,
+    search,
+    selectedCategory,
+    levelFilter,
+    slopeFilter,
+    skillFilter,
+  });
 
   const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
   const hasMore = filteredLessons.length > 10 && !showAll;
@@ -112,13 +77,12 @@ function HomeContent() {
       </header>
 
       <div className="p-4 space-y-6">
-        {/* 標籤篩選提示 */}
         {hasTagFilter && (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-zinc-400">篩選：</span>
             {levelFilter && (
               <span className="px-2 py-1 text-xs rounded-full bg-green-600">
-                {levelFilter === 'beginner' ? '初級' : levelFilter === 'intermediate' ? '中級' : '進階'}
+                {LEVEL_NAMES[levelFilter] || levelFilter}
               </span>
             )}
             {slopeFilter && (
@@ -139,7 +103,7 @@ function HomeContent() {
           </div>
         )}
 
-        {!search && (
+        {!search && !hasTagFilter && (
           <section>
             <h2 className="text-sm text-zinc-400 mb-3">你遇到什麼問題？</h2>
             <div className="grid grid-cols-2 gap-2">
@@ -151,9 +115,7 @@ function HomeContent() {
                     setShowAll(false);
                   }}
                   className={`p-3 rounded-lg text-left transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-zinc-800 hover:bg-zinc-700'
+                    selectedCategory === cat.id ? 'bg-blue-600 text-white' : 'bg-zinc-800 hover:bg-zinc-700'
                   }`}
                 >
                   <span className="text-lg mr-2">{cat.emoji}</span>
@@ -172,9 +134,7 @@ function HomeContent() {
                 : '熱門課程'}
             </h2>
             {(search || selectedCategory) && (
-              <button onClick={clearFilters} className="text-xs text-blue-400">
-                清除篩選
-              </button>
+              <button onClick={clearFilters} className="text-xs text-blue-400">清除篩選</button>
             )}
           </div>
 
@@ -184,9 +144,7 @@ function HomeContent() {
             <p className="text-center text-zinc-500 py-8">找不到相關課程</p>
           ) : (
             <div className="space-y-6">
-              {displayLessons.map(lesson => (
-                <LessonCard key={lesson.id} lesson={lesson} />
-              ))}
+              {displayLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} />)}
             </div>
           )}
 
