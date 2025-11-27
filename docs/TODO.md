@@ -93,7 +93,7 @@
 - [x] 58. scoreLessons() - 多維度評分
 - [x] 59. schedulePath() - 排程邏輯
 - [x] 60. buildSummary() - 產生人類可讀說明
-- [ ] 61. Supabase Edge Function: recommend-path
+- [x] 61. Supabase Edge Function: recommend-path
 
 ### Phase 4：症狀 → 課程映射
 - [x] 62. 定義 Symptom codes
