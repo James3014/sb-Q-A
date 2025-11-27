@@ -10,10 +10,42 @@ import { LoadingState, LockedState, PageHeader, EmptyState } from '@/components/
 
 function ImprovementDashboard({ data }: { data: ImprovementData }) {
   const improvementColor = data.improvement >= 0 ? 'text-green-400' : 'text-red-400'
-  const improvementSign = data.improvement >= 0 ? '+' : ''
+  const improvementSign = data.improvement >= 0 ? '↑' : '↓'
+  const hasEnoughData = data.totalPractices >= 6
 
   return (
-    <div className="space-y-4 mb-6">
+    <div className="space-y-4">
+      {/* 改善度 Summary */}
+      <div className="bg-zinc-800 rounded-lg p-4">
+        <h3 className="font-bold text-sm mb-3">📈 技能改善度</h3>
+        {hasEnoughData ? (
+          <>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-3xl font-bold ${improvementColor}`}>
+                {improvementSign} {Math.abs(data.improvement).toFixed(1)}
+              </span>
+              <span className="text-zinc-400 text-sm">分</span>
+            </div>
+            <p className="text-xs text-zinc-500">
+              計算方式：最近 3 次平均 - 最早 3 次平均
+            </p>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-zinc-400 text-sm mb-2">
+              尚未累積足夠資料（{data.totalPractices}/6 次）
+            </p>
+            <div className="w-full bg-zinc-700 rounded-full h-2 mb-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all" 
+                style={{ width: `${(data.totalPractices / 6) * 100}%` }}
+              />
+            </div>
+            <p className="text-xs text-zinc-500">完成 6 次練習後解鎖改善趨勢</p>
+          </div>
+        )}
+      </div>
+
       {/* 總覽 */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-zinc-800 rounded-lg p-3 text-center">
@@ -21,19 +53,22 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
           <p className="text-xl font-bold">{data.totalPractices}</p>
         </div>
         <div className="bg-zinc-800 rounded-lg p-3 text-center">
-          <p className="text-zinc-400 text-xs">改善度</p>
-          <p className={`text-xl font-bold ${improvementColor}`}>
-            {improvementSign}{data.improvement.toFixed(1)}
-          </p>
-        </div>
-        <div className="bg-zinc-800 rounded-lg p-3 text-center">
           <p className="text-zinc-400 text-xs">技能數</p>
           <p className="text-xl font-bold">{data.skills.length}</p>
         </div>
+        <div className="bg-zinc-800 rounded-lg p-3 text-center">
+          <p className="text-zinc-400 text-xs">平均分</p>
+          <p className="text-xl font-bold">
+            {data.scores.length > 0 
+              ? (data.scores.reduce((a, s) => a + s.score, 0) / data.scores.length).toFixed(1)
+              : '-'
+            }
+          </p>
+        </div>
       </div>
 
-      {/* CASI 技能雷達 */}
-      {data.skills.length > 0 && (
+      {/* CASI 技能分布 */}
+      {data.skills.length > 0 ? (
         <div className="bg-zinc-800 rounded-lg p-4">
           <h3 className="font-bold text-sm mb-3">🎯 CASI 技能分布</h3>
           <div className="space-y-2">
@@ -53,18 +88,23 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
             ))}
           </div>
         </div>
+      ) : (
+        <div className="bg-zinc-800 rounded-lg p-4 text-center">
+          <p className="text-zinc-400 text-sm">🎯 尚未有技能分類資料</p>
+          <p className="text-xs text-zinc-500 mt-1">開始練習以解鎖技能雷達圖</p>
+        </div>
       )}
 
       {/* 練習趨勢 */}
-      {data.trend.length > 0 && (
+      {data.trend.length > 0 ? (
         <div className="bg-zinc-800 rounded-lg p-4">
-          <h3 className="font-bold text-sm mb-3">📈 近 30 天練習量</h3>
-          <div className="flex items-end gap-1 h-16">
+          <h3 className="font-bold text-sm mb-3">📊 近 30 天練習量</h3>
+          <div className="flex items-end gap-1 h-20">
             {data.trend.map(t => {
               const max = Math.max(...data.trend.map(x => x.count), 1)
               const height = (t.count / max) * 100
               return (
-                <div key={t.date} className="flex-1">
+                <div key={t.date} className="flex-1 flex flex-col items-center">
                   <div 
                     className="w-full bg-green-500 rounded-t" 
                     style={{ height: `${height}%`, minHeight: t.count > 0 ? '4px' : '0' }}
@@ -74,6 +114,14 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
               )
             })}
           </div>
+          <p className="text-xs text-zinc-500 mt-2 text-center">
+            共 {data.trend.reduce((a, t) => a + t.count, 0)} 次練習
+          </p>
+        </div>
+      ) : (
+        <div className="bg-zinc-800 rounded-lg p-4 text-center">
+          <p className="text-zinc-400 text-sm">📊 近期沒有練習紀錄</p>
+          <p className="text-xs text-zinc-500 mt-1">從課程詳情頁點擊「已完成」開始累積</p>
         </div>
       )}
     </div>
@@ -116,7 +164,7 @@ export default function PracticePage() {
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white">
-      <PageHeader title="練習紀錄" emoji="📝" />
+      <PageHeader title="練習中心" emoji="🏂" />
       
       {/* Tab 切換 */}
       <div className="flex border-b border-zinc-800">
@@ -135,32 +183,50 @@ export default function PracticePage() {
       </div>
 
       <div className="p-4">
-        {tab === 'dashboard' && improvement && (
+        {tab === 'dashboard' && improvement && improvement.totalPractices > 0 && (
           <ImprovementDashboard data={improvement} />
         )}
 
         {tab === 'dashboard' && (!improvement || improvement.totalPractices === 0) && (
-          <EmptyState emoji="📊" title="還沒有練習數據" description="完成練習後這裡會顯示改善曲線" actionText="開始練習" actionHref="/" />
+          <EmptyState 
+            emoji="📊" 
+            title="還沒有練習數據" 
+            description="從任一課程點擊「已完成」開始累積練習紀錄" 
+            actionText="開始練習" 
+            actionHref="/" 
+          />
         )}
 
         {tab === 'logs' && logs.length === 0 && (
-          <EmptyState emoji="📝" title="還沒有練習紀錄" description="在課程頁點 📝 記錄練習心得" actionText="開始練習" actionHref="/" />
+          <EmptyState 
+            emoji="📝" 
+            title="還沒有練習紀錄" 
+            description="在課程頁點 📝 記錄練習心得" 
+            actionText="開始練習" 
+            actionHref="/" 
+          />
         )}
 
         {tab === 'logs' && logs.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {logs.map(log => {
               const lesson = getLesson(log.lesson_id)
               const isExpanded = expanded === log.id
               return (
                 <div key={log.id} className="bg-zinc-800 rounded-lg overflow-hidden">
                   <button onClick={() => setExpanded(isExpanded ? null : log.id)} className="w-full p-4 text-left">
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="font-medium text-sm">{lesson?.title || `課程 ${log.lesson_id}`}</p>
-                      <span className="text-xs text-zinc-400">{new Date(log.created_at).toLocaleDateString('zh-TW')}</span>
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="font-medium text-sm flex-1">{lesson?.title || `課程 ${log.lesson_id}`}</p>
+                      <div className="flex items-center gap-2">
+                        {log.rating && (
+                          <span className="text-xs bg-blue-600 px-2 py-0.5 rounded">{log.rating}分</span>
+                        )}
+                        <span className="text-xs text-zinc-500">
+                          {new Date(log.created_at).toLocaleDateString('zh-TW')}
+                        </span>
+                      </div>
                     </div>
-                    {log.note && <p className="text-sm text-zinc-300 mb-2">💭 {log.note}</p>}
-                    <p className="text-xs text-zinc-500">{isExpanded ? '▲ 收起' : '▼ 展開'}</p>
+                    {log.note && <p className="text-sm text-zinc-400 mt-1">💭 {log.note}</p>}
                   </button>
                   {isExpanded && lesson && (
                     <div className="px-4 pb-4 border-t border-zinc-700 pt-3">
