@@ -22,10 +22,11 @@ export default function PricingPage() {
           <h3 className="font-bold mb-2">免費版</h3>
           <p className="text-2xl font-bold mb-3">$0</p>
           <ul className="text-sm text-zinc-400 space-y-1">
-            <li>✓ 30 堂初級課程</li>
+            <li>✓ 28 堂初級課程</li>
             <li>✓ 搜尋 / 篩選</li>
             <li>✓ 試閱中級課程（僅問題區塊）</li>
             <li className="text-zinc-600">✗ PRO 課程完整內容</li>
+            <li className="text-zinc-600">✗ 收藏功能</li>
             <li className="text-zinc-600">✗ 練習紀錄</li>
           </ul>
         </div>
@@ -48,6 +49,7 @@ export default function PricingPage() {
           
           <ul className="text-sm space-y-1">
             <li>✓ 全部 213 堂課程</li>
+            <li>✓ 收藏功能</li>
             <li>✓ 練習紀錄 / 自評 / 趨勢</li>
           </ul>
         </div>
@@ -63,6 +65,7 @@ export default function PricingPage() {
           <ul className="text-sm space-y-1">
             <li className="text-amber-200">✓ 全部課程（213+）</li>
             <li className="text-amber-200">✓ 雪季更新內容</li>
+            <li>✓ 收藏功能</li>
             <li>✓ 練習紀錄 + 改善曲線</li>
             <li>✓ 課程組合推薦（未來）</li>
           </ul>

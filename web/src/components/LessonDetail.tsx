@@ -138,26 +138,28 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             {user && (
               <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 p-4">
                 <div className="max-w-lg mx-auto flex gap-3">
-                  <button
-                    onClick={handleToggleFav}
-                    disabled={favLoading}
-                    className={`flex-1 py-3 rounded-lg font-medium ${isFav ? 'bg-pink-600' : 'bg-slate-700'}`}
-                  >
-                    {favLoading ? '⏳' : isFav ? '❤️ 已收藏' : '🤍 加入收藏'}
-                  </button>
                   {subscription.isActive ? (
-                    <button
-                      onClick={() => setShowNote(true)}
-                      className="flex-1 py-3 rounded-lg font-medium bg-blue-600"
-                    >
-                      📝 完成練習
-                    </button>
+                    <>
+                      <button
+                        onClick={handleToggleFav}
+                        disabled={favLoading}
+                        className={`flex-1 py-3 rounded-lg font-medium ${isFav ? 'bg-pink-600' : 'bg-slate-700'}`}
+                      >
+                        {favLoading ? '⏳' : isFav ? '❤️ 已收藏' : '🤍 加入收藏'}
+                      </button>
+                      <button
+                        onClick={() => setShowNote(true)}
+                        className="flex-1 py-3 rounded-lg font-medium bg-blue-600"
+                      >
+                        📝 完成練習
+                      </button>
+                    </>
                   ) : (
                     <Link
                       href="/pricing"
                       className="flex-1 py-3 rounded-lg font-medium bg-amber-600 text-center"
                     >
-                      🔓 升級解鎖
+                      🔓 升級解鎖收藏與練習紀錄
                     </Link>
                   )}
                 </div>
