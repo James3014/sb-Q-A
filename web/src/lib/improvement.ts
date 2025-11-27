@@ -1,11 +1,35 @@
 import { getSupabase } from './supabase'
 
+export interface ScoreRecord {
+  date: string
+  score: number
+  lesson_id: string
+}
+
+export interface SkillStats {
+  skill: string
+  score: number
+  count: number
+}
+
+export interface TrendStats {
+  date: string
+  count: number
+}
+
+export interface PracticeRecord {
+  lesson_id: string
+  title: string
+  score: number
+  date: string
+}
+
 export interface ImprovementData {
   improvement: number
-  scores: { date: string; score: number; lesson_id: string }[]
-  skills: { skill: string; score: number; count: number }[]
-  trend: { date: string; count: number }[]
-  recentPractice: { lesson_id: string; title: string; score: number; date: string }[]
+  scores: ScoreRecord[]
+  skills: SkillStats[]
+  trend: TrendStats[]
+  recentPractice: PracticeRecord[]
   totalPractices: number
 }
 
@@ -26,13 +50,22 @@ export async function getImprovementData(userId: string): Promise<ImprovementDat
       .limit(10),
   ])
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recentPractice = (recent.data || []).map((r: any) => ({
-    lesson_id: r.lesson_id,
-    title: r.lessons?.title || r.lesson_id,
-    score: r.rating || 0,
-    date: r.created_at,
-  }))
+  interface RawPracticeLog {
+    lesson_id: string
+    rating: number
+    created_at: string
+    lessons: { title: string } | null
+  }
+
+  const recentPractice: PracticeRecord[] = (recent.data || []).map((r: unknown) => {
+    const log = r as RawPracticeLog
+    return {
+      lesson_id: log.lesson_id,
+      title: log.lessons?.title || log.lesson_id,
+      score: log.rating || 0,
+      date: log.created_at,
+    }
+  })
 
   return {
     improvement: improvement.data || 0,
