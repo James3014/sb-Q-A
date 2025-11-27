@@ -8,10 +8,43 @@ import { getLessons, Lesson } from '@/lib/lessons'
 import { getImprovementData, ImprovementData } from '@/lib/improvement'
 import { LoadingState, LockedState, PageHeader, EmptyState } from '@/components/ui'
 
-function ImprovementDashboard({ data }: { data: ImprovementData }) {
+// 技能對應推薦課程
+const SKILL_RECOMMENDATIONS: Record<string, string[]> = {
+  '用刃': ['後刃卡住', '刃轉換', '邊刃掌控'],
+  '旋轉': ['下肢旋轉', '軸轉技巧', '轉彎控制'],
+  '壓力控制': ['壓力轉換', '重心控制', '彈跳吸收'],
+  '站姿與平衡': ['基本站姿', '重心居中', '平衡練習'],
+  '時機與協調性': ['節奏控制', '動作連貫', '時機掌握'],
+}
+
+function ImprovementDashboard({ data, lessons }: { data: ImprovementData; lessons: Lesson[] }) {
+  const [trendDays, setTrendDays] = useState<7 | 30>(30)
+  
   const improvementColor = data.improvement >= 0 ? 'text-green-400' : 'text-red-400'
   const improvementSign = data.improvement >= 0 ? '↑' : '↓'
   const hasEnoughData = data.totalPractices >= 6
+
+  // 找出最弱技能
+  const weakSkill = data.skills.length > 0 
+    ? data.skills.reduce((min, s) => s.score < min.score ? s : min, data.skills[0])
+    : null
+
+  // 計算最後練習距今天數
+  const lastPracticeDate = data.recentPractice?.[0]?.date
+  const daysSinceLastPractice = lastPracticeDate 
+    ? Math.floor((Date.now() - new Date(lastPracticeDate).getTime()) / (1000 * 60 * 60 * 24))
+    : null
+
+  // 篩選趨勢資料
+  const filteredTrend = trendDays === 7 ? data.trend.slice(-7) : data.trend
+
+  // 找推薦課程
+  const getRecommendedLessons = (skill: string) => {
+    const keywords = SKILL_RECOMMENDATIONS[skill] || []
+    return lessons
+      .filter(l => keywords.some(k => l.title.includes(k) || l.what?.includes(k)))
+      .slice(0, 3)
+  }
 
   return (
     <div className="space-y-4">
@@ -27,7 +60,7 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
               <span className="text-zinc-400 text-sm">分</span>
             </div>
             <p className="text-xs text-zinc-500">
-              計算方式：最近 3 次平均 - 最早 3 次平均
+              最近 3 次平均 - 最早 3 次平均
             </p>
           </>
         ) : (
@@ -67,25 +100,31 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
         </div>
       </div>
 
-      {/* CASI 技能分布 */}
+      {/* CASI 技能分布（含弱項標註） */}
       {data.skills.length > 0 ? (
         <div className="bg-zinc-800 rounded-lg p-4">
           <h3 className="font-bold text-sm mb-3">🎯 CASI 技能分布</h3>
           <div className="space-y-2">
-            {data.skills.map(s => (
-              <div key={s.skill}>
-                <div className="flex justify-between text-xs mb-1">
-                  <span>{s.skill}</span>
-                  <span>{s.score.toFixed(1)} ({s.count}次)</span>
+            {data.skills.map(s => {
+              const isWeak = s.score < 3
+              return (
+                <div key={s.skill}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="flex items-center gap-1">
+                      {isWeak && <span className="w-2 h-2 bg-red-500 rounded-full" />}
+                      {s.skill}
+                    </span>
+                    <span className={isWeak ? 'text-red-400' : ''}>{s.score.toFixed(1)} ({s.count}次)</span>
+                  </div>
+                  <div className="h-2 bg-zinc-700 rounded">
+                    <div 
+                      className={`h-2 rounded ${isWeak ? 'bg-red-500' : 'bg-blue-500'}`}
+                      style={{ width: `${(s.score / 5) * 100}%` }} 
+                    />
+                  </div>
                 </div>
-                <div className="h-2 bg-zinc-700 rounded">
-                  <div 
-                    className="h-2 rounded bg-blue-500" 
-                    style={{ width: `${(s.score / 5) * 100}%` }} 
-                  />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       ) : (
@@ -95,35 +134,94 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
         </div>
       )}
 
-      {/* 練習趨勢 */}
-      {data.trend.length > 0 ? (
-        <div className="bg-zinc-800 rounded-lg p-4">
-          <h3 className="font-bold text-sm mb-3">📊 近 30 天練習量</h3>
-          <div className="flex items-end gap-1 h-20">
-            {data.trend.map(t => {
-              const max = Math.max(...data.trend.map(x => x.count), 1)
-              const height = (t.count / max) * 100
-              return (
-                <div key={t.date} className="flex-1 flex flex-col items-center">
-                  <div 
-                    className="w-full bg-green-500 rounded-t" 
-                    style={{ height: `${height}%`, minHeight: t.count > 0 ? '4px' : '0' }}
-                    title={`${t.date}: ${t.count}`}
-                  />
-                </div>
-              )
-            })}
-          </div>
-          <p className="text-xs text-zinc-500 mt-2 text-center">
-            共 {data.trend.reduce((a, t) => a + t.count, 0)} 次練習
+      {/* 弱項提示 + 推薦課程 */}
+      {weakSkill && weakSkill.score < 4 && (
+        <div className="bg-gradient-to-r from-amber-900/30 to-zinc-800 rounded-lg p-4 border border-amber-600/30">
+          <h3 className="font-bold text-sm mb-2 text-amber-400">🎯 建議加強：{weakSkill.skill}</h3>
+          <p className="text-xs text-zinc-400 mb-3">
+            根據你的練習資料，這是目前分數最低的技能（{weakSkill.score.toFixed(1)} 分）
           </p>
-        </div>
-      ) : (
-        <div className="bg-zinc-800 rounded-lg p-4 text-center">
-          <p className="text-zinc-400 text-sm">📊 近期沒有練習紀錄</p>
-          <p className="text-xs text-zinc-500 mt-1">從課程詳情頁點擊「已完成」開始累積</p>
+          {(() => {
+            const recommended = getRecommendedLessons(weakSkill.skill)
+            return recommended.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-xs text-zinc-500">推薦課程：</p>
+                {recommended.map(l => (
+                  <Link 
+                    key={l.id} 
+                    href={`/lesson/${l.id}`}
+                    className="block bg-zinc-700/50 rounded p-2 text-sm hover:bg-zinc-700 transition"
+                  >
+                    {l.title}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Link href="/" className="text-sm text-amber-400">
+                瀏覽相關課程 →
+              </Link>
+            )
+          })()}
         </div>
       )}
+
+      {/* 久未練習提示 */}
+      {daysSinceLastPractice !== null && daysSinceLastPractice >= 5 && (
+        <div className="bg-zinc-800 rounded-lg p-4 border border-blue-600/30">
+          <p className="text-sm">
+            🏂 已經 <span className="text-blue-400 font-bold">{daysSinceLastPractice}</span> 天沒練習囉！
+          </p>
+          <p className="text-xs text-zinc-500 mt-1">試試看回到雪場核心技巧的習題吧</p>
+          <Link href="/" className="inline-block mt-2 text-sm text-blue-400">
+            開始練習 →
+          </Link>
+        </div>
+      )}
+
+      {/* 練習趨勢（可切換 7/30 天） */}
+      <div className="bg-zinc-800 rounded-lg p-4">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-bold text-sm">📊 練習趨勢</h3>
+          <div className="flex gap-1">
+            <button 
+              onClick={() => setTrendDays(7)}
+              className={`px-2 py-1 text-xs rounded ${trendDays === 7 ? 'bg-blue-600' : 'bg-zinc-700'}`}
+            >
+              7天
+            </button>
+            <button 
+              onClick={() => setTrendDays(30)}
+              className={`px-2 py-1 text-xs rounded ${trendDays === 30 ? 'bg-blue-600' : 'bg-zinc-700'}`}
+            >
+              30天
+            </button>
+          </div>
+        </div>
+        {filteredTrend.length > 0 ? (
+          <>
+            <div className="flex items-end gap-1 h-20">
+              {filteredTrend.map(t => {
+                const max = Math.max(...filteredTrend.map(x => x.count), 1)
+                const height = (t.count / max) * 100
+                return (
+                  <div key={t.date} className="flex-1">
+                    <div 
+                      className="w-full bg-green-500 rounded-t" 
+                      style={{ height: `${height}%`, minHeight: t.count > 0 ? '4px' : '0' }}
+                      title={`${t.date}: ${t.count}`}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-xs text-zinc-500 mt-2 text-center">
+              共 {filteredTrend.reduce((a, t) => a + t.count, 0)} 次練習
+            </p>
+          </>
+        ) : (
+          <p className="text-zinc-500 text-sm text-center py-4">近期沒有練習紀錄</p>
+        )}
+      </div>
 
       {/* 最近練習 */}
       {data.recentPractice && data.recentPractice.length > 0 && (
@@ -139,7 +237,7 @@ function ImprovementDashboard({ data }: { data: ImprovementData }) {
                 <span className="text-zinc-300 truncate flex-1">{p.title}</span>
                 <div className="flex items-center gap-2">
                   {p.score > 0 && (
-                    <span className="text-xs bg-blue-600 px-2 py-0.5 rounded">{p.score}分</span>
+                    <span className="text-xs">⭐{p.score}</span>
                   )}
                   <span className="text-xs text-zinc-500">
                     {new Date(p.date).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' })}
@@ -192,7 +290,6 @@ export default function PracticePage() {
     <main className="min-h-screen bg-zinc-900 text-white">
       <PageHeader title="練習中心" emoji="🏂" />
       
-      {/* Tab 切換 */}
       <div className="flex border-b border-zinc-800">
         <button 
           onClick={() => setTab('dashboard')}
@@ -210,7 +307,7 @@ export default function PracticePage() {
 
       <div className="p-4">
         {tab === 'dashboard' && improvement && improvement.totalPractices > 0 && (
-          <ImprovementDashboard data={improvement} />
+          <ImprovementDashboard data={improvement} lessons={lessons} />
         )}
 
         {tab === 'dashboard' && (!improvement || improvement.totalPractices === 0) && (
@@ -244,9 +341,7 @@ export default function PracticePage() {
                     <div className="flex justify-between items-start mb-1">
                       <p className="font-medium text-sm flex-1">{lesson?.title || `課程 ${log.lesson_id}`}</p>
                       <div className="flex items-center gap-2">
-                        {log.rating && (
-                          <span className="text-xs bg-blue-600 px-2 py-0.5 rounded">{log.rating}分</span>
-                        )}
+                        {log.rating && <span className="text-xs">⭐{log.rating}</span>}
                         <span className="text-xs text-zinc-500">
                           {new Date(log.created_at).toLocaleDateString('zh-TW')}
                         </span>

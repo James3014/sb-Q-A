@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { getLessonStats, getLessonEffectiveness } from '@/lib/admin'
+import { getLessons, Lesson } from '@/lib/lessons'
 
 interface LessonStat {
   id: string
@@ -22,11 +23,15 @@ interface Effectiveness {
   samples: number
 }
 
+type HeatmapType = 'level' | 'skill' | 'slope'
+
 export default function LessonsPage() {
   const { isReady } = useAdminAuth()
   const [lessons, setLessons] = useState<LessonStat[]>([])
+  const [allLessons, setAllLessons] = useState<Lesson[]>([])
   const [effectiveness, setEffectiveness] = useState<Effectiveness[]>([])
-  const [tab, setTab] = useState<'stats' | 'effectiveness'>('stats')
+  const [tab, setTab] = useState<'stats' | 'effectiveness' | 'heatmap'>('stats')
+  const [heatmapType, setHeatmapType] = useState<HeatmapType>('level')
   const [sortBy, setSortBy] = useState<'views' | 'practices' | 'favorites'>('views')
   const [filterLevel, setFilterLevel] = useState<string>('all')
   const [filterPremium, setFilterPremium] = useState<string>('all')
@@ -34,20 +39,77 @@ export default function LessonsPage() {
 
   useEffect(() => {
     if (isReady) {
-      Promise.all([getLessonStats(), getLessonEffectiveness()]).then(([stats, eff]) => {
+      Promise.all([getLessonStats(), getLessonEffectiveness(), getLessons()]).then(([stats, eff, all]) => {
         setLessons(stats)
         setEffectiveness(eff)
+        setAllLessons(all)
         setLoading(false)
       })
     }
   }, [isReady])
 
+  // 篩選
   let filtered = lessons
   if (filterLevel !== 'all') filtered = filtered.filter(l => l.level_tags?.includes(filterLevel))
   if (filterPremium === 'free') filtered = filtered.filter(l => !l.is_premium)
   else if (filterPremium === 'pro') filtered = filtered.filter(l => l.is_premium)
-
   const sorted = [...filtered].sort((a, b) => b[sortBy] - a[sortBy])
+
+  // 熱力圖資料
+  const getHeatmapData = () => {
+    const statsMap = new Map(lessons.map(l => [l.id, l]))
+    
+    if (heatmapType === 'level') {
+      const levels = ['beginner', 'intermediate', 'advanced']
+      return levels.map(level => {
+        const levelLessons = allLessons.filter(l => l.level_tags?.includes(level))
+        const stats = levelLessons.map(l => statsMap.get(l.id)).filter(Boolean) as LessonStat[]
+        return {
+          label: level === 'beginner' ? '初級' : level === 'intermediate' ? '中級' : '進階',
+          count: levelLessons.length,
+          views: stats.reduce((a, s) => a + s.views, 0),
+          practices: stats.reduce((a, s) => a + s.practices, 0),
+          favorites: stats.reduce((a, s) => a + s.favorites, 0),
+        }
+      })
+    }
+    
+    if (heatmapType === 'skill') {
+      const skills = ['站姿與平衡', '旋轉', '用刃', '壓力控制', '時機與協調性']
+      return skills.map(skill => {
+        const skillLessons = allLessons.filter(l => l.casi?.Primary_Skill === skill)
+        const stats = skillLessons.map(l => statsMap.get(l.id)).filter(Boolean) as LessonStat[]
+        return {
+          label: skill,
+          count: skillLessons.length,
+          views: stats.reduce((a, s) => a + s.views, 0),
+          practices: stats.reduce((a, s) => a + s.practices, 0),
+          favorites: stats.reduce((a, s) => a + s.favorites, 0),
+        }
+      })
+    }
+    
+    // slope
+    const slopes = ['green', 'blue', 'black', 'mogul', 'powder', 'park', 'tree']
+    return slopes.map(slope => {
+      const slopeLessons = allLessons.filter(l => l.slope_tags?.includes(slope))
+      const stats = slopeLessons.map(l => statsMap.get(l.id)).filter(Boolean) as LessonStat[]
+      const labels: Record<string, string> = {
+        green: '綠道', blue: '藍道', black: '黑道', mogul: '蘑菇', 
+        powder: '粉雪', park: '公園', tree: '樹林'
+      }
+      return {
+        label: labels[slope] || slope,
+        count: slopeLessons.length,
+        views: stats.reduce((a, s) => a + s.views, 0),
+        practices: stats.reduce((a, s) => a + s.practices, 0),
+        favorites: stats.reduce((a, s) => a + s.favorites, 0),
+      }
+    })
+  }
+
+  const heatmapData = getHeatmapData()
+  const maxViews = Math.max(...heatmapData.map(d => d.views), 1)
 
   return (
     <AdminLayout>
@@ -60,13 +122,19 @@ export default function LessonsPage() {
             onClick={() => setTab('stats')}
             className={`flex-1 py-3 text-sm font-medium ${tab === 'stats' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-zinc-400'}`}
           >
-            📊 瀏覽統計
+            📊 熱門課程
           </button>
           <button 
             onClick={() => setTab('effectiveness')}
             className={`flex-1 py-3 text-sm font-medium ${tab === 'effectiveness' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-zinc-400'}`}
           >
-            🎯 有效度排行
+            🎯 有效度
+          </button>
+          <button 
+            onClick={() => setTab('heatmap')}
+            className={`flex-1 py-3 text-sm font-medium ${tab === 'heatmap' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-zinc-400'}`}
+          >
+            🔥 熱力圖
           </button>
         </div>
 
@@ -137,7 +205,7 @@ export default function LessonsPage() {
 
               {/* 課程列表 */}
               <div className="space-y-2">
-                {sorted.map((l, i) => (
+                {sorted.slice(0, 50).map((l, i) => (
                   <div key={l.id} className="bg-zinc-800 rounded-lg p-3 flex justify-between items-center">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -155,8 +223,7 @@ export default function LessonsPage() {
                 ))}
               </div>
             </>
-          ) : (
-            /* 有效度排行 */
+          ) : tab === 'effectiveness' ? (
             <div className="space-y-4">
               <div className="bg-zinc-800 rounded-lg p-4">
                 <p className="text-sm text-zinc-400 mb-2">
@@ -189,6 +256,66 @@ export default function LessonsPage() {
                   ))}
                 </div>
               )}
+            </div>
+          ) : (
+            /* 熱力圖 Tab */
+            <div className="space-y-4">
+              {/* 類型切換 */}
+              <div className="flex gap-2">
+                {(['level', 'skill', 'slope'] as const).map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setHeatmapType(t)}
+                    className={`px-3 py-2 rounded text-sm ${heatmapType === t ? 'bg-blue-600' : 'bg-zinc-800'}`}
+                  >
+                    {t === 'level' ? '程度' : t === 'skill' ? 'CASI 技能' : '雪道類型'}
+                  </button>
+                ))}
+              </div>
+
+              {/* 熱力圖 */}
+              <div className="space-y-3">
+                {heatmapData.map(d => (
+                  <div key={d.label} className="bg-zinc-800 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">{d.label}</span>
+                      <span className="text-xs text-zinc-500">{d.count} 堂課</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div>
+                        <p className="text-zinc-500 text-xs mb-1">瀏覽</p>
+                        <div className="h-4 bg-zinc-700 rounded overflow-hidden">
+                          <div 
+                            className="h-full bg-blue-500" 
+                            style={{ width: `${(d.views / maxViews) * 100}%` }}
+                          />
+                        </div>
+                        <p className="text-xs mt-1">{d.views}</p>
+                      </div>
+                      <div>
+                        <p className="text-zinc-500 text-xs mb-1">練習</p>
+                        <div className="h-4 bg-zinc-700 rounded overflow-hidden">
+                          <div 
+                            className="h-full bg-green-500" 
+                            style={{ width: `${(d.practices / maxViews) * 100}%` }}
+                          />
+                        </div>
+                        <p className="text-xs mt-1">{d.practices}</p>
+                      </div>
+                      <div>
+                        <p className="text-zinc-500 text-xs mb-1">收藏</p>
+                        <div className="h-4 bg-zinc-700 rounded overflow-hidden">
+                          <div 
+                            className="h-full bg-red-500" 
+                            style={{ width: `${(d.favorites / maxViews) * 100}%` }}
+                          />
+                        </div>
+                        <p className="text-xs mt-1">{d.favorites}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
