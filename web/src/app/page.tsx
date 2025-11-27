@@ -135,7 +135,7 @@ export default function Home() {
           ) : filteredLessons.length === 0 ? (
             <p className="text-center text-zinc-500 py-8">找不到相關課程</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {displayLessons.map(lesson => (
                 <LessonCard key={lesson.id} lesson={lesson} />
               ))}
