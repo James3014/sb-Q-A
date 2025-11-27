@@ -1,7 +1,7 @@
 import { getSupabase } from './supabase'
 
 // 管理員 email 列表
-const ADMIN_EMAILS = ['james@example.com'] // 改成你的 email
+const ADMIN_EMAILS = ['liligogo523@gmail.com']
 
 export function isAdmin(email?: string | null): boolean {
   return !!email && ADMIN_EMAILS.includes(email)
