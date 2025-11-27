@@ -14,7 +14,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -25,22 +24,29 @@ serve(async (req) => {
       options?: PathEngineOptions
     }
 
-    // Supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // Fetch lessons
-    const { data: lessons, error } = await supabase
-      .from('lessons')
-      .select('id, title, level_tags, slope_tags, what, why, primary_skill_code, difficulty_score, est_duration_min')
+    // Fetch lessons + prerequisites
+    const [lessonsRes, prereqsRes] = await Promise.all([
+      supabase
+        .from('lessons')
+        .select('id, title, level_tags, slope_tags, what, why, primary_skill_code, difficulty_score, est_duration_min'),
+      supabase
+        .from('lesson_prerequisites')
+        .select('lesson_id, prerequisite_id, type, note')
+    ])
 
-    if (error) throw error
+    if (lessonsRes.error) throw lessonsRes.error
 
-    // Execute engine
-    const candidates = filterCandidates(riderState, lessons || [])
-    const scored = scoreLessons(riderState, candidates)
+    const lessons = lessonsRes.data || []
+    const prereqs = prereqsRes.data || []
+
+    // Execute engine with prerequisites
+    const candidates = filterCandidates(riderState, lessons, prereqs)
+    const scored = scoreLessons(riderState, candidates, prereqs)
     const items = schedulePath(riderState, scored, options)
     const summary = buildSummary(items, riderState)
 

@@ -8,36 +8,74 @@ export function schedulePath(
   scored: ScoredLesson[],
   options: PathEngineOptions = {}
 ): LessonPlanItem[] {
-  const { days = 1, perDayLessonCount = 4 } = options
+  const { days = 1, perDayLessonCount = 4, includeWarmup = true } = options
   const items: LessonPlanItem[] = []
   const usedIds = new Set<string>()
 
+  // 分離 warm-up 課程
+  const warmups = scored.filter(s => s.isWarmup)
+  const regular = scored.filter(s => !s.isWarmup)
+
   for (let day = 1; day <= days; day++) {
     let order = 1
+    const dayItems: LessonPlanItem[] = []
 
-    for (const s of scored) {
+    // 每天第一堂插入 warm-up（如果有且啟用）
+    if (includeWarmup && day === 1) {
+      const warmup = warmups.find(s => !usedIds.has(s.lesson.id))
+      if (warmup) {
+        usedIds.add(warmup.lesson.id)
+        dayItems.push({
+          lessonId: warmup.lesson.id,
+          lessonTitle: warmup.lesson.title,
+          intent: 'warmup',
+          dayIndex: day,
+          orderInDay: order++,
+          mustDo: false,
+          rationale: ['暖身練習'],
+          estimatedMin: warmup.lesson.est_duration_min || 10,
+        })
+      }
+    }
+
+    // 填充一般課程
+    for (const s of regular) {
       if (usedIds.has(s.lesson.id)) continue
-      if (items.filter(i => i.dayIndex === day).length >= perDayLessonCount) break
+      if (dayItems.length >= perDayLessonCount) break
 
       usedIds.add(s.lesson.id)
 
-      const intent: LessonIntent = order === 1 ? 'build' : (s.symptomMatch > 2 ? 'diagnose' : 'apply')
+      const intent: LessonIntent = determineIntent(s, order, dayItems.length)
       const rationale = buildRationale(s, state)
 
-      items.push({
+      dayItems.push({
         lessonId: s.lesson.id,
         lessonTitle: s.lesson.title,
         intent,
         dayIndex: day,
         orderInDay: order++,
-        mustDo: order === 2,
+        mustDo: intent === 'build',
         rationale,
         estimatedMin: s.lesson.est_duration_min || 15,
       })
     }
+
+    items.push(...dayItems)
   }
 
   return items
+}
+
+function determineIntent(scored: ScoredLesson, order: number, currentCount: number): LessonIntent {
+  // 第一堂（非 warmup）為 build
+  if (currentCount === 0 || (currentCount === 1 && order === 2)) {
+    return 'build'
+  }
+  // 高症狀匹配為 diagnose
+  if (scored.symptomMatch > 2) {
+    return 'diagnose'
+  }
+  return 'apply'
 }
 
 function buildRationale(scored: ScoredLesson, state: RiderState): string[] {
@@ -64,6 +102,10 @@ export function buildSummary(items: LessonPlanItem[], state: RiderState): string
   const totalDays = Math.max(...items.map(i => i.dayIndex), 0)
   const symptoms = state.symptoms.map(s => s.description).join('、')
   const goals = state.profile.goals.join('、')
+  const hasWarmup = items.some(i => i.intent === 'warmup')
 
-  return `根據你的問題（${symptoms || '無'}）和目標（${goals || '一般進步'}），推薦 ${totalDays} 天共 ${items.length} 堂課程。`
+  let summary = `根據你的問題（${symptoms || '無'}）和目標（${goals || '一般進步'}），推薦 ${totalDays} 天共 ${items.length} 堂課程。`
+  if (hasWarmup) summary += '包含暖身練習。'
+
+  return summary
 }

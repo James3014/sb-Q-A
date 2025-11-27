@@ -1,6 +1,6 @@
 // Scoring logic for recommend-path
 
-import { Lesson, RiderState, ScoredLesson } from './types.ts'
+import { Lesson, RiderState, ScoredLesson, LessonPrerequisite } from './types.ts'
 
 // Symptom → Keyword mapping
 export const SYMPTOM_KEYWORDS: Record<string, string[]> = {
@@ -27,15 +27,41 @@ export const GOAL_SKILL_MAP: Record<string, string[]> = {
   general_progress: ['STANCE_BALANCE', 'EDGE_CONTROL'],
 }
 
-export function filterCandidates(state: RiderState, lessons: Lesson[]): Lesson[] {
+// Warm-up 課程關鍵字（基礎站姿、平地練習）
+const WARMUP_KEYWORDS = ['平地', '站姿', '居中', '企鵝', '基礎']
+
+export function filterCandidates(
+  state: RiderState,
+  lessons: Lesson[],
+  prereqs?: LessonPrerequisite[]
+): Lesson[] {
   const completedIds = new Set(
     state.completedLessons
       .filter(c => c.status === 'completed' && !c.stillWrongSignals?.length)
       .map(c => c.lessonId)
   )
 
+  // 建立 hard prerequisite map
+  const hardPrereqMap = new Map<string, string[]>()
+  if (prereqs) {
+    for (const p of prereqs) {
+      if (p.type === 'hard') {
+        const list = hardPrereqMap.get(p.lesson_id) || []
+        list.push(p.prerequisite_id)
+        hardPrereqMap.set(p.lesson_id, list)
+      }
+    }
+  }
+
   return lessons.filter(lesson => {
     if (completedIds.has(lesson.id)) return false
+
+    // Hard prerequisite 檢查：必須先完成
+    const hardPrereqs = hardPrereqMap.get(lesson.id)
+    if (hardPrereqs?.length) {
+      const allMet = hardPrereqs.every(pid => completedIds.has(pid))
+      if (!allMet) return false
+    }
 
     const levels = lesson.level_tags || []
     if (state.profile.level === 'beginner' && levels.includes('advanced')) return false
@@ -56,12 +82,32 @@ export function filterCandidates(state: RiderState, lessons: Lesson[]): Lesson[]
   })
 }
 
-export function scoreLessons(state: RiderState, candidates: Lesson[]): ScoredLesson[] {
+export function scoreLessons(
+  state: RiderState,
+  candidates: Lesson[],
+  prereqs?: LessonPrerequisite[]
+): ScoredLesson[] {
   const recentIds = new Set(
     state.completedLessons
       .filter(c => c.completedAt && (Date.now() - new Date(c.completedAt).getTime()) / 86400000 <= 2)
       .map(c => c.lessonId)
   )
+
+  const completedIds = new Set(
+    state.completedLessons.filter(c => c.status === 'completed').map(c => c.lessonId)
+  )
+
+  // Soft prerequisite map
+  const softPrereqMap = new Map<string, string[]>()
+  if (prereqs) {
+    for (const p of prereqs) {
+      if (p.type === 'soft') {
+        const list = softPrereqMap.get(p.lesson_id) || []
+        list.push(p.prerequisite_id)
+        softPrereqMap.set(p.lesson_id, list)
+      }
+    }
+  }
 
   return candidates.map(lesson => {
     const levelMatch = lesson.level_tags?.includes(state.profile.level) ? 3 : 1
@@ -84,8 +130,19 @@ export function scoreLessons(state: RiderState, candidates: Lesson[]): ScoredLes
     const terrainMatch = lesson.slope_tags?.some(t => state.profile.preferredTerrain.includes(t)) ? 1 : 0
     const novelty = recentIds.has(lesson.id) ? -3 : 0
 
-    const score = 2 * levelMatch + 3 * Math.min(goalMatch, 5) + 3 * Math.min(symptomMatch, 5) + terrainMatch + novelty
+    // Soft prerequisite bonus：如果前置課程已完成，加分
+    let prereqBonus = 0
+    const softPrereqs = softPrereqMap.get(lesson.id)
+    if (softPrereqs?.length) {
+      const metCount = softPrereqs.filter(pid => completedIds.has(pid)).length
+      prereqBonus = metCount > 0 ? 2 : -1 // 有完成加分，沒完成小扣分
+    }
 
-    return { lesson, score, levelMatch, goalMatch, symptomMatch, terrainMatch }
+    // Warm-up 識別
+    const isWarmup = WARMUP_KEYWORDS.some(kw => lesson.title?.includes(kw) || lesson.what?.includes(kw))
+
+    const score = 2 * levelMatch + 3 * Math.min(goalMatch, 5) + 3 * Math.min(symptomMatch, 5) + terrainMatch + novelty + prereqBonus
+
+    return { lesson, score, levelMatch, goalMatch, symptomMatch, terrainMatch, isWarmup }
   }).sort((a, b) => b.score - a.score)
 }

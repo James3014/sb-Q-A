@@ -2,7 +2,8 @@
 
 export type LessonLevel = 'beginner' | 'intermediate' | 'advanced'
 export type TerrainType = 'green' | 'blue' | 'black' | 'mogul' | 'park' | 'powder' | 'tree' | 'flat' | 'all'
-export type LessonIntent = 'diagnose' | 'build' | 'apply' | 'recover'
+export type LessonIntent = 'warmup' | 'diagnose' | 'build' | 'apply' | 'recover'
+export type PrereqType = 'hard' | 'soft'
 
 export interface Symptom {
   code: string
@@ -44,6 +45,13 @@ export interface Lesson {
   est_duration_min?: number
 }
 
+export interface LessonPrerequisite {
+  lesson_id: string
+  prerequisite_id: string
+  type: PrereqType
+  note?: string
+}
+
 export interface ScoredLesson {
   lesson: Lesson
   score: number
@@ -51,6 +59,7 @@ export interface ScoredLesson {
   goalMatch: number
   symptomMatch: number
   terrainMatch: number
+  isWarmup?: boolean
 }
 
 export interface LessonPlanItem {
@@ -76,4 +85,5 @@ export interface LearningPath {
 export interface PathEngineOptions {
   days?: number
   perDayLessonCount?: number
+  includeWarmup?: boolean
 }
