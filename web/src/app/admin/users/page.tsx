@@ -14,31 +14,46 @@ interface User {
   created_at: string
 }
 
+function getStatus(user: User): { label: string; color: string } {
+  if (!user.subscription_type || user.subscription_type === 'free') {
+    return { label: '免費', color: 'bg-zinc-600' }
+  }
+  if (user.subscription_expires_at) {
+    const expires = new Date(user.subscription_expires_at)
+    if (expires < new Date()) {
+      return { label: '已過期', color: 'bg-red-600' }
+    }
+  }
+  const labels: Record<string, string> = {
+    pass_7: '7天',
+    pass_30: '30天',
+    pro_yearly: '年費',
+  }
+  return { label: labels[user.subscription_type] || user.subscription_type, color: 'bg-amber-600' }
+}
+
 export default function UsersPage() {
   const { user, loading } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loadingData, setLoadingData] = useState(true)
-  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [selectedPlan, setSelectedPlan] = useState<string>('pass_7')
   const [activating, setActivating] = useState(false)
 
+  const loadUsers = async () => {
+    const supabase = getSupabase()
+    if (!supabase) return
+
+    const { data, error } = await supabase.rpc('get_all_users')
+    if (error) console.error('get_all_users error:', error)
+    setUsers(data || [])
+    setLoadingData(false)
+  }
+
   useEffect(() => {
-    async function load() {
-      const supabase = getSupabase()
-      if (!supabase) return
-
-      const { data, error } = await supabase.rpc('get_all_users')
-      
-      if (error) {
-        console.error('get_all_users error:', error)
-      }
-      
-      setUsers(data || [])
-      setLoadingData(false)
-    }
-
     if (!loading && user && isAdmin(user.email)) {
-      load()
+      loadUsers()
     }
   }, [user, loading])
 
@@ -52,7 +67,6 @@ export default function UsersPage() {
       return
     }
 
-    // 計算到期時間
     let expiresAt: Date
     if (selectedPlan === 'pass_7') {
       expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -68,15 +82,13 @@ export default function UsersPage() {
         subscription_type: selectedPlan,
         subscription_expires_at: expiresAt.toISOString(),
       })
-      .eq('id', selectedUser)
+      .eq('id', selectedUser.id)
 
     if (error) {
       alert('開通失敗：' + error.message)
     } else {
-      alert('開通成功！')
-      // 重新載入
-      const { data } = await supabase.from('users').select('*').order('created_at', { ascending: false })
-      setUsers(data || [])
+      alert(`已開通 ${selectedUser.email} 的 ${selectedPlan} 方案！`)
+      await loadUsers()
     }
 
     setActivating(false)
@@ -93,6 +105,10 @@ export default function UsersPage() {
     )
   }
 
+  const filtered = search
+    ? users.filter(u => u.email?.toLowerCase().includes(search.toLowerCase()))
+    : users
+
   return (
     <main className="min-h-screen bg-zinc-900 text-white">
       <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
@@ -103,12 +119,23 @@ export default function UsersPage() {
       </header>
 
       <div className="p-4 max-w-2xl mx-auto">
+        {/* 搜尋 */}
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="搜尋 Email..."
+          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg mb-4"
+        />
+
         {/* 開通面板 */}
         {selectedUser && (
           <div className="bg-blue-900/30 border border-blue-600 rounded-lg p-4 mb-6">
-            <h3 className="font-bold mb-3">開通訂閱</h3>
-            <p className="text-sm text-zinc-300 mb-3">
-              用戶：{users.find(u => u.id === selectedUser)?.email}
+            <h3 className="font-bold mb-3">🔓 開通訂閱</h3>
+            <p className="text-sm text-zinc-300 mb-1">用戶：{selectedUser.email}</p>
+            <p className="text-xs text-zinc-500 mb-3">
+              目前狀態：{getStatus(selectedUser).label}
+              {selectedUser.subscription_expires_at && ` (到期：${new Date(selectedUser.subscription_expires_at).toLocaleDateString('zh-TW')})`}
             </p>
             <div className="flex gap-2 mb-4">
               {[
@@ -145,38 +172,67 @@ export default function UsersPage() {
           </div>
         )}
 
-        {/* 用戶列表 */}
-        <p className="text-zinc-500 text-sm mb-4">共 {users.length} 位用戶</p>
+        {/* 統計 */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-zinc-800 rounded p-3 text-center">
+            <p className="text-xs text-zinc-400">總用戶</p>
+            <p className="text-xl font-bold">{users.length}</p>
+          </div>
+          <div className="bg-zinc-800 rounded p-3 text-center">
+            <p className="text-xs text-zinc-400">付費中</p>
+            <p className="text-xl font-bold text-amber-400">
+              {users.filter(u => u.subscription_type && u.subscription_type !== 'free' && 
+                (!u.subscription_expires_at || new Date(u.subscription_expires_at) > new Date())
+              ).length}
+            </p>
+          </div>
+          <div className="bg-zinc-800 rounded p-3 text-center">
+            <p className="text-xs text-zinc-400">已過期</p>
+            <p className="text-xl font-bold text-red-400">
+              {users.filter(u => u.subscription_expires_at && new Date(u.subscription_expires_at) < new Date()).length}
+            </p>
+          </div>
+        </div>
 
+        <p className="text-zinc-500 text-sm mb-4">
+          {search ? `搜尋結果：${filtered.length} 位` : `共 ${users.length} 位用戶`}
+        </p>
+
+        {/* 用戶列表 */}
         {loadingData ? (
           <p className="text-zinc-500">載入中...</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-zinc-500">找不到用戶</p>
         ) : (
           <div className="space-y-2">
-            {users.map(u => (
-              <div key={u.id} className="bg-zinc-800 rounded-lg p-3 flex justify-between items-center">
-                <div>
-                  <p className="text-sm">{u.email}</p>
-                  <div className="flex gap-2 mt-1">
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      u.subscription_type === 'free' ? 'bg-zinc-700' : 'bg-amber-600'
-                    }`}>
-                      {u.subscription_type || 'free'}
-                    </span>
-                    {u.subscription_expires_at && (
-                      <span className="text-xs text-zinc-500">
-                        到期：{new Date(u.subscription_expires_at).toLocaleDateString('zh-TW')}
+            {filtered.map(u => {
+              const status = getStatus(u)
+              return (
+                <div key={u.id} className="bg-zinc-800 rounded-lg p-3 flex justify-between items-center">
+                  <div>
+                    <p className="text-sm">{u.email}</p>
+                    <div className="flex gap-2 mt-1 items-center">
+                      <span className={`text-xs px-2 py-0.5 rounded ${status.color}`}>
+                        {status.label}
                       </span>
-                    )}
+                      {u.subscription_expires_at && u.subscription_type !== 'free' && (
+                        <span className="text-xs text-zinc-500">
+                          {new Date(u.subscription_expires_at) > new Date() ? '到期：' : '已於 '}
+                          {new Date(u.subscription_expires_at).toLocaleDateString('zh-TW')}
+                          {new Date(u.subscription_expires_at) <= new Date() && ' 過期'}
+                        </span>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    onClick={() => setSelectedUser(u)}
+                    className="px-3 py-1 bg-blue-600 rounded text-sm"
+                  >
+                    開通
+                  </button>
                 </div>
-                <button
-                  onClick={() => setSelectedUser(u.id)}
-                  className="px-3 py-1 bg-blue-600 rounded text-sm"
-                >
-                  開通
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
