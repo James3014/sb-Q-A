@@ -114,3 +114,6 @@ docs/migration_prerequisites.sql
 docs/prerequisites_analysis.json
 scripts/analyze_prerequisites.py
 give/
+
+# Archive (legacy & raw data)
+archive/
