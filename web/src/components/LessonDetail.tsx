@@ -11,15 +11,14 @@ const LEVEL_NAMES: Record<string, string> = { beginner: '初級', intermediate: 
 const SLOPE_NAMES: Record<string, string> = { green: '綠道', blue: '藍道', black: '黑道', mogul: '蘑菇', powder: '粉雪', park: '公園', tree: '樹林', flat: '平地', all: '全地形' }
 
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
-  const { user } = useAuth()
+  const { user, subscription } = useAuth()
   const [isFav, setIsFav] = useState(false)
   const [favLoading, setFavLoading] = useState(false)
   const [showNote, setShowNote] = useState(false)
   const [note, setNote] = useState('')
   const [noteStatus, setNoteStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
 
-  // TODO: 從 user metadata 檢查是否為 Premium 用戶
-  const isPremiumUser = false
+  const isPremiumUser = subscription.isActive
   const isLocked = lesson.is_premium && !isPremiumUser
 
   useEffect(() => {
@@ -146,12 +145,21 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
                   >
                     {favLoading ? '⏳' : isFav ? '❤️ 已收藏' : '🤍 加入收藏'}
                   </button>
-                  <button
-                    onClick={() => setShowNote(true)}
-                    className="flex-1 py-3 rounded-lg font-medium bg-blue-600"
-                  >
-                    📝 完成練習
-                  </button>
+                  {subscription.isActive ? (
+                    <button
+                      onClick={() => setShowNote(true)}
+                      className="flex-1 py-3 rounded-lg font-medium bg-blue-600"
+                    >
+                      📝 完成練習
+                    </button>
+                  ) : (
+                    <Link
+                      href="/pricing"
+                      className="flex-1 py-3 rounded-lg font-medium bg-amber-600 text-center"
+                    >
+                      🔓 升級解鎖
+                    </Link>
+                  )}
                 </div>
               </div>
             )}

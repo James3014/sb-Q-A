@@ -3,38 +3,53 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { getUser, onAuthStateChange } from '@/lib/auth'
+import { getSubscription, Subscription } from '@/lib/subscription'
 
 interface AuthContextType {
   user: User | null
   loading: boolean
+  subscription: Subscription
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true })
+const defaultSubscription: Subscription = { type: 'free', expiresAt: null, isActive: false }
+
+const AuthContext = createContext<AuthContextType>({ 
+  user: null, 
+  loading: true,
+  subscription: defaultSubscription
+})
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [subscription, setSubscription] = useState<Subscription>(defaultSubscription)
 
   useEffect(() => {
-    // 初始載入用戶
-    getUser().then((u) => {
-      console.log('[AuthProvider] initial user:', u?.email)
+    getUser().then(async (u) => {
       setUser(u)
+      if (u) {
+        const sub = await getSubscription(u.id)
+        setSubscription(sub)
+      }
       setLoading(false)
     })
 
-    // 監聽 auth 狀態變化
-    const { data: { subscription } } = onAuthStateChange((u) => {
-      console.log('[AuthProvider] auth changed:', u?.email)
+    const { data: { subscription: authSub } } = onAuthStateChange(async (u) => {
       setUser(u)
+      if (u) {
+        const sub = await getSubscription(u.id)
+        setSubscription(sub)
+      } else {
+        setSubscription(defaultSubscription)
+      }
       setLoading(false)
     })
     
-    return () => subscription.unsubscribe()
+    return () => authSub.unsubscribe()
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, subscription }}>
       {children}
     </AuthContext.Provider>
   )

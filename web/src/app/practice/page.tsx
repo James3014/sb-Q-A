@@ -7,7 +7,7 @@ import { getPracticeLogs, PracticeLog } from '@/lib/practice'
 import { getLessons, Lesson } from '@/lib/lessons'
 
 export default function PracticePage() {
-  const { user, loading } = useAuth()
+  const { user, loading, subscription } = useAuth()
   const [logs, setLogs] = useState<PracticeLog[]>([])
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [loadingData, setLoadingData] = useState(true)
@@ -32,7 +32,7 @@ export default function PracticePage() {
     return <main className="min-h-screen bg-zinc-900 text-white p-4"><p className="text-center text-zinc-400 mt-20">載入中...</p></main>
   }
 
-  if (!user) {
+  if (!user || !subscription.isActive) {
     return (
       <main className="min-h-screen bg-zinc-900 text-white p-4">
         <Link href="/" className="text-zinc-400 text-sm">← 返回首頁</Link>
@@ -43,9 +43,11 @@ export default function PracticePage() {
           <Link href="/pricing" className="inline-block bg-amber-600 px-6 py-3 rounded-lg mr-3">
             查看方案
           </Link>
-          <Link href="/login" className="inline-block bg-zinc-700 px-6 py-3 rounded-lg">
-            登入
-          </Link>
+          {!user && (
+            <Link href="/login" className="inline-block bg-zinc-700 px-6 py-3 rounded-lg">
+              登入
+            </Link>
+          )}
         </div>
       </main>
     )
