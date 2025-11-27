@@ -182,6 +182,87 @@ const { data } = await supabase.functions.invoke('recommend-path', {
 // data.items 為排序好的課程清單
 ```
 
+## Persona 範例
+
+### Persona A：中級怕速度
+
+```json
+{
+  "profile": {
+    "id": "user-a",
+    "level": "intermediate",
+    "preferredTerrain": ["blue"],
+    "avoidTerrain": ["black", "mogul"],
+    "goals": ["control_speed"]
+  },
+  "symptoms": [
+    { "code": "fear_speed", "description": "怕速度", "severity": 3 },
+    { "code": "standing_tall", "description": "站太直", "severity": 2 }
+  ],
+  "completedLessons": []
+}
+```
+
+**預期輸出：**
+- 優先推薦控速相關課程（煞車、減速、Speed Check）
+- 避開黑道和蘑菇課程
+- 插入站姿修正課程
+
+---
+
+### Persona B：進階冰面不穩
+
+```json
+{
+  "profile": {
+    "id": "user-b",
+    "level": "advanced",
+    "preferredTerrain": ["blue", "black"],
+    "goals": ["ice_stability", "carving_intro"]
+  },
+  "symptoms": [
+    { "code": "ice_chatter", "description": "冰面抖", "severity": 2 },
+    { "code": "weak_heelside", "description": "後刃弱", "severity": 1 }
+  ],
+  "completedLessons": [
+    { "lessonId": "01", "status": "completed" },
+    { "lessonId": "10", "status": "completed" }
+  ]
+}
+```
+
+**預期輸出：**
+- 優先推薦冰面技巧（冰面搓雪、膝前壓穩板底）
+- 後刃強化課程
+- 刻滑入門課程
+
+---
+
+### Persona C：初學蘑菇入門
+
+```json
+{
+  "profile": {
+    "id": "user-c",
+    "level": "intermediate",
+    "preferredTerrain": ["blue", "mogul"],
+    "goals": ["moguls_intro"]
+  },
+  "symptoms": [
+    { "code": "mogul_fear", "description": "蘑菇恐懼", "severity": 2 },
+    { "code": "rear_seat", "description": "後座", "severity": 1 }
+  ],
+  "completedLessons": []
+}
+```
+
+**預期輸出：**
+- 優先推薦蘑菇入門（走側壁、減速停點）
+- 修正後座問題
+- 團身換刃相關課程
+
+---
+
 ## 未來擴充
 
 - [x] Prerequisites 檢查（hard/soft）
