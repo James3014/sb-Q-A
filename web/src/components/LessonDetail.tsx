@@ -47,7 +47,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
 
   return (
     <main className="min-h-screen bg-slate-900 text-white">
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-6 pb-24">
         <div className="flex justify-between items-center mb-4">
           <Link href="/" className="text-slate-400">← 返回</Link>
           {user && !isLocked && (
@@ -134,6 +134,26 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
                 <p className="text-slate-300 text-sm">技能：{lesson.casi.Primary_Skill}</p>
                 <p className="text-slate-300 text-sm">能力：{lesson.casi.Core_Competency}</p>
               </section>
+            )}
+
+            {user && (
+              <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 p-4">
+                <div className="max-w-lg mx-auto flex gap-3">
+                  <button
+                    onClick={handleToggleFav}
+                    disabled={favLoading}
+                    className={`flex-1 py-3 rounded-lg font-medium ${isFav ? 'bg-pink-600' : 'bg-slate-700'}`}
+                  >
+                    {favLoading ? '⏳' : isFav ? '❤️ 已收藏' : '🤍 加入收藏'}
+                  </button>
+                  <button
+                    onClick={() => setShowNote(true)}
+                    className="flex-1 py-3 rounded-lg font-medium bg-blue-600"
+                  >
+                    📝 完成練習
+                  </button>
+                </div>
+              </div>
             )}
           </>
         )}

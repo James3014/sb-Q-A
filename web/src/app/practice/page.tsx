@@ -52,7 +52,14 @@ export default function PracticePage() {
 
       <div className="p-4">
         {logs.length === 0 ? (
-          <p className="text-center text-zinc-500 mt-10">還沒有練習紀錄</p>
+          <div className="text-center mt-20">
+            <p className="text-5xl mb-4">📝</p>
+            <p className="text-zinc-400 mb-2">還沒有練習紀錄</p>
+            <p className="text-zinc-500 text-sm mb-6">在課程頁點 📝 記錄練習心得</p>
+            <Link href="/" className="inline-block bg-blue-600 px-6 py-3 rounded-lg">
+              開始練習
+            </Link>
+          </div>
         ) : (
           <div className="space-y-6">
             {logs.map(log => {

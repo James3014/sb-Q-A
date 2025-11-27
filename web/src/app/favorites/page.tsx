@@ -59,7 +59,14 @@ export default function FavoritesPage() {
 
       <div className="p-4">
         {favLessons.length === 0 ? (
-          <p className="text-center text-zinc-500 mt-10">還沒有收藏任何課程</p>
+          <div className="text-center mt-20">
+            <p className="text-5xl mb-4">🤍</p>
+            <p className="text-zinc-400 mb-2">還沒有收藏任何課程</p>
+            <p className="text-zinc-500 text-sm mb-6">在課程頁點 ❤️ 即可收藏</p>
+            <Link href="/" className="inline-block bg-blue-600 px-6 py-3 rounded-lg">
+              探索課程
+            </Link>
+          </div>
         ) : (
           <div className="space-y-6">
             {favLessons.map(lesson => (
