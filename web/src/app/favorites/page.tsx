@@ -61,7 +61,7 @@ export default function FavoritesPage() {
         {favLessons.length === 0 ? (
           <p className="text-center text-zinc-500 mt-10">還沒有收藏任何課程</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-6">
             {favLessons.map(lesson => (
               <LessonCard key={lesson.id} lesson={lesson} />
             ))}

@@ -54,7 +54,7 @@ export default function PracticePage() {
         {logs.length === 0 ? (
           <p className="text-center text-zinc-500 mt-10">還沒有練習紀錄</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-6">
             {logs.map(log => {
               const lesson = getLesson(log.lesson_id)
               const isExpanded = expanded === log.id
