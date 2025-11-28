@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { getLessonById, Lesson } from '@/lib/lessons'
 import LessonDetail from '@/components/LessonDetail'
+import SkeletonLesson from '@/components/SkeletonLesson'
 import { trackEvent } from '@/lib/analytics'
 
 export default function LessonPage() {
@@ -22,14 +23,7 @@ export default function LessonPage() {
   }, [id])
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-zinc-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-zinc-400">載入中...</p>
-        </div>
-      </main>
-    )
+    return <SkeletonLesson />
   }
 
   if (!lesson) {
