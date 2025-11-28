@@ -66,3 +66,9 @@ web/out/
 !web/tsconfig.json
 !web/public/manifest.json
 !zeabur.json
+
+# 原始資料（敏感）
+txt/
+scripts/
+CASI/
+give/
