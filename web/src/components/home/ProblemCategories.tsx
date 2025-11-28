@@ -7,6 +7,9 @@ interface ProblemCategoriesProps {
 }
 
 export function ProblemCategories({ selectedCategory, setSelectedCategory, setShowAll }: ProblemCategoriesProps) {
+    // Priority 2: 定義優先按鈕（最常見問題）
+    const PRIORITY_CATEGORIES = ['heel', 'toe'];
+
     return (
         <section>
             {/* 標題：Alpine Velocity 風格 */}
@@ -21,6 +24,7 @@ export function ProblemCategories({ selectedCategory, setSelectedCategory, setSh
             <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
                 {PROBLEM_CATEGORIES.map(cat => {
                     const isSelected = selectedCategory === cat.id;
+                    const isPriority = PRIORITY_CATEGORIES.includes(cat.id);
 
                     return (
                         <button
@@ -45,6 +49,8 @@ export function ProblemCategories({ selectedCategory, setSelectedCategory, setSh
 
                                 ${isSelected
                                     ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black border-2 border-amber-400 shadow-lg shadow-amber-500/30'
+                                    : isPriority
+                                    ? 'bg-gradient-to-r from-amber-600/20 to-orange-600/20 border-2 border-amber-500/50 text-amber-200 hover:border-amber-500/70'
                                     : 'bg-zinc-800 border-2 border-zinc-700 hover:border-zinc-600'
                                 }
                             `}

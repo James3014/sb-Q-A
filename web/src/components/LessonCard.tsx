@@ -56,6 +56,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
 
       <div className="
         velocity-shine
+        lesson-card-pulse
         relative
         p-6
         rounded-2xl
@@ -72,6 +73,15 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
         borderImage: 'linear-gradient(165deg, var(--card-border), var(--card-border)) 1',
       }}
       >
+        {/* Priority 5: 左上角斜切角高光 */}
+        <div className="
+          absolute top-0 left-0
+          w-16 h-16
+          bg-gradient-to-br from-white/10 to-transparent
+          [clip-path:polygon(0_0,100%_0,0_100%)]
+          pointer-events-none
+        " />
+
         {/* 對角線裝飾條（速度感） */}
         <div className="
           absolute top-0 right-0
@@ -81,9 +91,18 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           pointer-events-none
         " />
 
-        {/* 標題：Bebas Neue 大字 */}
+        {/* 底部光暈效果 */}
+        <div className="
+          absolute bottom-0 left-0 right-0
+          h-16
+          bg-gradient-to-t from-amber-500/5 to-transparent
+          pointer-events-none
+        " />
+
+        {/* 標題：Bebas Neue 大字 + 文字陰影 */}
         <h3
           className="
+            lesson-card-title
             text-2xl font-bold
             text-gradient-velocity
             line-clamp-2 mb-4

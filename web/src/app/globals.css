@@ -196,6 +196,57 @@ body {
   animation: velocity-shine 0.6s ease-out;
 }
 
+/* Alpine Velocity 增強效果 */
+
+/* Priority 1: 卡片標題文字陰影與光暈 */
+.lesson-card-title {
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(251, 191, 36, 0.1);
+}
+
+[data-theme="snow"] .lesson-card-title {
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(251, 191, 36, 0.15);
+}
+
+/* Priority 3: 脈動光暈動畫 */
+@keyframes velocity-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgba(251, 191, 36, 0.15);
+  }
+}
+
+.lesson-card-pulse {
+  animation: velocity-pulse 3s ease-in-out infinite;
+}
+
+/* Priority 4: Snow Mode 環境光暈 */
+[data-theme="snow"] body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(251, 191, 36, 0.03) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="snow"] main {
+  position: relative;
+  z-index: 1;
+}
+
 /* 省電模式：減少動畫 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
