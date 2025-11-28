@@ -4,18 +4,17 @@ export function useScrollRestoration(ready: boolean = true) {
   useEffect(() => {
     if (!ready) return
 
-    const savedPosition = sessionStorage.getItem('homeScrollPos')
-    console.log('[useScrollRestoration] ready:', ready, 'savedPosition:', savedPosition)
+    const lastViewedLesson = sessionStorage.getItem('lastViewedLesson')
     
-    if (savedPosition) {
-      const position = parseInt(savedPosition, 10)
-      console.log('[useScrollRestoration] 準備恢復到:', position)
-      
+    if (lastViewedLesson) {
+      // 找到該卡片並滾動到它
       setTimeout(() => {
-        window.scrollTo(0, position)
-        console.log('[useScrollRestoration] 已恢復，當前位置:', window.scrollY)
-        sessionStorage.removeItem('homeScrollPos')
-      }, 0)
+        const card = document.querySelector(`[data-lesson-id="${lastViewedLesson}"]`)
+        if (card) {
+          card.scrollIntoView({ behavior: 'instant', block: 'center' })
+          sessionStorage.removeItem('lastViewedLesson')
+        }
+      }, 100) // 給內容渲染時間
     }
   }, [ready])
 }
