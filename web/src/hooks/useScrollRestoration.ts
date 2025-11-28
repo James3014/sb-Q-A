@@ -1,22 +1,22 @@
 import { useEffect } from 'react'
-import { usePathname } from 'next/navigation'
 
 export function useScrollRestoration() {
-  const pathname = usePathname()
-
   useEffect(() => {
-    // 恢復滾動位置
-    const savedPosition = sessionStorage.getItem(`scroll-${pathname}`)
+    // 恢復首頁的滾動位置
+    const savedPosition = sessionStorage.getItem('homeScrollPos')
+    
     if (savedPosition) {
-      window.scrollTo(0, parseInt(savedPosition))
-    }
+      const position = parseInt(savedPosition)
+      
+      // 延遲恢復，確保內容已渲染
+      const timeoutId = setTimeout(() => {
+        window.scrollTo({
+          top: position,
+          behavior: 'instant' // 立即跳轉，不要平滑滾動
+        })
+      }, 50)
 
-    // 儲存滾動位置
-    const handleScroll = () => {
-      sessionStorage.setItem(`scroll-${pathname}`, window.scrollY.toString())
+      return () => clearTimeout(timeoutId)
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [pathname])
+  }, [])
 }
