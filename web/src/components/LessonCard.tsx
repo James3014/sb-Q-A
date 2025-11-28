@@ -7,17 +7,19 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
   
   return (
     <Link href={`/lesson/${lesson.id}`} className="block">
-      <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-5 min-h-[100px] hover:bg-zinc-750 active:bg-zinc-700 active:scale-[0.98] transition-all">
-        <p className="text-zinc-300 text-base leading-relaxed line-clamp-2 mb-2">
-          😰 {lesson.what.slice(0, 80)}{lesson.what.length > 80 ? '...' : ''}
-        </p>
-        <h3 className="font-medium text-white text-lg mb-3">{lesson.title}</h3>
-        <div className="flex gap-2 text-sm flex-wrap">
+      <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-5 hover:bg-zinc-750 active:bg-zinc-700 active:scale-[0.98] transition-all">
+        {/* 標題放大到 20px，最多 2 行 */}
+        <h3 className="text-xl font-bold text-white line-clamp-2 mb-3">
+          {lesson.title}
+        </h3>
+        
+        {/* 徽章放大到 40px 高，間距加大 */}
+        <div className="flex gap-3 text-sm flex-wrap">
           {lesson.is_premium && (
-            <span className="px-2 py-1 bg-amber-600/80 rounded text-amber-100">PRO</span>
+            <span className="px-4 py-2 bg-amber-600/80 rounded-full text-amber-100 font-semibold">PRO</span>
           )}
-          <span className="px-2 py-1 bg-zinc-700 rounded text-zinc-300">{levels}</span>
-          <span className="px-2 py-1 bg-zinc-700 rounded text-zinc-300">
+          <span className="px-4 py-2 bg-orange-500/20 text-orange-300 rounded-full font-semibold">{levels}</span>
+          <span className="px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full font-semibold">
             {lesson.casi?.Primary_Skill || '技能'}
           </span>
         </div>

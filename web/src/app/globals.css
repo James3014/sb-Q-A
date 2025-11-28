@@ -117,6 +117,15 @@ body {
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400;
   }
+
+  /* 隱藏滾動條（手機水平滑動） */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE */
+    scrollbar-width: none;     /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome/Safari */
+  }
 }
 
 /* 省電模式：減少動畫 */

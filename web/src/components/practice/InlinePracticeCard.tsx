@@ -7,23 +7,38 @@ interface InlinePracticeCardProps {
   onClose: () => void
 }
 
-function RatingSlider({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+function RatingButtons({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between text-sm">
-        <span className="text-zinc-300">{label}</span>
-        <span className="text-[var(--accent)] font-bold">{value}/5</span>
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-lg font-semibold text-zinc-300">{label}</span>
+        <span className="text-2xl font-bold text-amber-400">{value}/5</span>
       </div>
-      <input
-        type="range"
-        min={1}
-        max={5}
-        value={value}
-        onChange={e => onChange(Number(e.target.value))}
-        className="w-full h-3 rounded-full appearance-none cursor-pointer accent-[var(--accent)]"
-        style={{ background: `linear-gradient(to right, var(--accent) ${(value - 1) * 25}%, #3f3f46 ${(value - 1) * 25}%)` }}
-      />
-      <div className="flex justify-between text-xs text-zinc-500">
+      
+      {/* 5 個分段按鈕 */}
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5].map(score => (
+          <button
+            key={score}
+            onClick={() => {
+              onChange(score)
+              if (navigator.vibrate) navigator.vibrate(10)
+            }}
+            className={`
+              flex-1 h-12 rounded-lg text-base font-bold transition-all duration-200
+              ${value >= score
+                ? 'bg-amber-500 text-slate-900 scale-105'
+                : 'bg-slate-700 text-slate-400'
+              }
+              active:scale-95
+            `}
+          >
+            {score}
+          </button>
+        ))}
+      </div>
+      
+      <div className="flex justify-between mt-2 text-sm text-slate-400">
         <span>需加強</span>
         <span>很好</span>
       </div>
@@ -64,30 +79,29 @@ export function InlinePracticeCard({ onSubmit, onClose }: InlinePracticeCardProp
         </div>
 
         <div className="space-y-6">
-          <RatingSlider 
+          <RatingButtons 
             label="技術理解" 
             value={ratings.r1} 
             onChange={v => setRatings(prev => ({ ...prev, r1: v }))}
           />
-          <RatingSlider 
+          <RatingButtons 
             label="動作成功度" 
             value={ratings.r2} 
             onChange={v => setRatings(prev => ({ ...prev, r2: v }))}
           />
-          <RatingSlider 
+          <RatingButtons 
             label="穩定度" 
             value={ratings.r3} 
             onChange={v => setRatings(prev => ({ ...prev, r3: v }))}
           />
         </div>
 
-        <button 
+        <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full h-14 mt-6 rounded-xl font-bold text-lg transition-all active:scale-95 disabled:opacity-50"
-          style={{ backgroundColor: 'var(--btn-success-bg)', color: 'var(--btn-success-text)' }}
+          className="w-full mt-6 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-lg font-bold text-slate-900 disabled:opacity-50 active:scale-98 transition-transform"
         >
-          {submitting ? '儲存中...' : '💾 儲存'}
+          {submitting ? '儲存中...' : '✓ 儲存練習紀錄'}
         </button>
       </div>
     </div>
