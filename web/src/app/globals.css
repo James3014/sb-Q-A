@@ -3,6 +3,24 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* 預設主題色 */
+  --btn-primary-bg: #1d4ed8;      /* blue-700 */
+  --btn-primary-text: #ffffff;
+  --btn-success-bg: #15803d;      /* green-700 */
+  --btn-success-text: #ffffff;
+  --accent: #3b82f6;              /* blue-500 */
+}
+
+/* Snow Mode：強光高對比主題（對比度 ≥12:1） */
+[data-theme="snow"] {
+  --background: #0a0a0a;          /* 純黑 */
+  --foreground: #ffffff;          /* 純白 */
+  --btn-primary-bg: #f59e0b;      /* amber-500 */
+  --btn-primary-text: #0a0a0a;    /* 黑字 */
+  --btn-success-bg: #f97316;      /* orange-500 */
+  --btn-success-text: #0a0a0a;    /* 黑字 */
+  --accent: #fbbf24;              /* amber-400 */
 }
 
 @theme inline {

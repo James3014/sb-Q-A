@@ -109,10 +109,28 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
     setShowPracticeModal(false)
   }
 
+  // 嵌入式評分卡提交
+  const handleInlinePractice = async (ratings: { r1: number; r2: number; r3: number }) => {
+    if (!user) return
+    const result = await addPracticeLog(user.id, lesson.id, '', { 
+      rating1: ratings.r1, 
+      rating2: ratings.r2, 
+      rating3: ratings.r3 
+    })
+    if (result.success) {
+      const [logs, improvement] = await Promise.all([
+        getLessonPracticeLogs(user.id, lesson.id),
+        getImprovementData(user.id)
+      ])
+      setPracticeLogs(logs)
+      setImprovementData(improvement)
+    }
+  }
+
   return (
     <main className="min-h-screen bg-zinc-900 text-white pb-24">
       <div className="max-w-lg mx-auto px-4 py-6">
-        <LessonHeader />
+        <LessonHeader skill={lesson.casi?.Primary_Skill} title={lesson.title} />
         <LessonTitle lesson={lesson} />
         <LessonWhat what={lesson.what} />
 
@@ -164,7 +182,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           favLoading={favLoading}
           onToggleFav={handleToggleFav}
           onShare={handleShare}
-          onPractice={() => setShowPracticeModal(true)}
+          onPractice={handleInlinePractice}
           showPractice={subscription.isActive}
           isCompleted={isCompletedToday}
         />

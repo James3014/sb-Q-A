@@ -1,7 +1,9 @@
+'use client'
 import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
 import { User } from '@supabase/supabase-js';
+import { useSnowMode } from '@/hooks/useSnowMode';
 
 interface HomeHeaderProps {
     user: User | null;
@@ -12,6 +14,8 @@ interface HomeHeaderProps {
 }
 
 export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: HomeHeaderProps) {
+    const { snowMode, toggle } = useSnowMode();
+    
     return (
         <header className="sticky top-0 z-10 bg-zinc-950/80 backdrop-blur-md border-b border-white/10 p-4">
             <div className="flex justify-between items-center mb-3">
@@ -20,6 +24,9 @@ export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: Hom
                     <h1 className="text-xl font-bold text-gradient">單板教學</h1>
                 </div>
                 <div className="flex items-center gap-1">
+                    <button onClick={toggle} className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title={snowMode ? '一般模式' : '雪地模式'}>
+                        {snowMode ? '☀️' : '❄️'}
+                    </button>
                     <Link href="/feedback" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="意見回報">💬</Link>
                     {user && <Link href="/practice" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">📝</Link>}
                     {user && <Link href="/favorites" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">❤️</Link>}

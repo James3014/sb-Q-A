@@ -1,18 +1,18 @@
-import Link from 'next/link'
-import { vibrate } from '@/components/ui'
+import { BackButton } from '@/components/BackButton'
+import { Breadcrumb } from '@/components/Breadcrumb'
 
-export function LessonHeader() {
-  const handleBack = () => vibrate(20)
+interface LessonHeaderProps {
+  skill?: string | null
+  title?: string
+}
 
+export function LessonHeader({ skill, title }: LessonHeaderProps) {
   return (
-    <div className="flex items-center mb-4">
-      <Link 
-        href="/" 
-        onClick={handleBack}
-        className="w-12 h-12 flex items-center justify-center rounded-xl bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-xl"
-      >
-        ←
-      </Link>
+    <div className="mb-4">
+      <div className="flex items-center gap-2 mb-2">
+        <BackButton />
+      </div>
+      <Breadcrumb skill={skill || undefined} lessonTitle={title} />
     </div>
   )
 }
