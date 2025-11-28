@@ -28,19 +28,19 @@ export function LessonSequence({ prerequisite, next, similar }: { prerequisite: 
       <div className="space-y-2">
         {prerequisite && (
           <Link href={`/lesson/${prerequisite.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
-            <span className="text-xs bg-blue-600 px-2 py-0.5 rounded">先看</span>
+            <span className="text-xs bg-blue-600 px-2 py-0.5 rounded whitespace-nowrap">先看</span>
             <span className="text-sm text-zinc-300 truncate">{prerequisite.title}</span>
           </Link>
         )}
         {next && (
           <Link href={`/lesson/${next.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
-            <span className="text-xs bg-green-600 px-2 py-0.5 rounded">下一步</span>
+            <span className="text-xs bg-green-600 px-2 py-0.5 rounded whitespace-nowrap">下一步</span>
             <span className="text-sm text-zinc-300 truncate">{next.title}</span>
           </Link>
         )}
         {similar.map(s => (
           <Link key={s.id} href={`/lesson/${s.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
-            <span className="text-xs bg-zinc-600 px-2 py-0.5 rounded">相似</span>
+            <span className="text-xs bg-zinc-600 px-2 py-0.5 rounded whitespace-nowrap">相似</span>
             <span className="text-sm text-zinc-300 truncate">{s.title}</span>
           </Link>
         ))}
