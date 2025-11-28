@@ -1,4 +1,5 @@
 'use client'
+import { PageContainer } from '@/components/ui';
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -33,7 +34,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white flex items-center justify-center p-4">
+    <PageContainer className="flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="text-zinc-400 text-sm mb-6 block">← 返回首頁</Link>
         
@@ -85,6 +86,6 @@ export default function LoginPage() {
           </button>
         </p>
       </div>
-    </main>
+    </PageContainer>
   )
 }

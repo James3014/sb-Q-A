@@ -49,7 +49,6 @@ export async function addFavorite(userId: string, lessonId: string): Promise<{ s
     return { success: false, error: '請先登入' }
   }
   
-  console.log('[Favorites] addFavorite:', { userId, lessonId, sessionUser: session.user.id })
   
   const { error } = await supabase
     .from('favorites')
@@ -76,7 +75,6 @@ export async function removeFavorite(userId: string, lessonId: string): Promise<
     return { success: false, error: '請先登入' }
   }
   
-  console.log('[Favorites] removeFavorite:', { userId, lessonId })
   
   const { error } = await supabase
     .from('favorites')

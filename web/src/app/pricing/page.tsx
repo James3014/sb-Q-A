@@ -1,4 +1,5 @@
 'use client'
+import { PageContainer } from '@/components/ui';
 
 import { useEffect } from 'react'
 import Link from 'next/link'
@@ -55,7 +56,7 @@ export default function PricingPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
+    <PageContainer>
       <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
         <div className="flex items-center gap-4">
           <Link href="/" className="text-zinc-400">←</Link>
@@ -157,6 +158,6 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
-    </main>
+    </PageContainer>
   )
 }

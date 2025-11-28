@@ -50,7 +50,6 @@ export function onAuthStateChange(callback: (user: User | null) => void) {
   if (!supabase) return { data: { subscription: { unsubscribe: () => {} } } }
   
   return supabase.auth.onAuthStateChange((event, session) => {
-    console.log('[Auth] state changed:', event, session?.user?.email)
     callback(session?.user ?? null)
   })
 }

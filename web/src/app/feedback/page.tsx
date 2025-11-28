@@ -1,4 +1,5 @@
 'use client'
+import { PageContainer } from '@/components/ui';
 
 import { useState } from 'react'
 import { useAuth } from '@/components/AuthProvider'
@@ -39,7 +40,7 @@ export default function FeedbackPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
+    <PageContainer>
       <PageHeader title="意見回報" emoji="📝" />
       
       <div className="p-4 max-w-lg mx-auto">
@@ -88,6 +89,6 @@ export default function FeedbackPage() {
           </>
         )}
       </div>
-    </main>
+    </PageContainer>
   )
 }

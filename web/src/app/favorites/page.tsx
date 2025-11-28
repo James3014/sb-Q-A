@@ -1,4 +1,5 @@
 'use client'
+import { PageContainer } from '@/components/ui';
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -36,7 +37,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
+    <PageContainer>
       <PageHeader title="我的收藏" emoji="❤️" />
       <div className="p-4">
         {favLessons.length === 0 ? (
@@ -47,6 +48,6 @@ export default function FavoritesPage() {
           </div>
         )}
       </div>
-    </main>
+    </PageContainer>
   )
 }

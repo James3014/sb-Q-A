@@ -8,6 +8,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/auth';
 import { useFilteredLessons } from '@/lib/useFilteredLessons';
 import { trackEvent } from '@/lib/analytics';
+import { PageContainer } from '@/components/ui';
 
 // Components
 import { HomeHeader } from '@/components/home/HomeHeader';
@@ -17,7 +18,7 @@ import { LessonList } from '@/components/home/LessonList';
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-zinc-900 text-white p-4 text-center">載入中...</div>}>
+    <Suspense fallback={<PageContainer className="p-4 text-center">載入中...</PageContainer>}>
       <HomeContent />
     </Suspense>
   );
@@ -72,7 +73,7 @@ function HomeContent() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
+    <PageContainer>
       <HomeHeader
         user={user}
         search={search}
@@ -121,6 +122,6 @@ function HomeContent() {
           </Link>
         </div>
       </div>
-    </main>
+    </PageContainer>
   );
 }
