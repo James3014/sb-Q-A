@@ -51,3 +51,12 @@ body {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400;
   }
 }
+
+/* 省電模式：減少動畫 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

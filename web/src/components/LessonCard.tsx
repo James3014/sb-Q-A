@@ -7,7 +7,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
   
   return (
     <Link href={`/lesson/${lesson.id}`} className="block">
-      <div className="bg-zinc-800 rounded-xl p-5 min-h-[100px] hover:bg-zinc-750 active:bg-zinc-700 active:scale-[0.98] transition-all">
+      <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-5 min-h-[100px] hover:bg-zinc-750 active:bg-zinc-700 active:scale-[0.98] transition-all">
         <p className="text-zinc-300 text-base leading-relaxed line-clamp-2 mb-2">
           😰 {lesson.what.slice(0, 80)}{lesson.what.length > 80 ? '...' : ''}
         </p>

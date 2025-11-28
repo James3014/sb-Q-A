@@ -54,8 +54,8 @@ export function BottomActionBar({
             onClick={handlePractice}
             className={`flex-1 h-14 rounded-xl font-bold text-lg transition-all active:scale-95 ${
               isCompleted 
-                ? 'bg-green-600 hover:bg-green-500' 
-                : 'bg-blue-600 hover:bg-blue-500'
+                ? 'bg-green-700 hover:bg-green-600' 
+                : 'bg-blue-700 hover:bg-blue-600'
             }`}
           >
             {isCompleted ? '✓ 今天已練習' : '🏂 完成練習'}

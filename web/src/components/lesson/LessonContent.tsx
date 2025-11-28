@@ -1,6 +1,8 @@
+import Image from 'next/image'
+
 export function LessonWhat({ what }: { what: string }) {
   return (
-    <section className="bg-zinc-800 rounded-lg p-5 mb-4">
+    <section className="bg-zinc-800 border border-zinc-700 rounded-lg p-5 mb-4">
       <h2 className="text-lg font-semibold mb-3 text-amber-400">😰 你可能遇到這些狀況</h2>
       <p className="text-zinc-300 text-lg leading-[1.8]">{what}</p>
     </section>
@@ -10,7 +12,7 @@ export function LessonWhat({ what }: { what: string }) {
 export function LessonWhy({ why }: { why: string[] }) {
   if (!why?.length) return null
   return (
-    <section className="bg-zinc-800 rounded-lg p-5 mb-4">
+    <section className="bg-zinc-800 border border-zinc-700 rounded-lg p-5 mb-4">
       <h2 className="text-lg font-semibold mb-3 text-blue-400">🎯 練習目標</h2>
       <ul className="text-zinc-300 text-lg leading-[1.8] space-y-2">
         {why.map((w, i) => <li key={i}>• {w}</li>)}
@@ -22,7 +24,7 @@ export function LessonWhy({ why }: { why: string[] }) {
 export function LessonSteps({ steps }: { steps: { text: string; image?: string | null }[] }) {
   if (!steps?.length) return null
   return (
-    <section className="bg-zinc-800 rounded-lg p-5 mb-4">
+    <section className="bg-zinc-800 border border-zinc-700 rounded-lg p-5 mb-4">
       <h2 className="text-lg font-semibold mb-4 text-green-400">🛠️ 怎麼練習</h2>
       <div className="space-y-4">
         {steps.map((step, i) => {
@@ -32,7 +34,11 @@ export function LessonSteps({ steps }: { steps: { text: string; image?: string |
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-7 h-7 bg-green-600 rounded-full flex items-center justify-center text-sm font-bold">{i + 1}</span>
                 <div className="flex-1">
-                  {step.image && <div className="mb-3 rounded-lg overflow-hidden bg-zinc-600"><img src={step.image} alt={`步驟 ${i + 1}`} className="w-full" /></div>}
+                  {step.image && (
+                    <div className="mb-3 rounded-lg overflow-hidden bg-zinc-600 relative aspect-video">
+                      <Image src={step.image} alt={`步驟 ${i + 1}`} fill className="object-cover" loading="lazy" />
+                    </div>
+                  )}
                   <p className="text-zinc-300 text-lg leading-[1.8]" dangerouslySetInnerHTML={{ __html: text }} />
                 </div>
               </div>

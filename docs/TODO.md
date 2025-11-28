@@ -127,6 +127,22 @@
 
 ---
 
+## UX 優化第二輪（2025-11-28）
+
+### 對比度與效能優化
+
+| # | 項目 | 工時 | 狀態 |
+|---|------|------|------|
+| - [x] 96. 主按鈕對比度提升（blue-700 + font-bold） | 10min | ✅ |
+| - [x] 97. 次要文字對比度（zinc-400 → zinc-300） | 10min | ✅ |
+| - [x] 98. 卡片邊框強化（border-zinc-700） | 10min | ✅ |
+| - [x] 99. fetchWithRetry 弱網重試 | 30min | ✅ |
+| - [x] 100. prefers-reduced-motion 省電 | 15min | ✅ |
+| - [x] 101. Next/Image 圖片優化 | 30min | ✅ |
+| - [x] 102. 驗證 build | - | ✅ |
+
+---
+
 ## Schema v3 + Learning Path Engine（2025-11-27）
 
 ### Phase 1：Schema v3 Migration

@@ -30,9 +30,9 @@ export function Button({
     lg: 'px-8 py-4 text-lg',
   }[size]
   const variantClass = {
-    primary: 'bg-blue-600 hover:bg-blue-500 text-white',
+    primary: 'bg-blue-700 hover:bg-blue-600 text-white font-bold',
     secondary: 'bg-zinc-700 hover:bg-zinc-600 text-white',
-    success: 'bg-green-600 hover:bg-green-500 text-white',
+    success: 'bg-green-700 hover:bg-green-600 text-white font-bold',
     danger: 'bg-red-600 hover:bg-red-500 text-white',
   }[variant]
   const disabledClass = disabled ? 'opacity-50 cursor-not-allowed' : ''
