@@ -35,8 +35,8 @@ export function LessonSteps({ steps }: { steps: { text: string; image?: string |
                 <span className="flex-shrink-0 w-7 h-7 bg-green-600 rounded-full flex items-center justify-center text-sm font-bold">{i + 1}</span>
                 <div className="flex-1">
                   {step.image && (
-                    <div className="mb-3 rounded-lg overflow-hidden bg-zinc-600 relative aspect-video">
-                      <Image src={step.image} alt={`步驟 ${i + 1}`} fill className="object-cover" loading="lazy" />
+                    <div className="mb-3 rounded-lg overflow-hidden bg-zinc-600">
+                      <Image src={step.image} alt={`步驟 ${i + 1}`} width={800} height={600} className="w-full h-auto" loading="lazy" />
                     </div>
                   )}
                   <p className="text-zinc-300 text-lg leading-[1.8]" dangerouslySetInnerHTML={{ __html: text }} />
