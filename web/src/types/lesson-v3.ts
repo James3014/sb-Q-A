@@ -1,4 +1,13 @@
-// Schema v3 TypeScript Types
+/**
+ * Schema v3 TypeScript Types
+ * 
+ * ⚠️ 這是未來規劃的型別定義，目前未使用
+ * 實際使用的 Lesson 介面在 lib/lessons.ts
+ * 
+ * 差異：
+ * - 這裡用 camelCase (levelTags)
+ * - lib/lessons.ts 用 snake_case (level_tags) 對應資料庫
+ */
 
 // ============================================
 // Enums

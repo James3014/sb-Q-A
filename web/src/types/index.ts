@@ -1,4 +1,3 @@
 // Types Index
-export * from './lesson'
-export * from './rider'
+// Note: lesson-v3.ts, rider-v3.ts 是 Schema v3 規劃，目前未使用
 export * from './path'

@@ -1,6 +1,6 @@
 // Learning Path Engine - Rider Types
 
-import { LessonLevel, TerrainType } from './lesson'
+import { LessonLevel, TerrainType } from './lesson-v3'
 
 // ============================================
 // Riding Goals
