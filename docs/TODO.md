@@ -123,6 +123,7 @@
 | - [x] 92. ui.tsx 拆分為 ui/ 目錄 | 45min | ✅ |
 | - [x] 93. PageHeader 加震動回饋 | 5min | ✅ |
 | - [x] 94. 驗證 build | - | ✅ |
+| - [x] 95. ErrorBoundary 全域錯誤邊界 | 30min | ✅ |
 
 ---
 
