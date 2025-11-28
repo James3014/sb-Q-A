@@ -12,7 +12,9 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
 
   const handleClick = () => {
     // 記住當前滾動位置
-    sessionStorage.setItem('homeScrollPos', window.scrollY.toString())
+    const currentScroll = window.scrollY
+    console.log('[LessonCard] 記住滾動位置:', currentScroll)
+    sessionStorage.setItem('homeScrollPos', currentScroll.toString())
   }
 
   return (
