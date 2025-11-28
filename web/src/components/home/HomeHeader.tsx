@@ -17,14 +17,14 @@ export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: Hom
                 <h1 className="text-xl font-bold text-white">
                     🏂 <span className="text-gradient">單板教學</span>
                 </h1>
-                <div className="flex items-center gap-3">
-                    <Link href="/feedback" className="text-lg hover:scale-110 transition-transform" title="意見回報">💬</Link>
-                    {user && <Link href="/practice" className="text-lg hover:scale-110 transition-transform">📝</Link>}
-                    {user && <Link href="/favorites" className="text-lg hover:scale-110 transition-transform">❤️</Link>}
+                <div className="flex items-center gap-1">
+                    <Link href="/feedback" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="意見回報">💬</Link>
+                    {user && <Link href="/practice" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">📝</Link>}
+                    {user && <Link href="/favorites" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">❤️</Link>}
                     {user ? (
-                        <button onClick={() => signOut()} className="text-sm text-zinc-400 hover:text-white transition-colors">登出</button>
+                        <button onClick={() => signOut()} className="h-11 px-3 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">登出</button>
                     ) : (
-                        <Link href="/login" className="text-sm text-brand-red hover:text-red-400 transition-colors font-medium">登入</Link>
+                        <Link href="/login" className="h-11 px-3 flex items-center text-sm text-brand-red hover:text-red-400 hover:bg-zinc-800 rounded-lg active:scale-95 transition-all font-medium">登入</Link>
                     )}
                 </div>
             </div>
