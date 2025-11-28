@@ -10,16 +10,10 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
   const cardRef = useCardAnimation()
   const levels = lesson.level_tags.map(t => LEVEL_NAMES[t] || t).join('/')
 
-  const handleClick = () => {
-    // 記住點擊的卡片 ID（而非滾動位置）
-    sessionStorage.setItem('lastViewedLesson', lesson.id)
-  }
-
   return (
     <Link
       href={`/lesson/${lesson.id}`}
       ref={cardRef}
-      onClick={handleClick}
       data-lesson-id={lesson.id}
       className="block relative opacity-0 mb-6 pt-2"
     >

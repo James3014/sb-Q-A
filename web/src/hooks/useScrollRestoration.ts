@@ -5,16 +5,20 @@ export function useScrollRestoration(ready: boolean = true) {
     if (!ready) return
 
     const lastViewedLesson = sessionStorage.getItem('lastViewedLesson')
+    const lastViewedUrl = sessionStorage.getItem('lastViewedUrl')
+    const currentUrl = window.location.href
     
-    if (lastViewedLesson) {
-      // 找到該卡片並滾動到它
+    // 只有在相同 URL（相同篩選條件）時才恢復位置
+    if (lastViewedLesson && lastViewedUrl === currentUrl) {
       setTimeout(() => {
         const card = document.querySelector(`[data-lesson-id="${lastViewedLesson}"]`)
         if (card) {
           card.scrollIntoView({ behavior: 'instant', block: 'center' })
-          sessionStorage.removeItem('lastViewedLesson')
         }
-      }, 100) // 給內容渲染時間
+        // 恢復後清除
+        sessionStorage.removeItem('lastViewedLesson')
+        sessionStorage.removeItem('lastViewedUrl')
+      }, 100)
     }
   }, [ready])
 }
