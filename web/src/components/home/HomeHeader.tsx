@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
 import { User } from '@supabase/supabase-js';
 
@@ -14,9 +15,10 @@ export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: Hom
     return (
         <header className="sticky top-0 z-10 bg-zinc-950/80 backdrop-blur-md border-b border-white/10 p-4">
             <div className="flex justify-between items-center mb-3">
-                <h1 className="text-xl font-bold text-white">
-                    🏂 <span className="text-gradient">單板教學</span>
-                </h1>
+                <div className="flex items-center gap-2">
+                    <Image src="/logo.jpeg" alt="Logo" width={36} height={36} className="rounded-lg" />
+                    <h1 className="text-xl font-bold text-gradient">單板教學</h1>
+                </div>
                 <div className="flex items-center gap-1">
                     <Link href="/feedback" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="意見回報">💬</Link>
                     {user && <Link href="/practice" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">📝</Link>}
