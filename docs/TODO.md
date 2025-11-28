@@ -140,6 +140,7 @@
 | - [x] 100. prefers-reduced-motion 省電 | 15min | ✅ |
 | - [x] 101. Next/Image 圖片優化 | 30min | ✅ |
 | - [x] 102. 驗證 build | - | ✅ |
+| - [x] 103. 頂部導航圖示放大 44px | 5min | ✅ |
 
 ---
 
