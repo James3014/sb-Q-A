@@ -35,8 +35,25 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
         block relative
         opacity-0
         mb-6
+        pt-2
       "
     >
+      {/* PRO 徽章（外層定位，不被卡片裁切） */}
+      {lesson.is_premium && (
+        <div className="
+          absolute top-0 right-2
+          px-4 py-1.5
+          bg-gradient-to-r from-amber-500 to-orange-500
+          text-black text-xs font-bold tracking-wider
+          rounded-full
+          shadow-lg shadow-amber-500/50
+          transform rotate-6
+          z-10
+        ">
+          PRO
+        </div>
+      )}
+
       <div className="
         velocity-shine
         relative
@@ -63,21 +80,6 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           [clip-path:polygon(100%_0,100%_100%,0_0)]
           pointer-events-none
         " />
-
-        {/* PRO 徽章（絕對定位，右上角） */}
-        {lesson.is_premium && (
-          <div className="
-            absolute -top-3 -right-3
-            px-4 py-1.5
-            bg-gradient-to-r from-amber-500 to-orange-500
-            text-black text-xs font-bold tracking-wider
-            rounded-full
-            shadow-lg shadow-amber-500/50
-            transform rotate-6
-          ">
-            PRO
-          </div>
-        )}
 
         {/* 標題：Bebas Neue 大字 */}
         <h3

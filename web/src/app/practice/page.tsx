@@ -102,37 +102,115 @@ export default function PracticePage() {
         )}
 
         {tab === 'logs' && logs.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {Object.entries(groupedLogs).map(([date, dateLogs]) => (
-              <div key={date} className="bg-zinc-800 rounded-lg overflow-hidden">
-                <button 
-                  onClick={() => toggleDate(date)} 
-                  className="w-full p-3 flex justify-between items-center text-left hover:bg-zinc-700/50"
+              <div
+                key={date}
+                className="
+                  velocity-shine
+                  bg-zinc-800 rounded-2xl overflow-hidden
+                  border-2 border-zinc-700
+                  [clip-path:polygon(0_8px,8px_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%)]
+                "
+              >
+                {/* 日期折疊按鈕 - Alpine Velocity 風格 */}
+                <button
+                  onClick={() => toggleDate(date)}
+                  className="
+                    w-full p-4
+                    flex justify-between items-center
+                    text-left
+                    hover:bg-zinc-700/30
+                    active:bg-zinc-700/50
+                    transition-all
+                  "
                 >
-                  <span className="font-medium">{date}</span>
-                  <span className="text-zinc-400 text-sm">
-                    {dateLogs.length} 筆 {expandedDates.has(date) ? '▼' : '▶'}
+                  <span
+                    className="text-lg font-bold text-gradient-velocity"
+                    style={{ fontFamily: 'var(--font-display)' }}
+                  >
+                    {date}
+                  </span>
+                  <span className="flex items-center gap-2 text-sm text-zinc-400">
+                    <span className="px-2.5 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-300 font-bold text-xs">
+                      {dateLogs.length} 筆
+                    </span>
+                    <span className="text-lg">
+                      {expandedDates.has(date) ? '▼' : '▶'}
+                    </span>
                   </span>
                 </button>
+
+                {/* 記錄列表 */}
                 {expandedDates.has(date) && (
                   <div className="border-t border-zinc-700">
                     {dateLogs.map(log => {
                       const lesson = getLesson(log.lesson_id)
                       const isExpanded = expanded === log.id
                       return (
-                        <div key={log.id} className="border-b border-zinc-700/50 last:border-0">
-                          <button onClick={() => setExpanded(isExpanded ? null : log.id)} className="w-full p-3 text-left">
-                            <div className="flex justify-between items-start">
-                              <p className="text-sm flex-1">{lesson?.title || `課程 ${log.lesson_id}`}</p>
-                              {log.rating && <span className="text-xs">⭐{log.rating}</span>}
+                        <div
+                          key={log.id}
+                          className="border-b border-zinc-700/50 last:border-0"
+                        >
+                          {/* 記錄卡片 */}
+                          <button
+                            onClick={() => setExpanded(isExpanded ? null : log.id)}
+                            className="
+                              w-full p-4
+                              text-left
+                              hover:bg-zinc-700/20
+                              active:bg-zinc-700/40
+                              transition-all
+                            "
+                          >
+                            <div className="flex justify-between items-start gap-3 mb-2">
+                              <p className="text-sm font-semibold flex-1 leading-snug">
+                                {lesson?.title || `課程 ${log.lesson_id}`}
+                              </p>
+                              {log.rating && (
+                                <span className="
+                                  flex-shrink-0
+                                  px-2.5 py-1
+                                  bg-gradient-to-r from-amber-500/30 to-orange-500/30
+                                  border border-amber-400/40
+                                  rounded-full
+                                  text-xs font-bold text-amber-300
+                                ">
+                                  ⭐ {log.rating}
+                                </span>
+                              )}
                             </div>
-                            {log.note && <p className="text-xs text-zinc-400 mt-1">💭 {log.note}</p>}
+                            {log.note && (
+                              <p className="text-xs text-zinc-400 leading-relaxed">
+                                💭 {log.note}
+                              </p>
+                            )}
                           </button>
+
+                          {/* 展開內容 */}
                           {isExpanded && lesson && (
-                            <div className="px-3 pb-3 pt-1">
-                              <p className="text-xs text-zinc-500 mb-1">😰 問題</p>
-                              <p className="text-xs text-zinc-300 mb-2">{lesson.what}</p>
-                              <Link href={`/lesson/${log.lesson_id}`} className="text-xs text-blue-400">查看課程 →</Link>
+                            <div className="px-4 pb-4 pt-1">
+                              <div className="
+                                p-3 rounded-lg
+                                bg-zinc-900/50
+                                border border-zinc-700/50
+                              ">
+                                <p className="text-xs text-zinc-500 mb-1 font-bold">😰 問題</p>
+                                <p className="text-xs text-zinc-300 mb-3 leading-relaxed">
+                                  {lesson.what}
+                                </p>
+                                <Link
+                                  href={`/lesson/${log.lesson_id}`}
+                                  className="
+                                    inline-flex items-center gap-1
+                                    text-xs font-bold
+                                    text-blue-400 hover:text-blue-300
+                                    transition-colors
+                                  "
+                                >
+                                  查看課程 →
+                                </Link>
+                              </div>
                             </div>
                           )}
                         </div>

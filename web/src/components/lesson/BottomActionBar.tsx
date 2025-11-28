@@ -14,14 +14,14 @@ interface Props {
   isCompleted?: boolean
 }
 
-export function BottomActionBar({ 
-  isFav, 
-  favLoading, 
-  onToggleFav, 
-  onShare, 
+export function BottomActionBar({
+  isFav,
+  favLoading,
+  onToggleFav,
+  onShare,
   onPractice,
   showPractice,
-  isCompleted 
+  isCompleted
 }: Props) {
   const [showCard, setShowCard] = useState(false)
 
@@ -44,7 +44,7 @@ export function BottomActionBar({
     <>
       {/* 嵌入式評分卡 */}
       {showCard && (
-        <InlinePracticeCard 
+        <InlinePracticeCard
           onSubmit={async (ratings) => {
             await onPractice(ratings)
           }}
@@ -52,36 +52,74 @@ export function BottomActionBar({
         />
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-700 px-4 py-3 pb-safe z-40">
+      {/* Alpine Velocity 底部操作欄 */}
+      <div className="
+        fixed bottom-0 left-0 right-0
+        bg-zinc-900/95 backdrop-blur-lg
+        border-t border-zinc-700
+        px-4 py-3 pb-safe
+        z-40
+      ">
         <div className="max-w-lg mx-auto">
-          {/* 次要按鈕（收藏 + 分享，移到頂部） */}
+          {/* 次要按鈕（收藏 + 分享） */}
           <div className="flex gap-3 mb-3">
-            <button 
-              onClick={handleFav} 
+            {/* 收藏按鈕 */}
+            <button
+              onClick={handleFav}
               disabled={favLoading}
-              className="flex-1 h-12 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-sm font-semibold flex items-center justify-center gap-2"
+              className={`
+                velocity-shine
+                flex-1 h-12
+                rounded-xl
+                text-sm font-bold tracking-wide
+                flex items-center justify-center gap-2
+                border-2
+                transition-all
+                active:scale-95
+                ${isFav
+                  ? 'bg-gradient-to-r from-red-500/20 to-pink-500/20 border-red-400/50 text-red-300'
+                  : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-600'
+                }
+              `}
             >
               {favLoading ? '⏳' : isFav ? '❤️ 已收藏' : '🤍 收藏'}
             </button>
 
-            <button 
+            {/* 分享按鈕 */}
+            <button
               onClick={handleShare}
-              className="flex-1 h-12 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-sm font-semibold flex items-center justify-center gap-2"
+              className="
+                velocity-shine
+                flex-1 h-12
+                rounded-xl
+                bg-zinc-800 border-2 border-zinc-700
+                hover:border-zinc-600
+                active:scale-95
+                transition-all
+                text-sm font-bold tracking-wide text-zinc-300
+                flex items-center justify-center gap-2
+              "
             >
               📤 分享
             </button>
           </div>
 
-          {/* 主按鈕（完成練習，獨立一行） */}
+          {/* 主按鈕（完成練習） */}
           {showPractice && (
-            <button 
+            <button
               onClick={handlePracticeClick}
-              className="w-full h-14 rounded-2xl font-bold text-lg transition-all active:scale-98 shadow-lg"
-              style={{ 
-                backgroundColor: isCompleted ? 'var(--btn-success-bg)' : 'var(--btn-primary-bg)',
-                color: isCompleted ? 'var(--btn-success-text)' : 'var(--btn-primary-text)',
-                boxShadow: isCompleted ? 'none' : '0 10px 30px -10px rgba(251, 191, 36, 0.3)'
-              }}
+              className={`
+                velocity-shine
+                w-full h-14
+                rounded-2xl
+                font-bold text-lg tracking-wide
+                transition-all
+                active:scale-[0.98]
+                ${isCompleted
+                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg shadow-green-500/30'
+                  : 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/40'
+                }
+              `}
             >
               {isCompleted ? '✓ 今天已練習' : '🏂 完成練習'}
             </button>
