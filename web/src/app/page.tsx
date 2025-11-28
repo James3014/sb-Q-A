@@ -35,8 +35,8 @@ function HomeContent() {
   const { user } = useAuth();
   const searchTimer = useRef<NodeJS.Timeout>(null);
   
-  // 恢復滾動位置
-  useScrollRestoration();
+  // 等待 lessons 載入完成後才恢復滾動位置
+  useScrollRestoration(!loading);
 
   const levelFilter = searchParams.get('level');
   const slopeFilter = searchParams.get('slope');

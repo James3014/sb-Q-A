@@ -1,22 +1,20 @@
 import { useEffect } from 'react'
 
-export function useScrollRestoration() {
+export function useScrollRestoration(ready: boolean = true) {
   useEffect(() => {
-    // 恢復首頁的滾動位置
+    if (!ready) return // 等待內容準備好
+
     const savedPosition = sessionStorage.getItem('homeScrollPos')
     
     if (savedPosition) {
       const position = parseInt(savedPosition)
       
-      // 延遲恢復，確保內容已渲染
-      const timeoutId = setTimeout(() => {
-        window.scrollTo({
-          top: position,
-          behavior: 'instant' // 立即跳轉，不要平滑滾動
+      // 使用 requestAnimationFrame 確保 DOM 已更新
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, position)
         })
-      }, 50)
-
-      return () => clearTimeout(timeoutId)
+      })
     }
-  }, [])
+  }, [ready])
 }
