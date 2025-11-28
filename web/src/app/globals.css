@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #ededed;
   
   /* 預設主題色 */
   --btn-primary-bg: #1d4ed8;      /* blue-700 */
@@ -10,17 +10,66 @@
   --btn-success-bg: #15803d;      /* green-700 */
   --btn-success-text: #ffffff;
   --accent: #3b82f6;              /* blue-500 */
+  --card-bg: #27272a;             /* zinc-800 */
+  --card-border: #3f3f46;         /* zinc-700 */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;      /* zinc-400 */
 }
 
 /* Snow Mode：強光高對比主題（對比度 ≥12:1） */
 [data-theme="snow"] {
-  --background: #0a0a0a;          /* 純黑 */
+  --background: #000000;          /* 純黑 */
   --foreground: #ffffff;          /* 純白 */
   --btn-primary-bg: #f59e0b;      /* amber-500 */
-  --btn-primary-text: #0a0a0a;    /* 黑字 */
+  --btn-primary-text: #000000;    /* 黑字 */
   --btn-success-bg: #f97316;      /* orange-500 */
-  --btn-success-text: #0a0a0a;    /* 黑字 */
+  --btn-success-text: #000000;    /* 黑字 */
   --accent: #fbbf24;              /* amber-400 */
+  --card-bg: #171717;             /* 深灰 */
+  --card-border: #fbbf24;         /* 黃色邊框 */
+  --text-primary: #ffffff;
+  --text-secondary: #fef3c7;      /* amber-100 */
+}
+
+/* Snow Mode 全局樣式覆蓋 */
+[data-theme="snow"] body {
+  background: #000000 !important;
+}
+
+[data-theme="snow"] .bg-zinc-900,
+[data-theme="snow"] .bg-zinc-950 {
+  background-color: #000000 !important;
+}
+
+[data-theme="snow"] .bg-zinc-800 {
+  background-color: #171717 !important;
+  border-color: #fbbf24 !important;
+}
+
+[data-theme="snow"] .text-zinc-300,
+[data-theme="snow"] .text-zinc-400 {
+  color: #fef3c7 !important;
+}
+
+[data-theme="snow"] .text-blue-400,
+[data-theme="snow"] .text-green-400 {
+  color: #fbbf24 !important;
+}
+
+[data-theme="snow"] .bg-blue-700,
+[data-theme="snow"] .bg-blue-600 {
+  background-color: #f59e0b !important;
+  color: #000000 !important;
+}
+
+[data-theme="snow"] .bg-green-700,
+[data-theme="snow"] .bg-green-600 {
+  background-color: #f97316 !important;
+  color: #000000 !important;
+}
+
+[data-theme="snow"] .border-zinc-700 {
+  border-color: #fbbf24 !important;
 }
 
 @theme inline {
