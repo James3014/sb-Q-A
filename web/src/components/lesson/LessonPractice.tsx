@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { PracticeLog, PracticeRatings, getAvgRating } from '@/lib/practice'
 import { formatDate } from '@/lib/constants'
+import { vibrate } from '@/components/ui'
 
 interface CTAProps {
   onComplete: (note: string, ratings: PracticeRatings) => void
@@ -10,15 +11,22 @@ interface CTAProps {
   saving: boolean
   totalPractices?: number
   improvement?: number | null
+  showModal?: boolean
+  setShowModal?: (show: boolean) => void
 }
 
-export function LessonPracticeCTA({ onComplete, lastPractice, saving, totalPractices, improvement }: CTAProps) {
-  const [showModal, setShowModal] = useState(false)
+export function LessonPracticeCTA({ onComplete, lastPractice, saving, totalPractices, improvement, showModal: externalShowModal, setShowModal: externalSetShowModal }: CTAProps) {
+  const [internalShowModal, setInternalShowModal] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [note, setNote] = useState('')
   const [ratings, setRatings] = useState<PracticeRatings>({ rating1: 3, rating2: 3, rating3: 3 })
 
+  // 支援外部或內部控制 modal
+  const showModal = externalShowModal ?? internalShowModal
+  const setShowModal = externalSetShowModal ?? setInternalShowModal
+
   const handleSubmit = () => {
+    vibrate([50, 100, 50]) // 慶祝震動
     onComplete(note, ratings)
     setShowModal(false)
     setShowSuccess(true)
@@ -49,19 +57,15 @@ export function LessonPracticeCTA({ onComplete, lastPractice, saving, totalPract
         </div>
       )}
 
-      <section className="bg-gradient-to-r from-blue-900/50 to-zinc-800 rounded-lg p-4 mb-4 border border-blue-600/30">
-        {isToday && avgRating ? (
+      {/* 今日完成狀態顯示 */}
+      {isToday && avgRating && (
+        <section className="bg-gradient-to-r from-green-900/50 to-zinc-800 rounded-lg p-4 mb-4 border border-green-600/30">
           <div className="text-center">
             <p className="text-green-400 font-medium mb-1">✔ 已完成（今天）</p>
             <p className="text-2xl font-bold">⭐ {avgRating.toFixed(1)} / 5.0</p>
-            <button onClick={() => setShowModal(true)} className="mt-2 text-sm text-blue-400">再練一次 →</button>
           </div>
-        ) : (
-          <button onClick={() => setShowModal(true)} className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition">
-            🏂 完成練習
-          </button>
-        )}
-      </section>
+        </section>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
@@ -74,8 +78,8 @@ export function LessonPracticeCTA({ onComplete, lastPractice, saving, totalPract
             </div>
             <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="今天練習的心得（選填）" className="w-full bg-zinc-700 rounded-lg p-3 text-sm mb-4 h-20" />
             <div className="flex gap-2">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-2 bg-zinc-700 rounded-lg">取消</button>
-              <button onClick={handleSubmit} disabled={saving} className="flex-1 py-2 bg-blue-600 rounded-lg font-medium disabled:opacity-50">
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 bg-zinc-700 rounded-xl text-lg active:scale-95 transition-all">取消</button>
+              <button onClick={handleSubmit} disabled={saving} className="flex-1 py-3 bg-blue-600 rounded-xl font-medium text-lg disabled:opacity-50 active:scale-95 transition-all">
                 {saving ? '儲存中...' : '儲存'}
               </button>
             </div>

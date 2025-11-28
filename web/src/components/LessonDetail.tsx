@@ -19,6 +19,7 @@ import {
   LessonRecommendations,
   LessonSequence,
   LessonUnlockPRO,
+  BottomActionBar,
 } from './lesson'
 
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
@@ -26,6 +27,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const [isFav, setIsFav] = useState(false)
   const [favLoading, setFavLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showPracticeModal, setShowPracticeModal] = useState(false)
   const [practiceLogs, setPracticeLogs] = useState<PracticeLog[]>([])
   const [weakSkill, setWeakSkill] = useState<string | null>(null)
   const [recommendations, setRecommendations] = useState<{ id: string; title: string }[]>([])
@@ -38,9 +40,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
 
   const isLocked = lesson.is_premium && !subscription.isActive
   const showActions = !!user && !isLocked
+  const isCompletedToday = practiceLogs[0] && new Date(practiceLogs[0].created_at).toDateString() === new Date().toDateString()
 
   useEffect(() => {
-    // 載入相關課程（不需登入）
     getLessons().then(allLessons => {
       const related = getRelatedLessons(lesson, allLessons)
       setRelatedLessons({
@@ -94,9 +96,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const handlePracticeComplete = async (note: string, ratings: PracticeRatings) => {
     if (!user) return
     setSaving(true)
-    console.log('[Practice] Adding log:', { userId: user.id, lessonId: lesson.id, note, ratings })
     const result = await addPracticeLog(user.id, lesson.id, note, ratings)
-    console.log('[Practice] Result:', result)
     if (result.success) {
       const [logs, improvement] = await Promise.all([
         getLessonPracticeLogs(user.id, lesson.id),
@@ -106,19 +106,13 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
       setImprovementData(improvement)
     }
     setSaving(false)
+    setShowPracticeModal(false)
   }
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
-      <div className="max-w-lg mx-auto px-4 py-6 pb-8">
-        <LessonHeader 
-          isFav={isFav}
-          favLoading={favLoading}
-          onToggleFav={handleToggleFav}
-          onShare={handleShare}
-          showActions={showActions}
-        />
-
+    <main className="min-h-screen bg-zinc-900 text-white pb-24">
+      <div className="max-w-lg mx-auto px-4 py-6">
+        <LessonHeader />
         <LessonTitle lesson={lesson} />
         <LessonWhat what={lesson.what} />
 
@@ -138,6 +132,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
                   saving={saving}
                   totalPractices={improvementData?.totalPractices}
                   improvement={improvementData?.improvement}
+                  showModal={showPracticeModal}
+                  setShowModal={setShowPracticeModal}
                 />
                 <LessonPracticeHistory logs={practiceLogs} />
                 <LessonRecommendations weakSkill={weakSkill} recommendations={recommendations} />
@@ -160,6 +156,19 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           </>
         )}
       </div>
+
+      {/* 底部固定操作欄 */}
+      {showActions && (
+        <BottomActionBar
+          isFav={isFav}
+          favLoading={favLoading}
+          onToggleFav={handleToggleFav}
+          onShare={handleShare}
+          onPractice={() => setShowPracticeModal(true)}
+          showPractice={subscription.isActive}
+          isCompleted={isCompletedToday}
+        />
+      )}
     </main>
   )
 }
