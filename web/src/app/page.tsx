@@ -9,6 +9,7 @@ import { signOut } from '@/lib/auth';
 import { useFilteredLessons } from '@/lib/useFilteredLessons';
 import { trackEvent } from '@/lib/analytics';
 import { PageContainer } from '@/components/ui';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 
 // Components
 import { HomeHeader } from '@/components/home/HomeHeader';
@@ -33,6 +34,9 @@ function HomeContent() {
   const [showAll, setShowAll] = useState(false);
   const { user } = useAuth();
   const searchTimer = useRef<NodeJS.Timeout>(null);
+  
+  // 恢復滾動位置
+  useScrollRestoration();
 
   const levelFilter = searchParams.get('level');
   const slopeFilter = searchParams.get('slope');
