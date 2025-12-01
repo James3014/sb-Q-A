@@ -397,13 +397,13 @@
 | - [x] 153. 練習開始追蹤（vs 完成率） | 15min | BottomActionBar.tsx | ✅ |
 | - [x] 154. Dashboard 新增「課程健康度」面板 | 45min | admin/lessons/page.tsx + admin.ts | ✅ |
 
-### Phase 3：Dashboard 進階面板
+### Phase 3：Dashboard 進階面板 ✅ 已完成
 
 | # | 項目 | 工時 | 檔案 | 狀態 |
 |---|------|------|------|------|
-| - [ ] 155. 搜尋無結果 TOP 10 面板 | 30min | admin/page.tsx | |
-| - [ ] 156. 課程來源分析（搜尋 vs 推薦 vs 首頁） | 30min | admin/lessons/page.tsx | |
-| - [ ] 157. 課程健康度綜合評分（跳出率+滾動+有效度） | 45min | admin/lessons/page.tsx | |
+| - [x] 155. 搜尋無結果 TOP 10 面板 | 30min | admin/page.tsx | ✅ (Phase 1 內容缺口) |
+| - [x] 156. 課程來源分析（搜尋 vs 推薦 vs 首頁） | 30min | admin/page.tsx | ✅ (Phase 1 來源分析) |
+| - [x] 157. 課程健康度綜合評分（跳出率+滾動+有效度） | 45min | admin/lessons/page.tsx | ✅ (Phase 2 健康度) |
 
 ### 數據用途對照
 

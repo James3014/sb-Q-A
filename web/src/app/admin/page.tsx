@@ -99,6 +99,68 @@ function LessonSources({ sources }: { sources?: Stats['lessonSources'] }) {
   )
 }
 
+function QuickInsights({ stats }: { stats: Stats | null }) {
+  if (!stats) return null
+  
+  const insights: { icon: string; text: string; type: 'info' | 'warn' | 'success' }[] = []
+  
+  // 分析內容缺口
+  if (stats.contentGaps && stats.contentGaps.length > 0) {
+    const top = stats.contentGaps[0]
+    insights.push({
+      icon: '🔍',
+      text: `「${top.keyword}」被搜尋 ${top.count} 次但找不到，考慮新增相關課程`,
+      type: 'warn'
+    })
+  }
+  
+  // 分析來源
+  if (stats.lessonSources && stats.lessonSources.length > 0) {
+    const total = stats.lessonSources.reduce((a, s) => a + s.count, 0)
+    const searchPct = stats.lessonSources.find(s => s.source === 'search')?.count || 0
+    const relatedPct = stats.lessonSources.find(s => s.source === 'related')?.count || 0
+    if (total > 0) {
+      if ((searchPct / total) > 0.4) {
+        insights.push({ icon: '✅', text: '搜尋功能使用率高，用戶能找到想要的課程', type: 'success' })
+      }
+      if ((relatedPct / total) > 0.2) {
+        insights.push({ icon: '✅', text: '相關課程推薦有效，用戶會點擊延伸學習', type: 'success' })
+      }
+    }
+  }
+  
+  // 分析熱門搜尋 vs 熱門課程
+  if (stats.topKeywords?.length && stats.topLessons?.length) {
+    const topKeyword = stats.topKeywords[0]?.keyword
+    const topLesson = stats.topLessons[0]?.title
+    if (topKeyword && topLesson && !topLesson.includes(topKeyword)) {
+      insights.push({
+        icon: '💡',
+        text: `熱門搜尋「${topKeyword}」與熱門課程不同，可優化課程標題`,
+        type: 'info'
+      })
+    }
+  }
+  
+  if (insights.length === 0) {
+    insights.push({ icon: '📊', text: '數據收集中，稍後會有更多洞察', type: 'info' })
+  }
+  
+  return (
+    <section className="bg-gradient-to-r from-blue-900/30 to-zinc-800 rounded-lg p-4 border border-blue-600/30">
+      <h2 className="font-bold mb-3 text-blue-400">💡 快速洞察</h2>
+      <div className="space-y-2">
+        {insights.map((i, idx) => (
+          <div key={idx} className={`text-sm flex items-start gap-2 ${i.type === 'warn' ? 'text-amber-300' : i.type === 'success' ? 'text-green-300' : 'text-zinc-300'}`}>
+            <span>{i.icon}</span>
+            <span>{i.text}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function RecentFeedback({ feedback }: { feedback?: Stats['recentFeedback'] }) {
   return (
     <section className="bg-zinc-800 rounded-lg p-4">
@@ -148,6 +210,7 @@ export default function AdminPage() {
               <StatCard key={s.subscription_type} label={s.subscription_type || 'free'} value={s.count} />
             ))}
           </section>
+          {!loading && <QuickInsights stats={stats} />}
           <TopLessons lessons={stats?.topLessons} loading={loading} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TopKeywords keywords={stats?.topKeywords} />
