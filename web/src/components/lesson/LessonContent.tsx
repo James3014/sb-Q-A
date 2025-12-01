@@ -23,46 +23,36 @@ export function LessonWhy({ why }: { why: string[] }) {
 
 export function LessonSteps({ steps }: { steps: { text: string; image?: string | null }[] }) {
   if (!steps?.length) return null
-  
-  // 將 steps 拆分成多個段落（根據數字標頭）
-  const splitSteps = steps.flatMap(step => {
-    const lines = step.text.split('\n').filter(l => l.trim())
-    const segments: { text: string; image?: string | null }[] = []
-    let current = ''
-    
-    lines.forEach(line => {
-      // 偵測數字標頭：開頭是數字 + 空格或冒號
-      if (/^\d+[\s:：]/.test(line.trim())) {
-        if (current) segments.push({ text: current.trim(), image: step.image })
-        current = line
-      } else {
-        current += (current ? '\n' : '') + line
-      }
-    })
-    if (current) segments.push({ text: current.trim(), image: step.image })
-    return segments.length ? segments : [step]
-  })
+
+  // 格式化文字：粗體 + 換行 + 數字標題前斷行
+  const formatText = (text: string) => {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+      .replace(/\n/g, '<br/>')
+      // 數字標題前加換行（1. 2. 3. 或 1、2、3、）
+      .replace(/(\d+[\.\、:：]\s*)/g, '<br/><b>$1</b>')
+      // 移除開頭多餘的 <br/>
+      .replace(/^<br\/>/, '')
+  }
 
   return (
     <section className="bg-zinc-800 border border-zinc-700 rounded-lg p-5 mb-4">
       <h2 className="text-lg font-semibold mb-4 text-green-400">🛠️ 怎麼練習</h2>
       <div className="space-y-4">
-        {splitSteps.map((step, i) => {
-          const text = step.text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\d+[\.\s:：]+/, '').replace(/^-\s*/, '')
-          return (
-            <div key={i} className="bg-zinc-700/50 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-7 h-7 bg-green-600 rounded-full flex items-center justify-center text-sm font-bold">{i + 1}</span>
-                <div className="flex-1">
-                  {step.image && (
-                    <div className="mb-3 rounded-lg overflow-hidden bg-zinc-600">
-                      <Image src={step.image} alt={`步驟 ${i + 1}`} width={800} height={600} className="w-full h-auto" loading="lazy" />
-                    </div>
-                  )}
-                  <p className="text-zinc-300 text-lg leading-[1.8]" dangerouslySetInnerHTML={{ __html: text }} />
-                </div>
+        {steps.map((step, i) => (
+          <div key={i} className="bg-zinc-700/50 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-7 h-7 bg-green-600 rounded-full flex items-center justify-center text-sm font-bold">{i + 1}</span>
+              <div className="flex-1">
+                {step.image && (
+                  <div className="mb-3 rounded-lg overflow-hidden bg-zinc-600">
+                    <Image src={step.image} alt={`步驟 ${i + 1}`} width={800} height={600} className="w-full h-auto" loading="lazy" />
+                  </div>
+                )}
+                <p className="text-zinc-300 text-lg leading-[1.8]" dangerouslySetInnerHTML={{ __html: formatText(step.text) }} />
               </div>
             </div>
+          </div>
           )
         })}
       </div>
