@@ -53,8 +53,7 @@ export function LessonSteps({ steps }: { steps: { text: string; image?: string |
               </div>
             </div>
           </div>
-          )
-        })}
+        ))}
       </div>
     </section>
   )
