@@ -389,13 +389,13 @@
 | - [x] 150. 追蹤課程來源（from: search/home/related） | 20min | LessonCard.tsx + LessonRecommend.tsx | ✅ |
 | - [x] 151. Dashboard 新增「內容缺口」+「來源分析」面板 | 30min | admin/page.tsx + admin.ts | ✅ |
 
-### Phase 2：內容優化數據（3-5 天）
+### Phase 2：內容優化數據（3-5 天）✅ 已完成
 
 | # | 項目 | 工時 | 檔案 | 狀態 |
 |---|------|------|------|------|
-| - [ ] 152. 滾動深度追蹤（25/50/75/100%） | 30min | LessonDetail.tsx + analytics.ts | |
-| - [ ] 153. 練習開始追蹤（vs 完成率） | 15min | BottomActionBar.tsx + analytics.ts | |
-| - [ ] 154. Dashboard 新增「課程健康度」面板 | 45min | admin/lessons/page.tsx | |
+| - [x] 152. 滾動深度追蹤（25/50/75/100%） | 30min | useScrollDepth.ts + LessonDetail.tsx | ✅ |
+| - [x] 153. 練習開始追蹤（vs 完成率） | 15min | BottomActionBar.tsx | ✅ |
+| - [x] 154. Dashboard 新增「課程健康度」面板 | 45min | admin/lessons/page.tsx + admin.ts | ✅ |
 
 ### Phase 3：Dashboard 進階面板
 

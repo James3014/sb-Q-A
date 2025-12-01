@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { vibrate } from '@/components/ui'
 import { InlinePracticeCard } from '@/components/practice/InlinePracticeCard'
+import { trackEvent } from '@/lib/analytics'
 
 interface Props {
+  lessonId: string
   isFav: boolean
   favLoading: boolean
   onToggleFav: () => void
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export function BottomActionBar({
+  lessonId,
   isFav,
   favLoading,
   onToggleFav,
@@ -37,6 +40,7 @@ export function BottomActionBar({
 
   const handlePracticeClick = () => {
     vibrate([50, 30, 50])
+    trackEvent('practice_start', lessonId)
     setShowCard(true)
   }
 

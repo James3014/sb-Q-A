@@ -196,3 +196,63 @@ export async function getLessonSources() {
     .sort((a, b) => b[1] - a[1])
     .map(([source, count]) => ({ source, count }))
 }
+
+// 課程健康度（滾動深度 + 練習完成率）
+export async function getLessonHealth() {
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  // 取得滾動深度數據
+  const { data: scrollData } = await supabase
+    .from('event_log')
+    .select('lesson_id, metadata')
+    .eq('event_type', 'scroll_depth')
+
+  // 取得練習開始/完成數據
+  const { data: startData } = await supabase
+    .from('event_log')
+    .select('lesson_id')
+    .eq('event_type', 'practice_start')
+
+  const { data: completeData } = await supabase
+    .from('event_log')
+    .select('lesson_id')
+    .eq('event_type', 'practice_complete')
+
+  // 統計每個課程
+  const stats: Record<string, { scroll100: number; scrollTotal: number; starts: number; completes: number }> = {}
+
+  scrollData?.forEach(row => {
+    const id = row.lesson_id
+    if (!id) return
+    if (!stats[id]) stats[id] = { scroll100: 0, scrollTotal: 0, starts: 0, completes: 0 }
+    stats[id].scrollTotal++
+    if ((row.metadata as { depth?: number })?.depth === 100) stats[id].scroll100++
+  })
+
+  startData?.forEach(row => {
+    const id = row.lesson_id
+    if (!id) return
+    if (!stats[id]) stats[id] = { scroll100: 0, scrollTotal: 0, starts: 0, completes: 0 }
+    stats[id].starts++
+  })
+
+  completeData?.forEach(row => {
+    const id = row.lesson_id
+    if (!id) return
+    if (!stats[id]) stats[id] = { scroll100: 0, scrollTotal: 0, starts: 0, completes: 0 }
+    stats[id].completes++
+  })
+
+  // 計算健康度分數
+  return Object.entries(stats)
+    .map(([lesson_id, s]) => {
+      const scrollRate = s.scrollTotal > 0 ? (s.scroll100 / s.scrollTotal) * 100 : 0
+      const practiceRate = s.starts > 0 ? (s.completes / s.starts) * 100 : 0
+      const healthScore = (scrollRate * 0.4 + practiceRate * 0.6) // 加權平均
+      return { lesson_id, scrollRate, practiceRate, healthScore, samples: s.scrollTotal + s.starts }
+    })
+    .filter(x => x.samples >= 3) // 至少 3 筆數據
+    .sort((a, b) => a.healthScore - b.healthScore) // 低分在前（需要改善）
+    .slice(0, 10)
+}

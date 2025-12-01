@@ -7,6 +7,7 @@ import { isFavorited, addFavorite, removeFavorite } from '@/lib/favorites'
 import { addPracticeLog, getLessonPracticeLogs, PracticeLog, PracticeRatings } from '@/lib/practice'
 import { getImprovementData, ImprovementData } from '@/lib/improvement'
 import { SKILL_RECOMMENDATIONS } from '@/lib/constants'
+import { useScrollDepth } from '@/hooks/useScrollDepth'
 import {
   LessonHeader,
   LessonTitle,
@@ -41,6 +42,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const isLocked = lesson.is_premium && !subscription.isActive
   const showActions = !!user && !isLocked
   const isCompletedToday = practiceLogs[0] && new Date(practiceLogs[0].created_at).toDateString() === new Date().toDateString()
+
+  // 滾動深度追蹤
+  useScrollDepth(lesson.id)
 
   useEffect(() => {
     getLessons().then(allLessons => {
@@ -178,6 +182,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
       {/* 底部固定操作欄 */}
       {showActions && (
         <BottomActionBar
+          lessonId={lesson.id}
           isFav={isFav}
           favLoading={favLoading}
           onToggleFav={handleToggleFav}
