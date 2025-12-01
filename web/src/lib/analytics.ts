@@ -21,6 +21,20 @@ export async function trackEvent(
   const supabase = getSupabase()
   if (!supabase) return
 
+  // 防呆：限制 metadata 大小，避免濫用
+  const safeMetadata = (() => {
+    if (!metadata) return {}
+    try {
+      const raw = JSON.stringify(metadata)
+      if (raw.length > 4000) {
+        return { truncated: true }
+      }
+      return metadata
+    } catch {
+      return {}
+    }
+  })()
+
   try {
     const { data: { user } } = await supabase.auth.getUser()
     
@@ -28,7 +42,7 @@ export async function trackEvent(
       user_id: user?.id || null,
       event_type: eventType,
       lesson_id: lessonId || null,
-      metadata: metadata || {},
+      metadata: safeMetadata,
     })
   } catch (e) {
     console.error('[trackEvent]', e)

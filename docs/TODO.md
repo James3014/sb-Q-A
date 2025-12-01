@@ -108,6 +108,75 @@
 
 ---
 
+## 訂閱／權限強化（2025-11-29）✅ 已完成
+
+- [x] 117. 建立 Postgres 函式 `is_subscription_active(user_id)` 並在 RLS 中使用，避免依賴客戶端時間
+- [x] 118. 啟用／強化 RLS：`users`、`subscriptions`、`lessons`、`favorites`、`practice_logs`、`event_log` 僅本人可存取；`is_admin` 例外
+- [x] 119. Premium 資料防護：非有效訂閱僅回傳免費或摘要欄位；阻擋非訂閱寫入 favorites／practice／event_log
+- [x] 120. Admin API 伺服器化：所有 admin 查詢／RPC 改由 server/edge API 執行並檢查 `is_admin`，前端只吃結果
+- [x] 121. 訂閱開通 API：伺服器端用 service key 驗證與開通，`ActivationPanel` 改呼叫新 API，移除客戶端直接更新 `users`
+- [x] 122. event_log 寫入限制：metadata 大小／格式限制與 rate-limit 策略，避免濫用（migration_event_log_guardrails.sql 已執行）
+- [x] 123. 方案／定價同步：前端常數與 DB 方案表版本化，保留歷史方案避免老用戶失效（migration_subscription_plans.sql 已執行）
+- [x] 124. 上線 `docs/migration_subscription_security.sql`：RLS + is_subscription_active 函式，並逐環境驗證（已執行）
+
+---
+
+## Clean Code + Linus 重構行動（2025-11-29）✅ 已完成
+
+- [x] 125. 收斂敏感資料/付費資料訪問：移除客戶端直連 Supabase（Admin/metrics/monetization），全面改走 server API + service key
+- [x] 126. Admin API 客戶端封裝：共用 token 取得與錯誤處理，避免頁面重複 fetch 邏輯
+- [x] 127. 前端關注點分離：資料讀寫改由 hooks/services（或 server actions/route handlers），頁面只負責 UI 組裝
+- [x] 128. event_log 後端校驗/節流：為常用事件定義 schema/大小限制並加入 rate-limit（migration_event_log_guardrails.sql 已執行）
+- [x] 129. 方案表版控：建立 DB 方案表並與 `SUBSCRIPTION_PLANS` 同步流程，保留歷史方案（migration_subscription_plans.sql 已執行）
+- [x] 130. 權限驗證 Smoke Tests：撰寫腳本/用例覆蓋未訂閱/訂閱中/admin 的 premium 讀寫與 event_log/favorites/practice 行為（SMOKE_AUTH_SUBSCRIPTION.md 已建立）
+
+### 改善總結
+
+**核心問題**：前端直接用 anon key 存取敏感資料，存在安全漏洞
+
+**解決方案**：三層架構分離
+```
+前端（UI）→ adminData.ts（資料層）→ /api/admin/*（Server API）→ Supabase（service key）
+```
+
+**安全防護**：
+- ✅ RLS 政策：用戶只能存取自己的資料
+- ✅ 訂閱檢查：使用伺服器時間（`is_subscription_active()`），無法繞過
+- ✅ Premium 防護：非訂閱用戶無法讀取 premium 課程
+- ✅ Rate Limit：event_log 限制 120 次/分鐘（用戶）、60 次/分鐘（匿名）
+- ✅ 大小限制：metadata 限制 4000 字元
+
+**可維護性提升**：
+- ✅ 統一錯誤處理（`adminApi.ts`）
+- ✅ 統一 token 取得（避免重複代碼）
+- ✅ 型別安全（TypeScript interfaces）
+- ✅ 測試用例（Smoke Tests）
+
+**修改的檔案**：
+- `web/src/lib/adminApi.ts` - 新增（客戶端 API 封裝）
+- `web/src/lib/adminData.ts` - 新增（資料層封裝）
+- `web/src/lib/supabaseServer.ts` - 新增（Service Role Client）
+- `web/src/app/api/admin/**/*.ts` - 新增 5 個 Server API 路由
+- `web/src/app/admin/**/*.tsx` - 改用 `adminData.ts`
+- `docs/migration_subscription_security.sql` - 新增並已執行
+- `docs/migration_event_log_guardrails.sql` - 新增並已執行
+- `docs/migration_subscription_plans.sql` - 新增並已執行
+- `docs/SMOKE_AUTH_SUBSCRIPTION.md` - 新增
+
+**完成日期**：2025-12-01
+- ✅ 安全性：敏感資料不再暴露給前端
+- ✅ 可維護性：統一 API 封裝，減少重複代碼 ~200 行
+- ✅ 可測試性：建立 Smoke Tests 文件
+- ✅ 擴展性：方案版本化，不影響老用戶
+
+**架構改善**：
+```
+改善前：前端頁面 → Supabase (anon key) ❌
+改善後：前端頁面 → adminData.ts → /api/admin/* → Supabase (service key) ✅
+```
+
+**詳細報告**：[docs/安全性強化報告_2025-12-01.md](安全性強化報告_2025-12-01.md)
+
 ## Clean Code 第七輪重構（2025-11-28）
 
 > 基於 Linus 原則：消除重複、統一型別、減少維護負擔

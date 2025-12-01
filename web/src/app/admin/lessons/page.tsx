@@ -3,41 +3,16 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { getLessonStats, getLessonEffectiveness, getLessonHealth } from '@/lib/admin'
-import { getLessons, Lesson } from '@/lib/lessons'
+import { Lesson } from '@/lib/lessons'
+import { fetchAdminLessons, LessonStat, LessonEffectiveness, LessonHealth } from '@/lib/adminData'
 import { LessonHeatmap } from '@/components/LessonHeatmap'
-
-interface LessonStat {
-  id: string
-  title: string
-  is_premium: boolean
-  level_tags?: string[]
-  views: number
-  practices: number
-  favorites: number
-}
-
-interface Effectiveness {
-  lesson_id: string
-  title: string
-  avg_score: number
-  samples: number
-}
-
-interface Health {
-  lesson_id: string
-  scrollRate: number
-  practiceRate: number
-  healthScore: number
-  samples: number
-}
 
 export default function LessonsPage() {
   const { isReady } = useAdminAuth()
   const [lessons, setLessons] = useState<LessonStat[]>([])
   const [allLessons, setAllLessons] = useState<Lesson[]>([])
-  const [effectiveness, setEffectiveness] = useState<Effectiveness[]>([])
-  const [health, setHealth] = useState<Health[]>([])
+  const [effectiveness, setEffectiveness] = useState<LessonEffectiveness[]>([])
+  const [health, setHealth] = useState<LessonHealth[]>([])
   const [tab, setTab] = useState<'stats' | 'effectiveness' | 'health' | 'heatmap'>('stats')
   const [sortBy, setSortBy] = useState<'views' | 'practices' | 'favorites'>('views')
   const [filterLevel, setFilterLevel] = useState<string>('all')
@@ -45,15 +20,17 @@ export default function LessonsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (isReady) {
-      Promise.all([getLessonStats(), getLessonEffectiveness(), getLessons(), getLessonHealth()]).then(([stats, eff, all, h]) => {
-        setLessons(stats)
-        setEffectiveness(eff)
-        setAllLessons(all)
-        setHealth(h)
-        setLoading(false)
-      })
+    async function load() {
+      const body = await fetchAdminLessons()
+      if (body) {
+        setLessons(body.lessonStats || [])
+        setEffectiveness(body.effectiveness || [])
+        setAllLessons(body.lessons || [])
+        setHealth(body.lessonHealth || [])
+      }
+      setLoading(false)
     }
+    if (isReady) load()
   }, [isReady])
 
   let filtered = lessons

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import { SUBSCRIPTION_PLANS, SubscriptionPlanId, formatDate } from '@/lib/constants'
-import { getSubscriptionStatus, calculateExpiryDate } from '@/lib/subscription'
+import { getSubscriptionStatus } from '@/lib/subscription'
 
 interface User {
   id: string
@@ -34,22 +34,32 @@ export function ActivationPanel({ user, onClose, onSuccess }: Props) {
       return
     }
 
-    const expiresAt = calculateExpiryDate(selectedPlan)
-
-    const { error } = await supabase
-      .from('users')
-      .update({
-        subscription_type: selectedPlan,
-        subscription_expires_at: expiresAt.toISOString(),
-      })
-      .eq('id', user.id)
-
-    if (error) {
-      alert('開通失敗：' + error.message)
-    } else {
-      alert(`已開通 ${user.email} 的 ${selectedPlan} 方案！`)
-      onSuccess()
+    const { data: sessionData } = await supabase.auth.getSession()
+    const token = sessionData.session?.access_token
+    if (!token) {
+      alert('尚未登入或 Session 失效')
+      setActivating(false)
+      return
     }
+
+    const res = await fetch('/api/admin/subscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId: user.id, planId: selectedPlan }),
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      alert('開通失敗：' + (body.error || res.statusText))
+      setActivating(false)
+      return
+    }
+
+    alert(`已開通 ${user.email} 的 ${selectedPlan} 方案！`)
+    onSuccess()
     setActivating(false)
   }
 

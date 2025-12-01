@@ -87,6 +87,17 @@
 
 ---
 
+## 訂閱／權限強化（2025-11-29）
+| 項目 | 說明 |
+|------|------|
+| Server API for Admin | 新增 `/api/admin/subscription`、`/api/admin/users`、`/api/admin/monetization`、`/api/admin/dashboard` 以 service key + is_admin 驗證執行 |
+| ActivationPanel | 客戶端不再直接更新 `users`，改呼叫 server API |
+| Admin 頁面 | users/monetization/dashboard 改為呼叫 server API，需 access token |
+| Supabase server client | 新增 `lib/supabaseServer.ts` 以 service role key 建立 server 端客戶端 |
+| event_log 防呆 | `trackEvent` 限制 metadata 大小，避免濫用寫入 |
+
+---
+
 ## 敏感資料清理
 - 從 GitHub 移除 SQL、課程 JSON、原始 .md 檔案
 - 使用 `git filter-branch` 清除歷史

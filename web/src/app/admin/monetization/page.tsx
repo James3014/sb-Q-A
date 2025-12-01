@@ -3,39 +3,26 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { getSupabase } from '@/lib/supabase'
+import { fetchAdminMonetization, MonetizationStats } from '@/lib/adminData'
 import { StatCard, FunnelBar, ProgressBar } from '@/components/ui'
-
-interface Stats {
-  subscriptions: { plan: string; active_count: number; total_count: number }[]
-  funnel: { pricing_views: number; plan_clicks: number; purchases: number }
-  dailySubs: { date: string; count: number }[]
-  totalUsers: number
-}
 
 export default function MonetizationPage() {
   const { isReady } = useAdminAuth()
-  const [stats, setStats] = useState<Stats | null>(null)
+  const [stats, setStats] = useState<MonetizationStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase()
-      if (!supabase) return
+      const body = await fetchAdminMonetization()
 
-      const [subs, funnel, daily, users] = await Promise.all([
-        supabase.rpc('get_subscription_stats'),
-        supabase.rpc('get_funnel_stats', { p_days: 30 }),
-        supabase.rpc('get_daily_subscriptions', { p_days: 30 }),
-        supabase.from('users').select('id', { count: 'exact' }),
-      ])
-
-      setStats({
-        subscriptions: subs.data || [],
-        funnel: funnel.data?.[0] || { pricing_views: 0, plan_clicks: 0, purchases: 0 },
-        dailySubs: daily.data || [],
-        totalUsers: users.count || 0,
-      })
+      if (body) {
+        setStats({
+          subscriptions: body.subscriptions || [],
+          funnel: body.funnel || { pricing_views: 0, plan_clicks: 0, purchases: 0 },
+          dailySubs: body.dailySubs || [],
+          totalUsers: body.totalUsers || 0,
+        })
+      }
       setLoading(false)
     }
     if (isReady) load()

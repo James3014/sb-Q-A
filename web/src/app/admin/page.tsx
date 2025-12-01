@@ -4,22 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { getDashboardStats, getContentGaps, getLessonSources } from '@/lib/admin'
+import { fetchAdminDashboard, DashboardStats } from '@/lib/adminData'
 import { StatCard } from '@/components/ui'
 import { formatDate } from '@/lib/constants'
 
-interface Stats {
-  dau: number
-  wau: number
-  topLessons: { lesson_id: string; title: string; view_count: number }[]
-  subscriptions: { subscription_type: string; count: number }[]
-  recentFeedback: { id: string; type: string; content: string; created_at: string }[]
-  topKeywords: { keyword: string; count: number }[]
-  contentGaps: { keyword: string; count: number }[]
-  lessonSources: { source: string; count: number }[]
-}
-
-function TopLessons({ lessons, loading }: { lessons?: Stats['topLessons']; loading: boolean }) {
+function TopLessons({ lessons, loading }: { lessons?: DashboardStats['topLessons']; loading: boolean }) {
   return (
     <section className="bg-zinc-800 rounded-lg p-4">
       <h2 className="font-bold mb-3">🔥 熱門課程 TOP 10</h2>
@@ -38,7 +27,7 @@ function TopLessons({ lessons, loading }: { lessons?: Stats['topLessons']; loadi
   )
 }
 
-function TopKeywords({ keywords }: { keywords?: Stats['topKeywords'] }) {
+function TopKeywords({ keywords }: { keywords?: DashboardStats['topKeywords'] }) {
   return (
     <section className="bg-zinc-800 rounded-lg p-4">
       <h2 className="font-bold mb-3">🔍 熱門搜尋</h2>
@@ -54,7 +43,7 @@ function TopKeywords({ keywords }: { keywords?: Stats['topKeywords'] }) {
   )
 }
 
-function ContentGaps({ gaps }: { gaps?: Stats['contentGaps'] }) {
+function ContentGaps({ gaps }: { gaps?: DashboardStats['contentGaps'] }) {
   return (
     <section className="bg-zinc-800 rounded-lg p-4">
       <h2 className="font-bold mb-3">🔍 內容缺口（搜尋無結果）</h2>
@@ -74,7 +63,7 @@ function ContentGaps({ gaps }: { gaps?: Stats['contentGaps'] }) {
   )
 }
 
-function LessonSources({ sources }: { sources?: Stats['lessonSources'] }) {
+function LessonSources({ sources }: { sources?: DashboardStats['lessonSources'] }) {
   const total = sources?.reduce((a, s) => a + s.count, 0) || 0
   const labels: Record<string, string> = { home: '首頁', search: '搜尋', category: '分類', filter: '篩選', related: '相關課程', direct: '直接訪問', unknown: '未知' }
   return (
@@ -99,7 +88,7 @@ function LessonSources({ sources }: { sources?: Stats['lessonSources'] }) {
   )
 }
 
-function QuickInsights({ stats }: { stats: Stats | null }) {
+function QuickInsights({ stats }: { stats: DashboardStats | null }) {
   if (!stats) return null
   
   const insights: { icon: string; text: string; type: 'info' | 'warn' | 'success' }[] = []
@@ -161,7 +150,7 @@ function QuickInsights({ stats }: { stats: Stats | null }) {
   )
 }
 
-function RecentFeedback({ feedback }: { feedback?: Stats['recentFeedback'] }) {
+function RecentFeedback({ feedback }: { feedback?: DashboardStats['recentFeedback'] }) {
   return (
     <section className="bg-zinc-800 rounded-lg p-4">
       <div className="flex justify-between items-center mb-3">
@@ -186,16 +175,16 @@ function RecentFeedback({ feedback }: { feedback?: Stats['recentFeedback'] }) {
 
 export default function AdminPage() {
   const { isReady } = useAdminAuth()
-  const [stats, setStats] = useState<Stats | null>(null)
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (isReady) {
-      Promise.all([getDashboardStats(), getContentGaps(), getLessonSources()]).then(([data, gaps, sources]) => {
-        setStats(data ? { ...data, contentGaps: gaps, lessonSources: sources } : null)
-        setLoading(false)
-      })
+    async function load() {
+      const body = await fetchAdminDashboard()
+      if (body) setStats(body)
+      setLoading(false)
     }
+    if (isReady) load()
   }, [isReady])
 
   return (

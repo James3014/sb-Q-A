@@ -147,12 +147,19 @@ web/
 │   │   ├── pricing/            # 付費方案
 │   │   ├── feedback/           # 意見回報
 │   │   ├── login/              # 登入頁
-│   │   └── admin/              # 後台
+│   │   ├── admin/              # 後台
+│   │   └── api/admin/          # 🔒 Admin Server API（2025-11-29 新增）
+│   │       ├── dashboard/      # Dashboard 數據 API
+│   │       ├── users/          # 用戶管理 API
+│   │       ├── lessons/        # 課程分析 API
+│   │       ├── monetization/   # 付費分析 API
+│   │       └── subscription/   # 訂閱開通 API
 │   │
 │   ├── components/
 │   │   ├── ui/                 # 原子組件（Button, Loading, Stats...）
 │   │   ├── home/               # 首頁組件
 │   │   ├── lesson/             # 課程詳情子組件
+│   │   ├── practice/           # 練習相關組件
 │   │   ├── dashboard/          # 儀表板組件
 │   │   ├── AuthProvider.tsx    # 認證 Context
 │   │   ├── ErrorBoundary.tsx   # 錯誤邊界
@@ -162,14 +169,16 @@ web/
 │   │   └── SkeletonLesson.tsx  # 載入骨架
 │   │
 │   └── lib/
-│       ├── supabase.ts         # Supabase Client
+│       ├── supabase.ts         # Supabase Client（前端）
+│       ├── supabaseServer.ts   # 🔒 Supabase Service Role（後端）
 │       ├── auth.ts             # 認證函數
 │       ├── lessons.ts          # 課程 API
 │       ├── favorites.ts        # 收藏 API
 │       ├── practice.ts         # 練習紀錄 API
 │       ├── improvement.ts      # 改善度計算
 │       ├── analytics.ts        # 事件追蹤
-│       ├── admin.ts            # 後台 API
+│       ├── adminApi.ts         # 🔒 Admin API 客戶端封裝（2025-11-29）
+│       ├── adminData.ts        # 🔒 Admin 資料層封裝（2025-11-29）
 │       ├── subscription.ts     # 訂閱檢查
 │       ├── constants.ts        # 常數定義
 │       ├── retry.ts            # 弱網重試工具
@@ -186,8 +195,13 @@ web/
 # .env.local
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key  # 🔒 後端專用（2025-11-29）
 NEXT_PUBLIC_ADMIN_PASSWORD=your-admin-password
 ```
+
+**注意**：
+- `NEXT_PUBLIC_*` 會暴露給前端，只能用於公開資料
+- `SUPABASE_SERVICE_ROLE_KEY` 僅用於 server-side API，可繞過 RLS
 
 ### 本地開發
 
@@ -200,21 +214,84 @@ npm run dev
 ### 資料庫 Schema
 
 主要表格：
-- `lessons` - 課程內容
-- `users` - 用戶資料（含訂閱狀態）
-- `favorites` - 收藏關聯
-- `practice_logs` - 練習紀錄
-- `event_log` - 事件追蹤
+- `lessons` - 課程內容（🔒 RLS 啟用，premium 需訂閱）
+- `users` - 用戶資料（含訂閱狀態，🔒 RLS 啟用）
+- `favorites` - 收藏關聯（🔒 RLS 啟用，需訂閱）
+- `practice_logs` - 練習紀錄（🔒 RLS 啟用，需訂閱）
+- `event_log` - 事件追蹤（🔒 RLS 啟用 + rate-limit）
 - `feedback` - 用戶回報
+- `subscription_plans` - 訂閱方案版本化表（2025-11-29 新增）
 
-詳見 [docs/schema.sql](docs/schema.sql)
+安全函數：
+- `is_subscription_active(user_id)` - 檢查訂閱是否有效（伺服器時間）
+- `assert_event_log_limits()` - event_log 寫入限制（rate-limit + 大小）
+
+詳見：
+- [docs/schema.sql](docs/schema.sql) - 基礎 Schema
+- [docs/migration_subscription_security.sql](docs/migration_subscription_security.sql) - RLS 政策
+- [docs/migration_event_log_guardrails.sql](docs/migration_event_log_guardrails.sql) - Rate limit
+- [docs/migration_subscription_plans.sql](docs/migration_subscription_plans.sql) - 方案版本化
 
 ### 後台安全機制
 
-三層驗證：
+#### 三層驗證
 1. Supabase Auth 登入
 2. Email 白名單（`ADMIN_EMAILS`）
 3. 後台密碼（`NEXT_PUBLIC_ADMIN_PASSWORD`）
+
+#### 安全架構（2025-11-29 強化）
+
+| 層級 | 機制 | 說明 |
+|------|------|------|
+| **前端** | API 封裝 | `adminApi.ts` 統一 token 取得與錯誤處理 |
+| **前端** | 關注點分離 | `adminData.ts` 封裝所有 API，頁面只負責 UI |
+| **後端** | Server API | 所有 admin 查詢改由 `/api/admin/*` 執行 |
+| **後端** | Service Key | 使用 service role key，繞過 RLS |
+| **後端** | is_admin 檢查 | 每個 API 都驗證 `users.is_admin = true` |
+| **資料庫** | RLS 政策 | `users`/`lessons`/`favorites`/`practice_logs` 啟用 RLS |
+| **資料庫** | 訂閱檢查 | `is_subscription_active()` 函數（伺服器時間） |
+| **資料庫** | Premium 防護 | 非訂閱用戶無法讀取 premium 課程 |
+| **資料庫** | Rate Limit | event_log 限制 120 次/分鐘（用戶）、60 次/分鐘（匿名） |
+| **資料庫** | 大小限制 | event_log metadata 限制 4000 字元 |
+
+#### 安全改善效果
+
+**改善前**：
+- ❌ 前端直接用 anon key 查詢敏感資料
+- ❌ 客戶端可繞過訂閱檢查（修改本地時間）
+- ❌ event_log 可被濫用（無限寫入）
+- ❌ 訂閱方案變更會影響老用戶
+
+**改善後**：
+- ✅ 敏感資料只能透過 server API + service key 存取
+- ✅ 訂閱檢查使用伺服器時間（`is_subscription_active()`）
+- ✅ event_log 有 rate-limit 和大小限制
+- ✅ 訂閱方案版本化，保留歷史方案
+- ✅ RLS 政策確保資料隔離（用戶只能存取自己的資料）
+- ✅ Premium 課程受 RLS 保護（需有效訂閱）
+
+#### 相關檔案
+
+```
+web/src/
+├── lib/
+│   ├── adminApi.ts          # 客戶端 API 封裝（token + 錯誤處理）
+│   ├── adminData.ts         # Admin API 調用封裝
+│   └── supabaseServer.ts    # Service Role Client
+│
+├── app/api/admin/
+│   ├── dashboard/route.ts   # Dashboard API（server-side）
+│   ├── users/route.ts       # 用戶管理 API
+│   ├── lessons/route.ts     # 課程分析 API
+│   ├── monetization/route.ts # 付費分析 API
+│   └── subscription/route.ts # 訂閱開通 API
+│
+docs/
+├── migration_subscription_security.sql    # RLS + is_subscription_active
+├── migration_event_log_guardrails.sql     # Rate limit + 大小限制
+├── migration_subscription_plans.sql       # 方案版本化表
+└── SMOKE_AUTH_SUBSCRIPTION.md             # 權限驗證測試用例
+```
 
 ---
 
@@ -334,6 +411,14 @@ streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 - [x] LessonDetail 拆分子組件
 - [x] AdminLayout 統一後台驗證
 - [x] useAdminAuth Hook
+- [x] **安全性強化（2025-11-29）**
+  - 移除客戶端直連 Supabase（Admin/metrics/monetization）
+  - Admin API 伺服器化（service key + RLS）
+  - 客戶端 API 封裝（adminApi.ts + adminData.ts）
+  - 前端關注點分離（頁面只負責 UI）
+  - event_log 後端校驗/節流（rate-limit + 大小限制）
+  - 訂閱方案版本化（DB 方案表 + 歷史保留）
+  - 權限驗證 Smoke Tests（未訂閱/訂閱中/admin）
 
 ### UX 優化（2025-11-28）
 - [x] 手機優先改造（卡片簡化、水平滑動、分段評分）
@@ -364,10 +449,74 @@ streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 | [migration_subscription.sql](docs/migration_subscription.sql) | 訂閱欄位 Migration |
 | [migration_event_log.sql](docs/migration_event_log.sql) | 事件追蹤 Migration |
 | [migration_admin.sql](docs/migration_admin.sql) | 後台函數 Migration |
+| [migration_subscription_security.sql](docs/migration_subscription_security.sql) | 🔒 RLS 政策 + 訂閱檢查函數（2025-11-29） |
+| [migration_event_log_guardrails.sql](docs/migration_event_log_guardrails.sql) | 🔒 event_log Rate Limit（2025-11-29） |
+| [migration_subscription_plans.sql](docs/migration_subscription_plans.sql) | 🔒 訂閱方案版本化表（2025-11-29） |
+| [SMOKE_AUTH_SUBSCRIPTION.md](docs/SMOKE_AUTH_SUBSCRIPTION.md) | 🔒 權限驗證測試用例（2025-11-29） |
 | [Alpine_Velocity_實作報告_2025-11-28.md](Alpine_Velocity_實作報告_2025-11-28.md) | Alpine Velocity 美學實作 |
 | [Alpine_Velocity_進階優化_2025-11-28.md](Alpine_Velocity_進階優化_2025-11-28.md) | 視覺深度與微動效優化 |
 | [UX_第四輪建議_手機優先_2025-11-28.md](UX_第四輪建議_手機優先_2025-11-28.md) | 手機優先 UX 改善方案 |
 
 ---
 
-*最後更新：2025-11-28*
+---
+
+## 🔒 安全性強化總結（2025-11-29）
+
+### 項目 125-130：Clean Code + Linus 重構行動
+
+這次重構主要解決了**安全性漏洞**和**架構問題**，確保敏感資料不會被前端直接存取。
+
+#### 改善項目
+
+| # | 項目 | 改善前 | 改善後 |
+|---|------|--------|--------|
+| 125 | 敏感資料訪問 | 前端用 anon key 直連 Supabase | 改走 server API + service key |
+| 126 | API 客戶端封裝 | 每個頁面重複 fetch 邏輯 | `adminApi.ts` 統一處理 |
+| 127 | 關注點分離 | 頁面混雜資料邏輯 | `adminData.ts` 封裝，頁面只負責 UI |
+| 128 | event_log 防護 | 無限制，可被濫用 | Rate-limit + 大小限制 |
+| 129 | 方案版本化 | 前端常數，無歷史記錄 | DB 方案表 + 版本控制 |
+| 130 | 權限驗證測試 | 無測試用例 | Smoke Tests 文件 |
+
+#### 核心改善
+
+**1. 三層架構分離**
+```
+前端（UI）→ adminData.ts（資料層）→ /api/admin/*（Server API）→ Supabase（service key）
+```
+
+**2. 安全防護機制**
+- ✅ RLS 政策：用戶只能存取自己的資料
+- ✅ 訂閱檢查：使用伺服器時間，無法繞過
+- ✅ Premium 防護：非訂閱用戶無法讀取 premium 課程
+- ✅ Rate Limit：event_log 限制 120 次/分鐘
+- ✅ 大小限制：metadata 限制 4000 字元
+
+**3. 可維護性提升**
+- ✅ 統一錯誤處理（`adminApi.ts`）
+- ✅ 統一 token 取得（避免重複代碼）
+- ✅ 型別安全（TypeScript interfaces）
+- ✅ 測試用例（Smoke Tests）
+
+#### 影響範圍
+
+**修改的檔案**：
+- `web/src/lib/adminApi.ts` - 新增
+- `web/src/lib/adminData.ts` - 新增
+- `web/src/lib/supabaseServer.ts` - 新增
+- `web/src/app/api/admin/**/*.ts` - 新增 5 個 API 路由
+- `web/src/app/admin/**/*.tsx` - 改用 `adminData.ts`
+- `docs/migration_subscription_security.sql` - 新增
+- `docs/migration_event_log_guardrails.sql` - 新增
+- `docs/migration_subscription_plans.sql` - 新增
+- `docs/SMOKE_AUTH_SUBSCRIPTION.md` - 新增
+
+**程式碼品質**：
+- ✅ 移除 21 處 `console.log`
+- ✅ 統一型別使用 `lesson-v3.ts`
+- ✅ 消除重複樣式（`PageContainer` 組件）
+- ✅ Build 成功通過
+
+---
+
+*最後更新：2025-12-01*

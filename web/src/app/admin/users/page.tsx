@@ -3,32 +3,22 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { getSupabase } from '@/lib/supabase'
+import { fetchAdminUsers, AdminUser } from '@/lib/adminData'
 import { StatCard } from '@/components/ui'
 import { ActivationPanel } from '@/components/ActivationPanel'
 import { getSubscriptionStatus } from '@/lib/subscription'
 import { formatDate } from '@/lib/constants'
 
-interface User {
-  id: string
-  email: string
-  subscription_type: string
-  subscription_expires_at: string | null
-  created_at: string
-}
-
 export default function UsersPage() {
   const { isReady } = useAdminAuth()
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<AdminUser[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
 
   const loadUsers = async () => {
-    const supabase = getSupabase()
-    if (!supabase) return
-    const { data } = await supabase.rpc('get_all_users')
-    setUsers(data || [])
+    const data = await fetchAdminUsers()
+    if (data?.users) setUsers(data.users)
     setLoadingData(false)
   }
 
