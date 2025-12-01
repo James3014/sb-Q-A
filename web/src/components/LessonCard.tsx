@@ -6,13 +6,18 @@ import { LEVEL_NAMES } from '@/lib/constants'
 import { useCardAnimation } from '@/hooks/useCardAnimation'
 import { ProBadge } from '@/components/ui'
 
-export default function LessonCard({ lesson }: { lesson: Lesson }) {
+interface LessonCardProps {
+  lesson: Lesson
+  from?: 'home' | 'search' | 'category' | 'related' | 'filter'
+}
+
+export default function LessonCard({ lesson, from = 'home' }: LessonCardProps) {
   const cardRef = useCardAnimation()
   const levels = lesson.level_tags.map(t => LEVEL_NAMES[t] || t).join('/')
 
   const handleClick = () => {
-    // 儲存當前滾動位置（簡化版，只記 scrollY）
     sessionStorage.setItem('homeScrollY', window.scrollY.toString())
+    sessionStorage.setItem('lessonFrom', from)
   }
 
   return (

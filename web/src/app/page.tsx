@@ -70,6 +70,13 @@ function HomeContent() {
     skillFilter,
   });
 
+  // 追蹤搜尋無結果
+  useEffect(() => {
+    if (search.length >= 2 && filteredLessons.length === 0 && !loading) {
+      trackEvent('search_no_result', undefined, { keyword: search });
+    }
+  }, [search, filteredLessons.length, loading]);
+
   const clearFilters = () => {
     setSearch('');
     setSelectedCategory(null);

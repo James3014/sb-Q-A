@@ -18,7 +18,11 @@ export default function LessonPage() {
     getLessonById(id).then(data => {
       setLesson(data)
       setLoading(false)
-      if (data) trackEvent('view_lesson', id)
+      if (data) {
+        const from = sessionStorage.getItem('lessonFrom') || 'direct'
+        trackEvent('view_lesson', id, { from })
+        sessionStorage.removeItem('lessonFrom')
+      }
     })
   }, [id])
 

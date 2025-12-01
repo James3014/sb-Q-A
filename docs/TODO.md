@@ -377,6 +377,46 @@
 
 ---
 
+## Dashboard 數據優化（2025-12-01）
+
+> 目標：收集能改善內容的用戶行為數據
+
+### Phase 1：低成本高價值（1-2 天）✅ 已完成
+
+| # | 項目 | 工時 | 檔案 | 狀態 |
+|---|------|------|------|------|
+| - [x] 149. 追蹤搜尋無結果 | 15min | page.tsx + analytics.ts | ✅ |
+| - [x] 150. 追蹤課程來源（from: search/home/related） | 20min | LessonCard.tsx + LessonRecommend.tsx | ✅ |
+| - [x] 151. Dashboard 新增「內容缺口」+「來源分析」面板 | 30min | admin/page.tsx + admin.ts | ✅ |
+
+### Phase 2：內容優化數據（3-5 天）
+
+| # | 項目 | 工時 | 檔案 | 狀態 |
+|---|------|------|------|------|
+| - [ ] 152. 滾動深度追蹤（25/50/75/100%） | 30min | LessonDetail.tsx + analytics.ts | |
+| - [ ] 153. 練習開始追蹤（vs 完成率） | 15min | BottomActionBar.tsx + analytics.ts | |
+| - [ ] 154. Dashboard 新增「課程健康度」面板 | 45min | admin/lessons/page.tsx | |
+
+### Phase 3：Dashboard 進階面板
+
+| # | 項目 | 工時 | 檔案 | 狀態 |
+|---|------|------|------|------|
+| - [ ] 155. 搜尋無結果 TOP 10 面板 | 30min | admin/page.tsx | |
+| - [ ] 156. 課程來源分析（搜尋 vs 推薦 vs 首頁） | 30min | admin/lessons/page.tsx | |
+| - [ ] 157. 課程健康度綜合評分（跳出率+滾動+有效度） | 45min | admin/lessons/page.tsx | |
+
+### 數據用途對照
+
+| 數據 | 洞察 | 行動 |
+|------|------|------|
+| 搜尋無結果 | 用戶想學但找不到 | 新增課程 |
+| 課程來源 | 哪個入口最有效 | 優化導流 |
+| 滾動深度 | 內容是否太長 | 精簡或分段 |
+| 練習完成率 | 用戶是否願意練 | 優化 CTA |
+| 課程健康度 | 綜合表現 | 重寫低分課程 |
+
+---
+
 ## ✅ 已完成
 
 ### Clean Code 第五輪 (2025-11-27)

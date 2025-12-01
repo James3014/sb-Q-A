@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { getDashboardStats } from '@/lib/admin'
+import { getDashboardStats, getContentGaps, getLessonSources } from '@/lib/admin'
 import { StatCard } from '@/components/ui'
 import { formatDate } from '@/lib/constants'
 
@@ -15,6 +15,8 @@ interface Stats {
   subscriptions: { subscription_type: string; count: number }[]
   recentFeedback: { id: string; type: string; content: string; created_at: string }[]
   topKeywords: { keyword: string; count: number }[]
+  contentGaps: { keyword: string; count: number }[]
+  lessonSources: { source: string; count: number }[]
 }
 
 function TopLessons({ lessons, loading }: { lessons?: Stats['topLessons']; loading: boolean }) {
@@ -52,6 +54,51 @@ function TopKeywords({ keywords }: { keywords?: Stats['topKeywords'] }) {
   )
 }
 
+function ContentGaps({ gaps }: { gaps?: Stats['contentGaps'] }) {
+  return (
+    <section className="bg-zinc-800 rounded-lg p-4">
+      <h2 className="font-bold mb-3">🔍 內容缺口（搜尋無結果）</h2>
+      {(!gaps || gaps.length === 0) ? (
+        <p className="text-zinc-500 text-sm">尚無數據（用戶搜尋找不到的關鍵字會顯示在這裡）</p>
+      ) : (
+        <div className="space-y-2">
+          {gaps.map((g, i) => (
+            <div key={g.keyword} className="flex justify-between text-sm">
+              <span className="text-red-400">{i + 1}. {g.keyword}</span>
+              <span className="text-zinc-500">{g.count} 次</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function LessonSources({ sources }: { sources?: Stats['lessonSources'] }) {
+  const total = sources?.reduce((a, s) => a + s.count, 0) || 0
+  const labels: Record<string, string> = { home: '首頁', search: '搜尋', category: '分類', filter: '篩選', related: '相關課程', direct: '直接訪問', unknown: '未知' }
+  return (
+    <section className="bg-zinc-800 rounded-lg p-4">
+      <h2 className="font-bold mb-3">📊 課程來源分析</h2>
+      {(!sources || sources.length === 0) ? (
+        <p className="text-zinc-500 text-sm">尚無數據</p>
+      ) : (
+        <div className="space-y-2">
+          {sources.map(s => {
+            const pct = total ? ((s.count / total) * 100).toFixed(1) : 0
+            return (
+              <div key={s.source} className="flex justify-between text-sm">
+                <span className="text-zinc-300">{labels[s.source] || s.source}</span>
+                <span className="text-zinc-500">{s.count} ({pct}%)</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </section>
+  )
+}
+
 function RecentFeedback({ feedback }: { feedback?: Stats['recentFeedback'] }) {
   return (
     <section className="bg-zinc-800 rounded-lg p-4">
@@ -82,8 +129,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isReady) {
-      getDashboardStats().then(data => {
-        setStats(data)
+      Promise.all([getDashboardStats(), getContentGaps(), getLessonSources()]).then(([data, gaps, sources]) => {
+        setStats(data ? { ...data, contentGaps: gaps, lessonSources: sources } : null)
         setLoading(false)
       })
     }
@@ -102,7 +149,11 @@ export default function AdminPage() {
             ))}
           </section>
           <TopLessons lessons={stats?.topLessons} loading={loading} />
-          <TopKeywords keywords={stats?.topKeywords} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TopKeywords keywords={stats?.topKeywords} />
+            <ContentGaps gaps={stats?.contentGaps} />
+          </div>
+          <LessonSources sources={stats?.lessonSources} />
           <RecentFeedback feedback={stats?.recentFeedback} />
         </div>
       </main>

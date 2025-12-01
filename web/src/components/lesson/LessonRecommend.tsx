@@ -1,5 +1,10 @@
 import Link from 'next/link'
 
+function RelatedLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const handleClick = () => sessionStorage.setItem('lessonFrom', 'related')
+  return <Link href={href} onClick={handleClick}>{children}</Link>
+}
+
 export function LessonRecommendations({ weakSkill, recommendations }: { weakSkill: string | null; recommendations: { id: string; title: string }[] }) {
   if (!weakSkill && !recommendations.length) {
     return (
@@ -13,7 +18,9 @@ export function LessonRecommendations({ weakSkill, recommendations }: { weakSkil
       <h2 className="font-semibold mb-2 text-amber-400">🔥 {weakSkill ? `根據你的弱項（${weakSkill}），推薦練習` : '推薦練習'}</h2>
       <div className="space-y-2">
         {recommendations.map(r => (
-          <Link key={r.id} href={`/lesson/${r.id}`} className="block bg-zinc-700/50 rounded p-2 text-sm hover:bg-zinc-700 transition">{r.title}</Link>
+          <RelatedLink key={r.id} href={`/lesson/${r.id}`}>
+            <span className="block bg-zinc-700/50 rounded p-2 text-sm hover:bg-zinc-700 transition">{r.title}</span>
+          </RelatedLink>
         ))}
       </div>
     </section>
@@ -27,22 +34,28 @@ export function LessonSequence({ prerequisite, next, similar }: { prerequisite: 
       <h2 className="font-semibold mb-3">📚 學習路徑</h2>
       <div className="space-y-2">
         {prerequisite && (
-          <Link href={`/lesson/${prerequisite.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
-            <span className="text-xs bg-blue-600 px-2 py-0.5 rounded whitespace-nowrap">先看</span>
-            <span className="text-sm text-zinc-300 truncate">{prerequisite.title}</span>
-          </Link>
+          <RelatedLink href={`/lesson/${prerequisite.id}`}>
+            <span className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
+              <span className="text-xs bg-blue-600 px-2 py-0.5 rounded whitespace-nowrap">先看</span>
+              <span className="text-sm text-zinc-300 truncate">{prerequisite.title}</span>
+            </span>
+          </RelatedLink>
         )}
         {next && (
-          <Link href={`/lesson/${next.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
-            <span className="text-xs bg-green-600 px-2 py-0.5 rounded whitespace-nowrap">下一步</span>
-            <span className="text-sm text-zinc-300 truncate">{next.title}</span>
-          </Link>
+          <RelatedLink href={`/lesson/${next.id}`}>
+            <span className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
+              <span className="text-xs bg-green-600 px-2 py-0.5 rounded whitespace-nowrap">下一步</span>
+              <span className="text-sm text-zinc-300 truncate">{next.title}</span>
+            </span>
+          </RelatedLink>
         )}
         {similar.map(s => (
-          <Link key={s.id} href={`/lesson/${s.id}`} className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
-            <span className="text-xs bg-zinc-600 px-2 py-0.5 rounded whitespace-nowrap">相似</span>
-            <span className="text-sm text-zinc-300 truncate">{s.title}</span>
-          </Link>
+          <RelatedLink key={s.id} href={`/lesson/${s.id}`}>
+            <span className="flex items-center gap-2 p-2 bg-zinc-700/50 rounded hover:bg-zinc-700 transition">
+              <span className="text-xs bg-zinc-600 px-2 py-0.5 rounded whitespace-nowrap">相似</span>
+              <span className="text-sm text-zinc-300 truncate">{s.title}</span>
+            </span>
+          </RelatedLink>
         ))}
       </div>
     </section>

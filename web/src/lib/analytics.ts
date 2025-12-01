@@ -3,12 +3,15 @@ import { getSupabase } from './supabase'
 type EventType = 
   | 'view_lesson'
   | 'search_keyword'
+  | 'search_no_result'    // 新增：搜尋無結果
   | 'pricing_view'
-  | 'plan_selected'      // 新增：選擇方案
-  | 'purchase_success'   // 新增：購買成功
+  | 'plan_selected'
+  | 'purchase_success'
   | 'favorite_add'
   | 'favorite_remove'
   | 'practice_complete'
+  | 'practice_start'      // 新增：開始練習
+  | 'scroll_depth'        // 新增：滾動深度
 
 export async function trackEvent(
   eventType: EventType,

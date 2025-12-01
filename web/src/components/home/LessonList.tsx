@@ -25,6 +25,9 @@ export function LessonList({
     const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
     const hasMore = filteredLessons.length > 10 && !showAll;
 
+    // 判斷來源
+    const from = search ? 'search' : selectedCategory ? 'category' : hasTagFilter ? 'filter' : 'home';
+
     return (
         <section>
             <div className="flex justify-between items-center mb-3">
@@ -44,7 +47,7 @@ export function LessonList({
                 <p className="text-center text-zinc-500 py-8">找不到相關課程</p>
             ) : (
                 <div className="space-y-6">
-                    {displayLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} />)}
+                    {displayLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} from={from} />)}
                 </div>
             )}
 
