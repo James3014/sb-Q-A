@@ -129,7 +129,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white pb-24">
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <article className="max-w-lg mx-auto px-4 py-6">
         <LessonHeader skill={lesson.casi?.Primary_Skill} title={lesson.title} />
         <LessonTitle lesson={lesson} />
         <LessonWhat what={lesson.what} />
@@ -173,7 +173,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             )}
           </>
         )}
-      </div>
+      </article>
 
       {/* 底部固定操作欄 */}
       {showActions && (
