@@ -1,4 +1,5 @@
 import { getSupabase } from './supabase'
+import { queueEventSync } from './userCoreSync'
 
 type EventType = 
   | 'view_lesson'
@@ -12,6 +13,21 @@ type EventType =
   | 'practice_complete'
   | 'practice_start'      // 新增：開始練習
   | 'scroll_depth'        // 新增：滾動深度
+
+// 映射單板教學事件到 user-core 事件類型
+const EVENT_TYPE_MAPPING: Record<EventType, string> = {
+  'view_lesson': 'snowboard.lesson.viewed',
+  'search_keyword': 'snowboard.search.performed',
+  'search_no_result': 'snowboard.search.no_result',
+  'pricing_view': 'snowboard.pricing.viewed',
+  'plan_selected': 'snowboard.plan.selected',
+  'purchase_success': 'snowboard.purchase.completed',
+  'favorite_add': 'snowboard.favorite.added',
+  'favorite_remove': 'snowboard.favorite.removed',
+  'practice_complete': 'snowboard.practice.completed',
+  'practice_start': 'snowboard.practice.started',
+  'scroll_depth': 'snowboard.content.scrolled',
+}
 
 export async function trackEvent(
   eventType: EventType,
@@ -38,12 +54,24 @@ export async function trackEvent(
   try {
     const { data: { user } } = await supabase.auth.getUser()
     
+    // 1. 寫入 Supabase（保持現有邏輯）
     await supabase.from('event_log').insert({
       user_id: user?.id || null,
       event_type: eventType,
       lesson_id: lessonId || null,
       metadata: safeMetadata,
     })
+
+    // 2. 同步到 user-core（非阻塞，批次處理）
+    if (user?.id) {
+      const userCoreEventType = EVENT_TYPE_MAPPING[eventType] || `snowboard.${eventType}`
+      
+      queueEventSync(user.id, userCoreEventType, {
+        lesson_id: lessonId,
+        ...safeMetadata,
+        original_event_type: eventType, // 保留原始事件類型
+      })
+    }
   } catch (e) {
     console.error('[trackEvent]', e)
   }

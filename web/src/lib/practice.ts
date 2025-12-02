@@ -100,6 +100,11 @@ export async function addPracticeLog(
     return { success: false, error: error.message }
   }
   
-  trackEvent('practice_complete', lessonId)
+  // 發送事件到 analytics（會同步到 user-core）
+  trackEvent('practice_complete', lessonId, {
+    rating: avgRating || 3,  // 傳送評分，如果沒有則預設 3
+    note: note,
+  })
+  
   return { success: true }
 }

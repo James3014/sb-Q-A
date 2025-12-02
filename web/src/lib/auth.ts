@@ -18,6 +18,17 @@ export async function signUpWithEmail(email: string, password: string) {
   
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) console.error('[Auth] signUp error:', error.message)
+  
+  // 同步到 user-core（非阻塞）
+  if (data.user) {
+    const user = data.user
+    import('./userCoreSync').then(({ syncUserToCore }) => {
+      syncUserToCore(user).catch((err) =>
+        console.error('[Auth] UserCore sync failed:', err)
+      )
+    })
+  }
+  
   return { user: data.user, error }
 }
 
