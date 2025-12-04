@@ -150,28 +150,26 @@ export default function PricingPage() {
           <p className="text-zinc-400 text-sm mb-3">適合短期雪旅</p>
           
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <div 
-              onClick={() => (checkoutPlan ? null : handleCheckout('pass_7'))}
-              className={`bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition ${
-                checkoutPlan === 'pass_7' ? 'opacity-60' : ''
-              }`}
+            <button
+              onClick={() => handleCheckout('pass_7')}
+              disabled={checkoutPlan !== null || !user}
+              className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-zinc-600 disabled:to-zinc-600 disabled:cursor-not-allowed rounded-lg p-3 text-center transition-all font-semibold text-white disabled:opacity-60 active:scale-95"
             >
               <p className="text-lg font-bold">
                 {checkoutPlan === 'pass_7' ? '建立中...' : '$180'}
               </p>
-              <p className="text-xs text-zinc-400">7 天</p>
-            </div>
-            <div 
-              onClick={() => (checkoutPlan ? null : handleCheckout('pass_30'))}
-              className={`bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition ${
-                checkoutPlan === 'pass_30' ? 'opacity-60' : ''
-              }`}
+              <p className="text-xs opacity-90">7 天方案</p>
+            </button>
+            <button
+              onClick={() => handleCheckout('pass_30')}
+              disabled={checkoutPlan !== null || !user}
+              className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-zinc-600 disabled:to-zinc-600 disabled:cursor-not-allowed rounded-lg p-3 text-center transition-all font-semibold text-white disabled:opacity-60 active:scale-95"
             >
               <p className="text-lg font-bold">
                 {checkoutPlan === 'pass_30' ? '建立中...' : '$290'}
               </p>
-              <p className="text-xs text-zinc-400">30 天</p>
-            </div>
+              <p className="text-xs opacity-90">30 天方案</p>
+            </button>
           </div>
           
           <ul className="text-sm space-y-1">
@@ -212,8 +210,15 @@ export default function PricingPage() {
         </div>
 
         {checkoutMessage && (
-          <div className="bg-red-900/40 border border-red-500/40 text-sm text-red-200 rounded-lg p-3 mb-4">
-            {checkoutMessage}
+          <div className={`rounded-lg p-4 mb-4 text-sm font-medium transition-all ${
+            checkoutMessage.includes('失敗') || checkoutMessage.includes('缺少')
+              ? 'bg-red-900/50 border border-red-500/50 text-red-100'
+              : 'bg-amber-900/50 border border-amber-500/50 text-amber-100'
+          }`}>
+            <div className="flex items-start gap-2">
+              <span className="text-lg">{checkoutMessage.includes('失敗') || checkoutMessage.includes('缺少') ? '⚠️' : 'ℹ️'}</span>
+              <p>{checkoutMessage}</p>
+            </div>
           </div>
         )}
 
