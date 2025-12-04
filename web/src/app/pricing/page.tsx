@@ -61,7 +61,7 @@ function PlanCard({
 }
 
 export default function PricingPage() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanId | null>(null)
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
@@ -76,30 +76,25 @@ export default function PricingPage() {
       return
     }
 
-    const supabase = getSupabase()
-    if (!supabase) {
-      setCheckoutMessage('系統尚未設定 Supabase')
-      return
-    }
-
     setCheckoutMessage(null)
     setCheckoutPlan(planId)
     trackEvent('plan_selected', undefined, { plan: planId })
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const token = sessionData.session?.access_token
-      if (!token) {
-        throw new Error('Session 已失效，請重新登入')
+      // 直接使用 Supabase client 取得當前 session
+      const supabase = getSupabase()
+      if (!supabase) {
+        throw new Error('系統尚未設定 Supabase')
       }
 
+      // 簡化：直接呼叫 API，讓 API 層驗證 auth
       const res = await fetch('/api/payments/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ planId }),
+        credentials: 'include', // 帶著 cookie/auth 信息
       })
 
       if (!res.ok) {
@@ -125,9 +120,25 @@ export default function PricingPage() {
   return (
     <PageContainer>
       <header className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 p-4">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-zinc-400">←</Link>
-          <h1 className="text-xl font-bold">方案與價格</h1>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-zinc-400">←</Link>
+            <h1 className="text-xl font-bold">方案與價格</h1>
+          </div>
+          <div className="text-sm">
+            {loading ? (
+              <span className="text-zinc-500">載入中...</span>
+            ) : user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-zinc-300">{user.email}</span>
+              </div>
+            ) : (
+              <Link href="/login" className="text-blue-400 hover:text-blue-300">
+                登入
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
