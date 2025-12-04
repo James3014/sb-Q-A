@@ -1,10 +1,13 @@
 'use client'
 import { PageContainer } from '@/components/ui';
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import { trackEvent } from '@/lib/analytics'
+import { getSupabase } from '@/lib/supabase'
+import { SubscriptionPlanId } from '@/lib/constants'
 
 function PlanCard({ 
   plan, 
@@ -12,7 +15,10 @@ function PlanCard({
   label, 
   features, 
   highlight,
-  badge 
+  badge,
+  onSelect,
+  loading,
+  disabled,
 }: { 
   plan: string
   price: string
@@ -20,25 +26,31 @@ function PlanCard({
   features: string[]
   highlight?: boolean
   badge?: string
+  onSelect?: () => void
+  loading?: boolean
+  disabled?: boolean
 }) {
-  const handleSelect = () => {
-    trackEvent('plan_selected', undefined, { plan })
-  }
-
+  const clickable = !!onSelect
   return (
     <div 
-      onClick={handleSelect}
-      className={`rounded-lg p-4 mb-4 cursor-pointer transition-all hover:scale-[1.02] ${
+      onClick={disabled ? undefined : onSelect}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      className={`rounded-lg p-4 mb-4 transition-all ${
         highlight 
           ? 'bg-gradient-to-b from-amber-900/50 to-zinc-800 border border-amber-600/50' 
           : 'bg-zinc-800'
-      }`}
+      } ${clickable ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+      style={{
+        cursor: clickable ? (disabled ? 'not-allowed' : 'pointer') : 'default',
+        opacity: disabled ? 0.6 : 1,
+      }}
     >
       <div className="flex justify-between items-start mb-2">
         <h3 className={`font-bold ${highlight ? 'text-amber-400' : ''}`}>{label || plan}</h3>
         {badge && <span className="text-xs bg-amber-600 px-2 py-0.5 rounded">{badge}</span>}
       </div>
-      <p className="text-2xl font-bold mb-3">{price}</p>
+      <p className="text-2xl font-bold mb-3">{loading ? '建立訂單中...' : price}</p>
       <ul className="text-sm space-y-1">
         {features.map((f, i) => (
           <li key={i} className={highlight ? 'text-amber-200' : 'text-zinc-300'}>{f}</li>
@@ -50,10 +62,65 @@ function PlanCard({
 
 export default function PricingPage() {
   const { user } = useAuth()
+  const router = useRouter()
+  const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanId | null>(null)
+  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
 
   useEffect(() => {
     trackEvent('pricing_view')
   }, [])
+
+  const handleCheckout = async (planId: SubscriptionPlanId) => {
+    if (!user) {
+      router.push('/login?redirect=/pricing')
+      return
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      setCheckoutMessage('系統尚未設定 Supabase')
+      return
+    }
+
+    setCheckoutMessage(null)
+    setCheckoutPlan(planId)
+    trackEvent('plan_selected', undefined, { plan: planId })
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
+      if (!token) {
+        throw new Error('Session 已失效，請重新登入')
+      }
+
+      const res = await fetch('/api/payments/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ planId }),
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        const detail = body.detail || body.error || res.statusText
+        throw new Error(detail || '建立訂單失敗')
+      }
+
+      const data = await res.json()
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
+      } else {
+        setCheckoutMessage('訂單已建立，但缺少導向網址')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '建立訂單失敗'
+      setCheckoutMessage(message)
+    } finally {
+      setCheckoutPlan(null)
+    }
+  }
 
   return (
     <PageContainer>
@@ -84,17 +151,25 @@ export default function PricingPage() {
           
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div 
-              onClick={() => trackEvent('plan_selected', undefined, { plan: '7day' })}
-              className="bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition"
+              onClick={() => (checkoutPlan ? null : handleCheckout('pass_7'))}
+              className={`bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition ${
+                checkoutPlan === 'pass_7' ? 'opacity-60' : ''
+              }`}
             >
-              <p className="text-lg font-bold">$180</p>
+              <p className="text-lg font-bold">
+                {checkoutPlan === 'pass_7' ? '建立中...' : '$180'}
+              </p>
               <p className="text-xs text-zinc-400">7 天</p>
             </div>
             <div 
-              onClick={() => trackEvent('plan_selected', undefined, { plan: '30day' })}
-              className="bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition"
+              onClick={() => (checkoutPlan ? null : handleCheckout('pass_30'))}
+              className={`bg-zinc-700/50 rounded p-3 text-center cursor-pointer hover:bg-zinc-600/50 transition ${
+                checkoutPlan === 'pass_30' ? 'opacity-60' : ''
+              }`}
             >
-              <p className="text-lg font-bold">$290</p>
+              <p className="text-lg font-bold">
+                {checkoutPlan === 'pass_30' ? '建立中...' : '$290'}
+              </p>
               <p className="text-xs text-zinc-400">30 天</p>
             </div>
           </div>
@@ -119,6 +194,9 @@ export default function PricingPage() {
             '✓ 練習紀錄 + 改善曲線',
             '✓ 課程組合推薦（未來）',
           ]}
+          onSelect={() => handleCheckout('pro_yearly')}
+          loading={checkoutPlan === 'pro_yearly'}
+          disabled={!user}
         />
 
         {/* 開通說明 */}
@@ -132,6 +210,12 @@ export default function PricingPage() {
           </ol>
           <p className="text-zinc-500 text-xs mt-3">付款方式請洽客服</p>
         </div>
+
+        {checkoutMessage && (
+          <div className="bg-red-900/40 border border-red-500/40 text-sm text-red-200 rounded-lg p-3 mb-4">
+            {checkoutMessage}
+          </div>
+        )}
 
         {!user && (
           <Link href="/login" className="block w-full bg-blue-600 hover:bg-blue-500 text-center py-3 rounded-lg font-medium mb-6">
