@@ -50,19 +50,18 @@ function PaymentSuccessContent() {
         const data = await response.json()
 
         if (data.status === 'active') {
-          setStatus('success')
-          setMessage('支付成功！訂閱已啟動。')
-          setIsCheckingStatus(false)
-
-          // 刷新订阅状态
-          if (refreshSubscription) {
-            try {
-              await refreshSubscription()
-              console.log('[PaymentSuccess] Subscription refreshed')
-            } catch (err) {
-              console.error('[PaymentSuccess] Failed to refresh subscription:', err)
-            }
+          // 先刷新訂閱狀態，確保狀態更新後再跳轉
+          console.log('[PaymentSuccess] Payment confirmed, refreshing subscription...')
+          try {
+            await refreshSubscription()
+            console.log('[PaymentSuccess] Subscription refreshed successfully')
+          } catch (err) {
+            console.error('[PaymentSuccess] Failed to refresh subscription:', err)
           }
+
+          setStatus('success')
+          setMessage('支付成功！訂閱已啟動。3 秒後自動返回首頁...')
+          setIsCheckingStatus(false)
 
           // 3 秒後導向首頁
           setTimeout(() => {
@@ -88,7 +87,7 @@ function PaymentSuccessContent() {
     if (paymentId && user) {
       checkPaymentStatus()
     }
-  }, [paymentId, user, router])
+  }, [paymentId, user, router, refreshSubscription])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">

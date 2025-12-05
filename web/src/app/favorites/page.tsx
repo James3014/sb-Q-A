@@ -10,18 +10,19 @@ import LessonCard from '@/components/LessonCard'
 import { LoadingState, LockedState, PageHeader, EmptyState } from '@/components/ui'
 
 export default function FavoritesPage() {
-  const { user, loading, subscription, refreshSubscription } = useAuth()
+  const { user, loading, subscription, subscriptionVersion } = useAuth()
   const [favIds, setFavIds] = useState<string[]>([])
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
-    const load = async () => {
-      // 確保訂閱狀態是最新的
-      if (refreshSubscription) {
-        await refreshSubscription()
-      }
+    // 等待 auth 載入完成
+    if (loading) return
 
+    // 重置載入狀態（當 subscriptionVersion 變更時）
+    setLoadingData(true)
+
+    const load = async () => {
       const allLessons = await getLessons()
       setLessons(allLessons)
       if (user) {
@@ -30,8 +31,8 @@ export default function FavoritesPage() {
       }
       setLoadingData(false)
     }
-    if (!loading) load()
-  }, [user, loading, refreshSubscription])
+    load()
+  }, [user, loading, subscriptionVersion])
 
   const favLessons = lessons.filter(l => favIds.includes(l.id))
 

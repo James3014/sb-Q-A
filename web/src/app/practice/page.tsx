@@ -10,7 +10,7 @@ import { ImprovementDashboard } from '@/components/ImprovementDashboard'
 import { PracticeLogs } from '@/components/practice/PracticeLogs'
 
 export default function PracticePage() {
-  const { user, loading, subscription } = useAuth()
+  const { user, loading, subscription, subscriptionVersion } = useAuth()
   const [logs, setLogs] = useState<PracticeLog[]>([])
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [improvement, setImprovement] = useState<ImprovementData | null>(null)
@@ -18,6 +18,12 @@ export default function PracticePage() {
   const [tab, setTab] = useState<'dashboard' | 'logs'>('dashboard')
 
   useEffect(() => {
+    // 等待 auth 載入完成
+    if (loading) return
+
+    // 重置載入狀態（當 subscriptionVersion 變更時）
+    setLoadingData(true)
+
     const load = async () => {
       const allLessons = await getLessons()
       setLessons(allLessons)
@@ -31,8 +37,8 @@ export default function PracticePage() {
       }
       setLoadingData(false)
     }
-    if (!loading) load()
-  }, [user, loading])
+    load()
+  }, [user, loading, subscriptionVersion])
 
   if (loading || loadingData) return <LoadingState />
 
