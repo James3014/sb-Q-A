@@ -10,13 +10,18 @@ import LessonCard from '@/components/LessonCard'
 import { LoadingState, LockedState, PageHeader, EmptyState } from '@/components/ui'
 
 export default function FavoritesPage() {
-  const { user, loading, subscription } = useAuth()
+  const { user, loading, subscription, refreshSubscription } = useAuth()
   const [favIds, setFavIds] = useState<string[]>([])
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
     const load = async () => {
+      // 確保訂閱狀態是最新的
+      if (refreshSubscription) {
+        await refreshSubscription()
+      }
+
       const allLessons = await getLessons()
       setLessons(allLessons)
       if (user) {
@@ -26,14 +31,19 @@ export default function FavoritesPage() {
       setLoadingData(false)
     }
     if (!loading) load()
-  }, [user, loading])
+  }, [user, loading, refreshSubscription])
 
   const favLessons = lessons.filter(l => favIds.includes(l.id))
 
   if (loading || loadingData) return <LoadingState />
 
-  if (!user || !subscription.isActive) {
-    return <LockedState title="收藏功能為付費功能" description="升級後可收藏喜愛的課程" showLogin={!user} />
+  // 檢查使用者和訂閱狀態
+  if (!user) {
+    return <LockedState title="收藏功能為付費功能" description="升級後可收藏喜愛的課程" showLogin={true} />
+  }
+
+  if (!subscription?.isActive) {
+    return <LockedState title="收藏功能為付費功能" description="升級後可收藏喜愛的課程" showLogin={false} />
   }
 
   return (
