@@ -44,7 +44,7 @@ const stats: {
 }
 
 /**
- * 記錄同步嘗試
+ * 紀錄同步嘗試
  */
 export function recordSyncAttempt(type: 'user' | 'event'): void {
   const stat = type === 'user' ? stats.userSync : stats.eventSync
@@ -52,7 +52,7 @@ export function recordSyncAttempt(type: 'user' | 'event'): void {
 }
 
 /**
- * 記錄同步成功
+ * 紀錄同步成功
  */
 export function recordSyncSuccess(
   type: 'user' | 'event',
@@ -62,7 +62,7 @@ export function recordSyncSuccess(
   stat.successCount++
   stat.lastSuccess = new Date()
   
-  // 記錄響應時間（最多保留 100 個）
+  // 紀錄響應時間（最多保留 100 個）
   stat.responseTimes.push(responseTime)
   if (stat.responseTimes.length > 100) {
     stat.responseTimes.shift()
@@ -74,7 +74,7 @@ export function recordSyncSuccess(
 }
 
 /**
- * 記錄同步失敗
+ * 紀錄同步失敗
  */
 export function recordSyncFailure(
   type: 'user' | 'event',

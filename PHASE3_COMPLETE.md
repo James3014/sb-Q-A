@@ -29,9 +29,9 @@
 
 **功能**：
 - ✅ 追蹤同步嘗試次數
-- ✅ 記錄成功/失敗次數
+- ✅ 紀錄成功/失敗次數
 - ✅ 計算成功率
-- ✅ 記錄響應時間
+- ✅ 紀錄響應時間
 - ✅ 健康狀態評估
 
 **使用方式**：
@@ -174,9 +174,9 @@ window.__userCoreConfig.updateConfig({
 #### 4. 性能追蹤
 
 **響應時間追蹤**：
-- 記錄每次 API 調用的響應時間
+- 紀錄每次 API 調用的響應時間
 - 計算平均響應時間
-- 保留最近 100 次記錄
+- 保留最近 100 次紀錄
 
 **統計資料**：
 ```javascript
@@ -204,11 +204,11 @@ trackEvent() → queueEventSync() → syncEventToCore()
                                    ↓
                                    檢查配置 (enableEventSync?)
                                    ↓
-                                   記錄嘗試 (recordSyncAttempt)
+                                   紀錄嘗試 (recordSyncAttempt)
                                    ↓
                                    API 調用 (計時)
                                    ↓
-                                   記錄結果 (recordSyncSuccess/Failure)
+                                   紀錄結果 (recordSyncSuccess/Failure)
                                    ↓
                                    更新統計 (成功率、響應時間)
 ```

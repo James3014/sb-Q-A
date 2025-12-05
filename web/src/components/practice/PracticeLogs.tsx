@@ -42,7 +42,7 @@ export function PracticeLogs({ logs, lessons }: Props) {
   }
 
   if (logs.length === 0) {
-    return <EmptyState emoji="📝" title="還沒有練習紀錄" description="完成課程後記錄練習心得" />
+    return <EmptyState emoji="📝" title="還沒有練習紀錄" description="完成課程後紀錄練習心得" />
   }
 
   return (

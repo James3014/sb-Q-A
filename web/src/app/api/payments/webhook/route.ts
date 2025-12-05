@@ -1,22 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 import { SUBSCRIPTION_PLANS } from '@/lib/constants'
-import { calculateExpiryDate } from '@/lib/subscription'
-import { queueEventSync } from '@/lib/userCoreSync'
-
-type ProviderStatus = 'success' | 'paid' | 'failed' | 'canceled' | 'refunded'
-type PaymentStatus = 'none' | 'pending' | 'active' | 'failed' | 'canceled' | 'refunded'
-
-interface WebhookPayload {
-  paymentId?: string
-  providerPaymentId?: string
-  planId?: string
-  status?: ProviderStatus
-  amount?: number
-  currency?: string
-  reason?: string
-  payload?: Record<string, unknown>
-}
+import {
+  buildRawPayload,
+  mapStatus,
+  shouldSkipStatusUpdate,
+  updateUserForStatus,
+  validatePaymentPayload,
+  logPaymentEvent,
+} from '@/lib/payments/webhookUtils'
+import { WebhookPayload, ProviderStatus, PaymentStatus } from '@/lib/payments/types'
 
 interface OenTechWebhookPayload {
   merchantId: string
@@ -28,14 +21,6 @@ interface OenTechWebhookPayload {
   message?: string
   customId?: string
   [key: string]: unknown
-}
-
-const STATUS_MAP: Record<ProviderStatus, PaymentStatus> = {
-  success: 'active',
-  paid: 'active',
-  failed: 'failed',
-  canceled: 'canceled',
-  refunded: 'refunded',
 }
 
 /**
@@ -96,8 +81,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing payment identifiers' }, { status: 400 })
   }
 
-  const statusKey = webhookPayload.status || 'success'
-  const mappedStatus: PaymentStatus = STATUS_MAP[statusKey] || 'pending'
+  const mappedStatus: PaymentStatus = mapStatus(webhookPayload.status)
 
   let query = supabase.from('payments').select('*').limit(1)
 
@@ -123,41 +107,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Plan not found' }, { status: 400 })
   }
 
-  if (webhookPayload.planId && webhookPayload.planId !== payment.plan_id) {
-    return NextResponse.json({ error: 'Plan mismatch' }, { status: 400 })
-  }
-  if (
-    typeof webhookPayload.amount === 'number' &&
-    Number(webhookPayload.amount) !== Number(payment.amount)
-  ) {
-    return NextResponse.json({ error: 'Amount mismatch' }, { status: 400 })
-  }
-  if (webhookPayload.currency && webhookPayload.currency !== payment.currency) {
-    return NextResponse.json({ error: 'Currency mismatch' }, { status: 400 })
+  const validationError = validatePaymentPayload(webhookPayload, payment)
+  if (validationError) {
+    return NextResponse.json({ error: validationError }, { status: 400 })
   }
 
-  const rawPayload = {
-    ...(webhookPayload.payload || {}),
-    provider,
-    received_at: new Date().toISOString(),
-  }
+  const rawPayload = buildRawPayload(webhookPayload, provider)
 
-  const duplicateSuccess =
-    payment.status === 'active' && mappedStatus === 'active'
-  const finalizedNoChange =
-    (payment.status === 'active' && mappedStatus !== 'refunded') ||
-    payment.status === 'refunded'
-  const duplicateFailure =
-    (payment.status === 'failed' || payment.status === 'canceled') &&
-    (mappedStatus === 'failed' || mappedStatus === 'canceled')
-
-  if (duplicateSuccess || finalizedNoChange || duplicateFailure) {
+  if (shouldSkipStatusUpdate(payment.status, mappedStatus)) {
     await supabase
       .from('payments')
       .update({
         raw_payload: rawPayload,
         error_message:
-          statusKey === 'failed' ? webhookPayload.reason || null : payment.error_message,
+          mappedStatus === 'failed' ? webhookPayload.reason || null : payment.error_message,
       })
       .eq('id', payment.id)
     return NextResponse.json({ ok: true, detail: 'Payment already processed' })
@@ -196,74 +159,29 @@ export async function POST(req: NextRequest) {
         : 'purchase_failed'
 
   if (payment.status !== mappedStatus) {
-    await supabase.from('event_log').insert({
-      user_id: payment.user_id,
-      event_type: eventType,
-      lesson_id: null,
-      metadata,
-    })
-
-    queueEventSync(
-      payment.user_id,
-      eventType === 'purchase_success'
-        ? 'snowboard.purchase.completed'
-        : eventType === 'purchase_refunded'
-          ? 'snowboard.purchase.refunded'
-          : 'snowboard.purchase.failed',
-      metadata
-    )
+    await logPaymentEvent(supabase, payment.user_id, eventType, metadata)
   }
 
   const referenceId = providerPaymentId || payment.provider_payment_id
 
   if (mappedStatus === 'active' && payment.status !== 'active') {
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('subscription_type, subscription_expires_at')
-      .eq('id', payment.user_id)
-      .single()
-
-    const now = new Date()
-    const currentExpiry = userProfile?.subscription_expires_at
-      ? new Date(userProfile.subscription_expires_at)
-      : null
-    const baseDate =
-      currentExpiry && currentExpiry > now ? currentExpiry : now
-    const extendedExpiry =
-      baseDate > now
-        ? new Date(
-            baseDate.getTime() + plan.days * 24 * 60 * 60 * 1000
-          ).toISOString()
-        : calculateExpiryDate(plan.id).toISOString()
-
-    await supabase
-      .from('users')
-      .update({
-        subscription_type: plan.id,
-        subscription_expires_at: extendedExpiry,
-        payment_status: 'active',
-        last_payment_provider: provider,
-        last_payment_reference: referenceId,
-      })
-      .eq('id', payment.user_id)
-  } else if (mappedStatus === 'refunded') {
-    await supabase
-      .from('users')
-      .update({
-        payment_status: 'refunded',
-        last_payment_provider: provider,
-        last_payment_reference: referenceId,
-      })
-      .eq('id', payment.user_id)
-  } else if (mappedStatus === 'failed' || mappedStatus === 'canceled') {
-    await supabase
-      .from('users')
-      .update({
-        payment_status: mappedStatus,
-        last_payment_provider: provider,
-        last_payment_reference: referenceId,
-      })
-      .eq('id', payment.user_id)
+    await updateUserForStatus(
+      supabase,
+      payment.user_id,
+      plan.id,
+      mappedStatus,
+      referenceId,
+      provider
+    )
+  } else if (mappedStatus === 'refunded' || mappedStatus === 'failed' || mappedStatus === 'canceled') {
+    await updateUserForStatus(
+      supabase,
+      payment.user_id,
+      plan.id,
+      mappedStatus,
+      referenceId,
+      provider
+    )
   }
 
   return NextResponse.json({ ok: true })

@@ -291,7 +291,7 @@ git checkout HEAD~1 -- web/src/components/home/ProblemCategories.tsx
 需要進一步優化的項目：
 1. 詳情頁標題美學升級
 2. 底部操作欄漸層按鈕
-3. 練習記錄卡片視覺
+3. 練習紀錄卡片視覺
 4. 評分分段按鈕漸層
 
 隨時告訴我需要優先實作哪個項目！

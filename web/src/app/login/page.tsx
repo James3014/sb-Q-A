@@ -43,7 +43,7 @@ export default function LoginPage() {
         </h1>
         
         <p className="text-center text-zinc-400 text-sm mb-6">
-          登入後可收藏課程、記錄練習進度
+          登入後可收藏課程、紀錄練習進度
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

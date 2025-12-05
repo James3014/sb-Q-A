@@ -419,7 +419,7 @@ NEXT_PUBLIC_USER_CORE_ENABLE_MONITORING=false  # 減少開銷
 ### 3. 資料安全
 
 - [ ] 用戶資料加密傳輸
-- [ ] 敏感資料不記錄到日誌
+- [ ] 敏感資料不紀錄到日誌
 - [ ] 遵守 GDPR/個資法規定
 
 ---

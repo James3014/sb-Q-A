@@ -158,6 +158,16 @@
 - `web/src/lib/supabaseServer.ts` - 新增（Service Role Client）
 - `web/src/app/api/admin/**/*.ts` - 新增 5 個 Server API 路由
 - `web/src/app/admin/**/*.tsx` - 改用 `adminData.ts`
+
+---
+
+## 支付模組 Clean Code / 漸進式重構（2025-12-XX）
+
+- [x] 131. 支付 provider adapter 抽象：拆分 `payments/provider/mock.ts`、`payments/provider/oentech.ts`，`payments/index.ts` 只負責 orchestrate。
+- [x] 132. Webhook 模組化：狀態映射、payload 驗證、冪等/續期邏輯提取到純函式，route 只做 parse/respond。
+- [x] 133. Server-side analytics helper：統一寫入 event_log + user-core queue，API 不再重複手寫。
+- [x] 134. Config 集中化：`lib/config/payments.ts` 讀取/驗證 `PAYMENT_*`，缺值即報錯；回應格式統一 `{ ok, error?, detail? }`。
+- [x] 135. 測試/防呆：最小單測或 smoke 覆蓋 checkout/webhook/status；middleware 防止非 mock 環境暴露 mock checkout。
 - `docs/migration_subscription_security.sql` - 新增並已執行
 - `docs/migration_event_log_guardrails.sql` - 新增並已執行
 - `docs/migration_subscription_plans.sql` - 新增並已執行

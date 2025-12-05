@@ -221,7 +221,7 @@ curl -s "https://user-core.zeabur.app/events?user_id=用戶ID" | \
 
 ### 錯誤監控
 
-所有錯誤都會記錄到瀏覽器控制台，格式：
+所有錯誤都會紀錄到瀏覽器控制台，格式：
 ```
 [UserCoreSync] <錯誤類型>: <錯誤訊息>
 ```
@@ -249,7 +249,7 @@ curl -s "https://user-core.zeabur.app/events?user_id=用戶ID" | \
 
 user-core 的資料將用於：
 1. **媒合算法**：基於技能等級、偏好雪場
-2. **學習行為**：利用課程瀏覽、練習完成記錄
+2. **學習行為**：利用課程瀏覽、練習完成紀錄
 3. **教練學生媒合**：單板教學的教練可以找到學生
 
 ### 跨專案數據共享
@@ -257,7 +257,7 @@ user-core 的資料將用於：
 其他專案可以通過 user-core 訪問：
 - 用戶基本資料
 - 滑雪技能等級
-- 學習行為記錄
+- 學習行為紀錄
 - 偏好設置
 
 ## 故障排除
@@ -274,7 +274,7 @@ curl https://user-core.zeabur.app/docs
 curl "https://user-core.zeabur.app/users/<user_id>"
 ```
 
-### 檢查事件是否記錄
+### 檢查事件是否紀錄
 
 ```bash
 curl "https://user-core.zeabur.app/events?user_id=<user_id>&limit=10"

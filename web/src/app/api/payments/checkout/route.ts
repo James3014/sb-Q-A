@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { SUBSCRIPTION_PLANS } from '@/lib/constants'
 import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 import { createCheckoutSession } from '@/lib/payments'
-import { queueEventSync } from '@/lib/userCoreSync'
+import { recordPurchaseEvent } from '@/lib/analyticsServer'
 
 interface CheckoutBody {
   planId?: string
@@ -112,28 +112,17 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', paymentRow.id)
 
-    await supabase.from('event_log').insert({
-      user_id: userId,
-      event_type: 'purchase_initiated',
-      lesson_id: null,
-      metadata: {
-        plan_id: plan.id,
-        amount: plan.price,
-        currency,
-        payment_id: paymentRow.id,
-        provider,
-      },
-    })
-
-    queueEventSync(userId, 'snowboard.purchase.initiated', {
+    const eventMetadata = {
       plan_id: plan.id,
       amount: plan.price,
       currency,
       payment_id: paymentRow.id,
       provider,
-    })
+    }
+    await recordPurchaseEvent(supabase, userId, 'purchase_initiated', eventMetadata)
 
     return NextResponse.json({
+      ok: true,
       paymentId: paymentRow.id,
       providerPaymentId: session.providerPaymentId,
       checkoutUrl: session.checkoutUrl,
@@ -155,6 +144,6 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', paymentRow.id)
 
-    return NextResponse.json({ error: 'Payment provider error' }, { status: 502 })
+    return NextResponse.json({ ok: false, error: 'Payment provider error' }, { status: 502 })
   }
 }

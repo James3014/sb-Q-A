@@ -37,7 +37,7 @@ export default function PracticePage() {
   if (loading || loadingData) return <LoadingState />
 
   if (!user || !subscription.isActive) {
-    return <LockedState title="練習紀錄為付費功能" description="升級後可記錄練習進度" showLogin={!user} />
+    return <LockedState title="練習紀錄為付費功能" description="升級後可紀錄練習進度" showLogin={!user} />
   }
 
   return (

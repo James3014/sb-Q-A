@@ -43,7 +43,7 @@ npm run dev
 
 **驗證**：
 ```bash
-# 獲取你的 user_id（從控制台或註冊時記錄）
+# 獲取你的 user_id（從控制台或註冊時紀錄）
 USER_ID="your-user-id"
 
 # 查詢 user-core 事件
