@@ -3,12 +3,16 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/components/AuthProvider'
+import { getSession } from '@/lib/auth'
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { user, subscription } = useAuth()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
+  const [isCheckingStatus, setIsCheckingStatus] = useState(true)
 
   const paymentId = searchParams.get('payment_id')
 
@@ -22,10 +26,14 @@ function PaymentSuccessContent() {
     // 輪詢查詢支付狀態
     const checkPaymentStatus = async () => {
       try {
-        const token = localStorage.getItem('supabase.auth.token')
+        // 從 Supabase session 取得 token
+        const session = await getSession()
+        const token = session?.access_token
+
         if (!token) {
           setStatus('error')
           setMessage('未登入，請重新登入')
+          setIsCheckingStatus(false)
           return
         }
 
@@ -44,6 +52,7 @@ function PaymentSuccessContent() {
         if (data.status === 'active') {
           setStatus('success')
           setMessage('支付成功！訂閱已啟動。')
+          setIsCheckingStatus(false)
           // 3 秒後導向首頁
           setTimeout(() => {
             router.push('/')
@@ -51,18 +60,24 @@ function PaymentSuccessContent() {
         } else if (data.status === 'failed' || data.status === 'canceled') {
           setStatus('error')
           setMessage(data.errorMessage || '支付失敗，請重試')
+          setIsCheckingStatus(false)
         } else if (data.status === 'pending') {
-          // 繼續等待
+          // 繼續等待，最多等待 60 秒
           setTimeout(checkPaymentStatus, 2000)
         }
       } catch (err) {
+        console.error('[PaymentSuccess] Error:', err)
         setStatus('error')
         setMessage(err instanceof Error ? err.message : '檢查狀態失敗')
+        setIsCheckingStatus(false)
       }
     }
 
-    checkPaymentStatus()
-  }, [paymentId, router])
+    // 確保只在 paymentId 存在且使用者已登入時才檢查
+    if (paymentId && user) {
+      checkPaymentStatus()
+    }
+  }, [paymentId, user, router])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">

@@ -80,6 +80,10 @@ export default function PricingPage() {
     setCheckoutPlan(planId)
     trackEvent('plan_selected', undefined, { plan: planId })
 
+    // 顯示提示訊息
+    const statusMessage = '正在建立訂單...請稍候'
+    setCheckoutMessage(statusMessage)
+
     try {
       // 直接使用 Supabase client 取得當前 session
       const supabase = getSupabase()
@@ -112,13 +116,17 @@ export default function PricingPage() {
 
       const data = await res.json()
       if (data.checkoutUrl) {
+        setCheckoutMessage('跳轉到支付頁面...')
+        // 添加短暫延遲以確保 UI 更新
+        await new Promise(resolve => setTimeout(resolve, 500))
         window.location.href = data.checkoutUrl
       } else {
-        setCheckoutMessage('訂單已建立，但缺少導向網址')
+        setCheckoutMessage('❌ 訂單已建立，但缺少導向網址')
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : '建立訂單失敗'
-      setCheckoutMessage(message)
+      setCheckoutMessage(`❌ ${message}`)
+      console.error('[Checkout] Error:', error)
     } finally {
       setCheckoutPlan(null)
     }
@@ -229,13 +237,21 @@ export default function PricingPage() {
 
         {checkoutMessage && (
           <div className={`rounded-lg p-4 mb-4 text-sm font-medium transition-all ${
-            checkoutMessage.includes('失敗') || checkoutMessage.includes('缺少')
+            checkoutMessage.startsWith('❌')
               ? 'bg-red-900/50 border border-red-500/50 text-red-100'
-              : 'bg-amber-900/50 border border-amber-500/50 text-amber-100'
+              : checkoutMessage.includes('跳轉')
+              ? 'bg-green-900/50 border border-green-500/50 text-green-100'
+              : 'bg-blue-900/50 border border-blue-500/50 text-blue-100'
           }`}>
-            <div className="flex items-start gap-2">
-              <span className="text-lg">{checkoutMessage.includes('失敗') || checkoutMessage.includes('缺少') ? '⚠️' : 'ℹ️'}</span>
-              <p>{checkoutMessage}</p>
+            <div className="flex items-center gap-3">
+              {checkoutMessage.startsWith('❌') ? (
+                <span className="text-lg">❌</span>
+              ) : checkoutMessage.includes('跳轉') ? (
+                <span className="text-lg">✓</span>
+              ) : (
+                <span className="inline-block animate-spin">⏳</span>
+              )}
+              <p className="flex-1">{checkoutMessage}</p>
             </div>
           </div>
         )}

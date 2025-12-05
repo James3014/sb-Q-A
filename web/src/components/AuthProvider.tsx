@@ -25,27 +25,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [subscription, setSubscription] = useState<Subscription>(defaultSubscription)
 
   useEffect(() => {
+    let isMounted = true
+
+    // 初始化使用者狀態
     getUser().then(async (u) => {
+      if (!isMounted) return
       setUser(u)
       if (u) {
         const sub = await getSubscription(u.id)
-        setSubscription(sub)
+        if (isMounted) setSubscription(sub)
       }
-      setLoading(false)
+      if (isMounted) setLoading(false)
+    }).catch((err) => {
+      console.error('[AuthProvider] Failed to get user:', err)
+      if (isMounted) setLoading(false)
     })
 
+    // 監聽認證狀態變化
     const { data: { subscription: authSub } } = onAuthStateChange(async (u) => {
+      if (!isMounted) return
+
       setUser(u)
       if (u) {
-        const sub = await getSubscription(u.id)
-        setSubscription(sub)
+        try {
+          const sub = await getSubscription(u.id)
+          if (isMounted) setSubscription(sub)
+        } catch (err) {
+          console.error('[AuthProvider] Failed to get subscription:', err)
+        }
       } else {
         setSubscription(defaultSubscription)
       }
-      setLoading(false)
     })
-    
-    return () => authSub.unsubscribe()
+
+    return () => {
+      isMounted = false
+      authSub.unsubscribe()
+    }
   }, [])
 
   return (
