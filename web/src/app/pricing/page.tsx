@@ -87,11 +87,18 @@ export default function PricingPage() {
         throw new Error('系統尚未設定 Supabase')
       }
 
-      // 簡化：直接呼叫 API，讓 API 層驗證 auth
+      // 取得當前使用者的 session token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError || !session?.access_token) {
+        throw new Error('無法取得認證 token，請重新登入')
+      }
+
+      // 呼叫 API 並傳遞 Bearer token
       const res = await fetch('/api/payments/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ planId }),
         credentials: 'include', // 帶著 cookie/auth 信息

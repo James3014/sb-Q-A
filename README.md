@@ -440,22 +440,49 @@ streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 
 ## 📚 開發文件
 
+所有文件統一放在 [docs/](docs/) 目錄，詳見 [FILE_ORGANIZATION.md](docs/FILE_ORGANIZATION.md)
+
+### 核心文件
+
 | 文件 | 說明 |
 |------|------|
 | [SDD.md](docs/SDD.md) | 軟體設計文件 |
 | [PLAN.md](docs/PLAN.md) | 開發計畫 |
 | [TODO.md](docs/TODO.md) | 待辦清單 |
+| [FILE_ORGANIZATION.md](docs/FILE_ORGANIZATION.md) | 📁 檔案組織說明 |
+
+### 資料庫
+
+| 文件 | 說明 |
+|------|------|
 | [schema.sql](docs/schema.sql) | 資料庫 Schema |
-| [migration_subscription.sql](docs/migration_subscription.sql) | 訂閱欄位 Migration |
-| [migration_event_log.sql](docs/migration_event_log.sql) | 事件追蹤 Migration |
-| [migration_admin.sql](docs/migration_admin.sql) | 後台函數 Migration |
-| [migration_subscription_security.sql](docs/migration_subscription_security.sql) | 🔒 RLS 政策 + 訂閱檢查函數（2025-11-29） |
-| [migration_event_log_guardrails.sql](docs/migration_event_log_guardrails.sql) | 🔒 event_log Rate Limit（2025-11-29） |
-| [migration_subscription_plans.sql](docs/migration_subscription_plans.sql) | 🔒 訂閱方案版本化表（2025-11-29） |
-| [SMOKE_AUTH_SUBSCRIPTION.md](docs/SMOKE_AUTH_SUBSCRIPTION.md) | 🔒 權限驗證測試用例（2025-11-29） |
-| [Alpine_Velocity_實作報告_2025-11-28.md](Alpine_Velocity_實作報告_2025-11-28.md) | Alpine Velocity 美學實作 |
-| [Alpine_Velocity_進階優化_2025-11-28.md](Alpine_Velocity_進階優化_2025-11-28.md) | 視覺深度與微動效優化 |
-| [UX_第四輪建議_手機優先_2025-11-28.md](UX_第四輪建議_手機優先_2025-11-28.md) | 手機優先 UX 改善方案 |
+| [migration_subscription_security.sql](docs/migration_subscription_security.sql) | 🔒 RLS 政策 + 訂閱檢查函數 |
+| [migration_event_log_guardrails.sql](docs/migration_event_log_guardrails.sql) | 🔒 event_log Rate Limit |
+| [migration_subscription_plans.sql](docs/migration_subscription_plans.sql) | 🔒 訂閱方案版本化表 |
+| [migration_payments.sql](docs/migration_payments.sql) | 💳 金流系統 |
+
+### UX/UI 設計
+
+| 文件 | 說明 |
+|------|------|
+| [Alpine_Velocity_實作報告_2025-11-28.md](docs/Alpine_Velocity_實作報告_2025-11-28.md) | Alpine Velocity 美學實作 |
+| [Alpine_Velocity_進階優化_2025-11-28.md](docs/Alpine_Velocity_進階優化_2025-11-28.md) | 視覺深度與微動效優化 |
+| [UX_第四輪建議_手機優先_2025-11-28.md](docs/UX_第四輪建議_手機優先_2025-11-28.md) | 手機優先 UX 改善方案 |
+
+### 安全性與測試
+
+| 文件 | 說明 |
+|------|------|
+| [安全性強化報告_2025-12-01.md](docs/安全性強化報告_2025-12-01.md) | 🔒 安全性強化總結 |
+| [SMOKE_AUTH_SUBSCRIPTION.md](docs/SMOKE_AUTH_SUBSCRIPTION.md) | 🔒 權限驗證測試用例 |
+| [PAYMENT_TESTING_GUIDE.md](docs/PAYMENT_TESTING_GUIDE.md) | 💳 金流測試指南 |
+
+### 部署與維護
+
+| 文件 | 說明 |
+|------|------|
+| [PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md) | 生產環境部署指南 |
+| [LINUS_GUIDE.md](docs/LINUS_GUIDE.md) | Linus 原則指南 |
 
 ---
 

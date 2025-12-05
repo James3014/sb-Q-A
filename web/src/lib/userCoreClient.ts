@@ -6,6 +6,9 @@
 
 const USER_CORE_API = process.env.NEXT_PUBLIC_USER_CORE_API_URL || 'https://user-core.zeabur.app'
 
+// 確保 API 使用 HTTPS 以避免 Mixed Content 錯誤
+const SECURE_USER_CORE_API = USER_CORE_API.replace(/^http:/, 'https:')
+
 export interface UserCoreProfile {
   user_id?: string
   roles?: string[]
@@ -34,7 +37,7 @@ export async function createUserInCore(
   userData: UserCoreProfile
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await fetch(`${USER_CORE_API}/users/`, {
+    const response = await fetch(`${SECURE_USER_CORE_API}/users/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +75,7 @@ export async function updateUserInCore(
   userData: Partial<UserCoreProfile>
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await fetch(`${USER_CORE_API}/users/${userId}`, {
+    const response = await fetch(`${SECURE_USER_CORE_API}/users/${userId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +112,7 @@ export async function sendEventToCore(
   event: UserCoreEvent
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`${USER_CORE_API}/events`, {
+    const response = await fetch(`${SECURE_USER_CORE_API}/events`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -147,7 +150,7 @@ export async function getUserFromCore(
   userId: string
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await fetch(`${USER_CORE_API}/users/${userId}`, {
+    const response = await fetch(`${SECURE_USER_CORE_API}/users/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
