@@ -9,20 +9,34 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   subscription: Subscription
+  refreshSubscription?: () => Promise<void>
 }
 
 const defaultSubscription: Subscription = { plan: 'free', endDate: null, isActive: false }
 
-const AuthContext = createContext<AuthContextType>({ 
-  user: null, 
+const AuthContext = createContext<AuthContextType>({
+  user: null,
   loading: true,
-  subscription: defaultSubscription
+  subscription: defaultSubscription,
+  refreshSubscription: async () => {}
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [subscription, setSubscription] = useState<Subscription>(defaultSubscription)
+
+  // 强制刷新订阅状态的函数
+  const refreshSubscription = async () => {
+    if (!user) return
+    try {
+      const sub = await getSubscription(user.id)
+      setSubscription(sub)
+      console.log('[AuthProvider] Subscription refreshed:', sub)
+    } catch (err) {
+      console.error('[AuthProvider] Failed to refresh subscription:', err)
+    }
+  }
 
   useEffect(() => {
     let isMounted = true
@@ -65,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, subscription }}>
+    <AuthContext.Provider value={{ user, loading, subscription, refreshSubscription }}>
       {children}
     </AuthContext.Provider>
   )

@@ -9,7 +9,7 @@ import { getSession } from '@/lib/auth'
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { user, subscription } = useAuth()
+  const { user, subscription, refreshSubscription } = useAuth()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const [isCheckingStatus, setIsCheckingStatus] = useState(true)
@@ -53,6 +53,17 @@ function PaymentSuccessContent() {
           setStatus('success')
           setMessage('支付成功！訂閱已啟動。')
           setIsCheckingStatus(false)
+
+          // 刷新订阅状态
+          if (refreshSubscription) {
+            try {
+              await refreshSubscription()
+              console.log('[PaymentSuccess] Subscription refreshed')
+            } catch (err) {
+              console.error('[PaymentSuccess] Failed to refresh subscription:', err)
+            }
+          }
+
           // 3 秒後導向首頁
           setTimeout(() => {
             router.push('/')

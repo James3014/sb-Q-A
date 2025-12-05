@@ -32,9 +32,9 @@ function HomeContent() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const { user } = useAuth();
+  const { user, refreshSubscription } = useAuth();
   const searchTimer = useRef<NodeJS.Timeout>(null);
-  
+
   // 資料載入完成後恢復滾動位置
   useHomePersistence(!loading);
 
@@ -48,7 +48,14 @@ function HomeContent() {
       setLessons(data);
       setLoading(false);
     });
-  }, []);
+
+    // 如果从支付成功返回，刷新订阅状态
+    if (refreshSubscription) {
+      refreshSubscription().catch(err => {
+        console.error('[Home] Failed to refresh subscription:', err);
+      });
+    }
+  }, [refreshSubscription]);
 
   // 搜尋追蹤 (debounce 1秒)
   useEffect(() => {
