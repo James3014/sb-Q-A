@@ -98,7 +98,7 @@ export default function PricingPage() {
 
       // 更新模態窗口狀態
       setModalStatus('processing')
-      setModalMessage('正在建立訂單...')
+      setModalMessage('建立訂單中... 請稍候')
 
       // 呼叫 API 並傳遞 Bearer token
       const res = await fetch('/api/payments/checkout', {
@@ -120,7 +120,7 @@ export default function PricingPage() {
       const data = await res.json()
       if (data.checkoutUrl) {
         setModalStatus('success')
-        setModalMessage('支付窗口即將打開...')
+        setModalMessage('訂單建立成功！即將跳轉到支付頁面...')
         // 添加短暫延遲以確保 UI 更新
         await new Promise(resolve => setTimeout(resolve, 1500))
         window.location.href = data.checkoutUrl
