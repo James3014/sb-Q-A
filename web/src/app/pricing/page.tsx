@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
+import { CheckoutModal } from '@/components/CheckoutModal'
 import { trackEvent } from '@/lib/analytics'
 import { getSupabase } from '@/lib/supabase'
 import { SubscriptionPlanId } from '@/lib/constants'
@@ -64,7 +65,8 @@ export default function PricingPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanId | null>(null)
-  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
+  const [modalStatus, setModalStatus] = useState<'pending' | 'processing' | 'success' | 'error' | null>(null)
+  const [modalMessage, setModalMessage] = useState<string>('')
 
   useEffect(() => {
     trackEvent('pricing_view')
@@ -76,13 +78,10 @@ export default function PricingPage() {
       return
     }
 
-    setCheckoutMessage(null)
     setCheckoutPlan(planId)
+    setModalStatus('pending')
+    setModalMessage('準備建立訂單...')
     trackEvent('plan_selected', undefined, { plan: planId })
-
-    // 顯示提示訊息
-    const statusMessage = '正在建立訂單...請稍候'
-    setCheckoutMessage(statusMessage)
 
     try {
       // 直接使用 Supabase client 取得當前 session
@@ -96,6 +95,10 @@ export default function PricingPage() {
       if (sessionError || !session?.access_token) {
         throw new Error('無法取得認證 token，請重新登入')
       }
+
+      // 更新模態窗口狀態
+      setModalStatus('processing')
+      setModalMessage('正在建立訂單...')
 
       // 呼叫 API 並傳遞 Bearer token
       const res = await fetch('/api/payments/checkout', {
@@ -116,20 +119,27 @@ export default function PricingPage() {
 
       const data = await res.json()
       if (data.checkoutUrl) {
-        setCheckoutMessage('跳轉到支付頁面...')
+        setModalStatus('success')
+        setModalMessage('支付窗口即將打開...')
         // 添加短暫延遲以確保 UI 更新
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1500))
         window.location.href = data.checkoutUrl
       } else {
-        setCheckoutMessage('❌ 訂單已建立，但缺少導向網址')
+        throw new Error('訂單已建立，但缺少導向網址')
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : '建立訂單失敗'
-      setCheckoutMessage(`❌ ${message}`)
+      setModalStatus('error')
+      setModalMessage(message)
       console.error('[Checkout] Error:', error)
     } finally {
       setCheckoutPlan(null)
     }
+  }
+
+  const handleCloseModal = () => {
+    setModalStatus(null)
+    setModalMessage('')
   }
 
   return (
@@ -235,26 +245,13 @@ export default function PricingPage() {
           <p className="text-zinc-500 text-xs mt-3">付款方式請洽客服</p>
         </div>
 
-        {checkoutMessage && (
-          <div className={`rounded-lg p-4 mb-4 text-sm font-medium transition-all ${
-            checkoutMessage.startsWith('❌')
-              ? 'bg-red-900/50 border border-red-500/50 text-red-100'
-              : checkoutMessage.includes('跳轉')
-              ? 'bg-green-900/50 border border-green-500/50 text-green-100'
-              : 'bg-blue-900/50 border border-blue-500/50 text-blue-100'
-          }`}>
-            <div className="flex items-center gap-3">
-              {checkoutMessage.startsWith('❌') ? (
-                <span className="text-lg">❌</span>
-              ) : checkoutMessage.includes('跳轉') ? (
-                <span className="text-lg">✓</span>
-              ) : (
-                <span className="inline-block animate-spin">⏳</span>
-              )}
-              <p className="flex-1">{checkoutMessage}</p>
-            </div>
-          </div>
-        )}
+        {/* 支付進度模態視窗 */}
+        <CheckoutModal
+          isOpen={modalStatus !== null}
+          status={modalStatus || 'pending'}
+          message={modalMessage}
+          onClose={handleCloseModal}
+        />
 
         {!user && (
           <Link href="/login" className="block w-full bg-blue-600 hover:bg-blue-500 text-center py-3 rounded-lg font-medium mb-6">
