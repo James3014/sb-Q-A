@@ -4,10 +4,12 @@
  * 提供與 user-core 服務通信的基礎功能
  */
 
-const USER_CORE_API = process.env.NEXT_PUBLIC_USER_CORE_API_URL || 'https://user-core.zeabur.app'
+const USER_CORE_API_BASE = process.env.NEXT_PUBLIC_USER_CORE_API_URL || 'https://user-core.zeabur.app'
 
-// 確保 API 使用 HTTPS 以避免 Mixed Content 錯誤
-const SECURE_USER_CORE_API = USER_CORE_API.replace(/^http:/, 'https:')
+// 在客戶端，使用本地 API proxy 避免 Mixed Content 錯誤
+// 在伺服器端，直接使用 UserCore API
+const isClient = typeof window !== 'undefined'
+const USER_CORE_API = isClient ? '/api/usercore/proxy' : USER_CORE_API_BASE
 
 export interface UserCoreProfile {
   user_id?: string
@@ -37,13 +39,18 @@ export async function createUserInCore(
   userData: UserCoreProfile
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await fetch(`${SECURE_USER_CORE_API}/users/`, {
+    const response = await fetch(USER_CORE_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Actor-Id': 'snowboard-teaching-app',
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({
+        endpoint: '/users/',
+        body: userData,
+        headers: {
+          'X-Actor-Id': 'snowboard-teaching-app',
+        },
+      }),
       signal: AbortSignal.timeout(5000), // 5 秒超時
     })
 
@@ -75,13 +82,18 @@ export async function updateUserInCore(
   userData: Partial<UserCoreProfile>
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await fetch(`${SECURE_USER_CORE_API}/users/${userId}`, {
-      method: 'PATCH',
+    const response = await fetch(USER_CORE_API, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Actor-Id': 'snowboard-teaching-app',
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({
+        endpoint: `/users/${userId}`,
+        body: userData,
+        headers: {
+          'X-Actor-Id': 'snowboard-teaching-app',
+        },
+      }),
       signal: AbortSignal.timeout(5000),
     })
 
@@ -112,14 +124,17 @@ export async function sendEventToCore(
   event: UserCoreEvent
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`${SECURE_USER_CORE_API}/events`, {
+    const response = await fetch(USER_CORE_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        ...event,
-        version: event.version || 1,
+        endpoint: '/events',
+        body: {
+          ...event,
+          version: event.version || 1,
+        },
       }),
       signal: AbortSignal.timeout(5000),
     })
@@ -150,7 +165,7 @@ export async function getUserFromCore(
   userId: string
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await fetch(`${SECURE_USER_CORE_API}/users/${userId}`, {
+    const response = await fetch(`${USER_CORE_API}?endpoint=/users/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
