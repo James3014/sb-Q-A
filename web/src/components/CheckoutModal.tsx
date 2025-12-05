@@ -95,7 +95,7 @@ export function CheckoutModal({ isOpen, status, message, onClose }: CheckoutModa
           <h2 className={`text-2xl font-bold mb-2 ${getTitleColor()}`}>
             {status === 'pending' && '準備支付'}
             {status === 'processing' && '處理中...'}
-            {status === 'success' && '支付成功！'}
+            {status === 'success' && (displayMessage.includes('即將跳轉') ? '訂單建立成功！' : '支付成功！')}
             {status === 'error' && '支付失敗'}
           </h2>
 
