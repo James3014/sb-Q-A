@@ -125,14 +125,42 @@
    建議：「熱門搜尋 XXX 與熱門課程不同，可優化課程標題」
 ```
 
-### 訂閱方案
+### 💳 訂閱 & 支付系統
 
-| 方案 | 價格 | 內容 |
-|------|------|------|
-| 免費 | $0 | 28 堂初級課程、搜尋篩選、PRO 課程預覽（僅問題） |
-| 7天 PASS | $180 | 全部 213 堂課程、收藏、練習紀錄 |
-| 30天 PASS | $290 | 同上 |
-| PRO 年費 | $690 | 同上 |
+**訂閱方案**
+
+| 方案 | 價格 | 有效期 | 內容 |
+|------|------|--------|------|
+| 免費 | $0 | ∞ | 28 堂初級課程、搜尋篩選、PRO 課程預覽（僅問題） |
+| 7天 PASS | $180 | 7 天 | 全部 213 堂課程、收藏功能、練習紀錄 |
+| 30天 PASS | $290 | 30 天 | 全部 213 堂課程、收藏功能、練習紀錄 |
+| PRO 年費 | $690 | 365 天 | 全部 213+ 堂課程、收藏、練習紀錄、未來新增內容 |
+
+**支付流程**
+
+```
+用戶選擇方案 → /pricing 頁面
+    ↓
+POST /api/payments/checkout (需登入)
+    ↓
+金流 SDK 初始化 → 支付頁面 (ŌEN Tech)
+    ↓
+支付完成 → POST /api/payments/webhook
+    ↓
+更新訂閱狀態 → 導回 /payment-success
+    ↓
+前端輪詢 /api/payments/status
+    ↓
+AuthProvider 自動刷新訂閱狀態 → 所有受保護頁面立即可用
+```
+
+**支付安全機制**
+
+- ✅ **伺服器時間驗證**：過期日期使用絕對 UTC 時間戳，防止客戶端時間篡改
+- ✅ **Webhook 冪等性**：唯一索引 on (provider, provider_payment_id) 防止重複處理
+- ✅ **重複購買防止**：檢查現有有效訂閱，返回 409 Conflict
+- ✅ **RLS 政策**：用戶只能存取自己的訂閱/收藏/練習紀錄
+- ✅ **訂閱狀態同期**：Payment Success 頁自動調用 refreshSubscription() 更新狀態
 
 ### 專案結構
 
@@ -295,16 +323,6 @@ docs/
 
 ---
 
-## 🐍 Streamlit 版本（舊版）
-
-```bash
-cd /Users/jameschen/Downloads/單板教學
-source .venv/bin/activate
-streamlit run app.py --server.address 0.0.0.0 --server.port 8501
-```
-
----
-
 ## 📱 功能特色
 
 ### 首頁（列表）
@@ -429,12 +447,36 @@ streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 
 ## 🗺️ 未來規劃
 
-- [ ] 金流串接（綠界/藍新）
-- [ ] AI 示意圖生成
-- [ ] 改善計畫課程
-- [ ] CASI Level 2/3 深度內容
-- [ ] 個人儀表板（趨勢圖）
-- [ ] 推播通知
+**已完成**
+- ✅ 金流系統（ŌEN Tech）
+- ✅ 訂閱管理（免費/短期 PASS/年費）
+- ✅ 後台數據分析（Dashboard/課程分析/付費分析）
+- ✅ 用戶認證與授權（Supabase Auth + RLS）
+- ✅ Alpine Velocity 美學系統
+
+**優先開發**
+- [ ] **推播提醒**
+  - 即將過期提醒（7天前）
+  - 新課程上線通知
+  - 練習成績改善提醒
+
+- [ ] **個人化機制**
+  - 學習進度儀表板（進度條/時間統計）
+  - 個人化課程推薦（基於瀏覽/練習歷史）
+  - 改善計畫跟蹤（針對弱項課程自動推薦）
+
+- [ ] **內容擴展**
+  - AI 生成示意圖（基於課程文字）
+  - CASI Level 2/3 進階內容
+  - 季節性課程（新雪季更新內容）
+  - 用戶貢獻內容（社群課程）
+
+**未來考慮**
+- [ ] 離線模式（Offline-first PWA）
+- [ ] 社群功能（課程討論/經驗分享）
+- [ ] 教練端平台（學生管理/進度追蹤）
+- [ ] 多語言支援（中文/英文/日文）
+- [ ] 小組訓練課程（班級管理）
 
 ---
 
@@ -475,7 +517,7 @@ streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 |------|------|
 | [安全性強化報告_2025-12-01.md](docs/安全性強化報告_2025-12-01.md) | 🔒 安全性強化總結 |
 | [SMOKE_AUTH_SUBSCRIPTION.md](docs/SMOKE_AUTH_SUBSCRIPTION.md) | 🔒 權限驗證測試用例 |
-| [PAYMENT_TESTING_GUIDE.md](docs/PAYMENT_TESTING_GUIDE.md) | 💳 金流測試指南 |
+| [PAYMENTS.md](docs/PAYMENTS.md) | 💳 支付系統完整文件（規劃/測試/報告） |
 
 ### 部署與維護
 
@@ -546,4 +588,4 @@ streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 
 ---
 
-*最後更新：2025-12-01*
+*最後更新：2025-12-07*
