@@ -126,6 +126,23 @@ function HomeContent() {
           clearFilters={clearFilters}
         />
 
+        {/* 🆕 升級 CTA - 免費用戶看到 28 筆課程後的升級提示 */}
+        {user && !user.user_metadata?.subscription_tier && !search && !hasTagFilter && (
+          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-6 text-center">
+            <div className="text-3xl mb-3">🏔️</div>
+            <h3 className="text-lg font-bold text-white mb-2">想學習進階技巧？</h3>
+            <p className="text-sm text-zinc-300 mb-4">
+              升級到 PRO 解鎖 154+ 進階課程，掌握黑道、野雪等高難度技能
+            </p>
+            <Link
+              href="/pricing"
+              className="inline-block px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-900 font-bold rounded-lg hover:shadow-lg hover:shadow-amber-500/50 transition-all transform hover:scale-105"
+            >
+              查看 PRO 方案 →
+            </Link>
+          </div>
+        )}
+
         {/* 回報入口 */}
         <div className="text-center pt-4 pb-8">
           <Link href="/feedback" className="text-zinc-500 text-sm hover:text-zinc-300">
