@@ -29,16 +29,14 @@ export const SKILL_RECOMMENDATIONS: Record<string, string[]> = {
 
 // 問題分類
 export const PROBLEM_CATEGORIES = [
-  { id: 'heel', label: '後刃問題', keywords: ['後刃', '後腳', '後膝'], emoji: '🦶', isPro: false },
-  { id: 'toe', label: '前刃問題', keywords: ['前刃', '前腳', '前膝', '前腿'], emoji: '👣', isPro: false },
-  { id: 'edge', label: '換刃卡卡', keywords: ['換刃', '換邊', '轉換'], emoji: '🔄', isPro: false },
-  { id: 'balance', label: '重心不穩', keywords: ['重心', '平衡', '居中'], emoji: '⚖️', isPro: false },
-  { id: 'speed', label: '速度控制', keywords: ['控速', '減速', '煞車', '太快'], emoji: '🏂', isPro: false },
-  { id: 'mogul', label: '蘑菇地形', keywords: ['蘑菇', '包', 'mogul'], emoji: '🍄', isPro: false },
-  { id: 'steep', label: '陡坡技巧', keywords: ['陡坡', '黑道', '陡'], emoji: '⬇️', isPro: false },
-  { id: 'stance', label: '站姿調整', keywords: ['站姿', '姿勢', '站直'], emoji: '🧍', isPro: false },
-  // 🆕 進階技巧分類（PRO 專屬）
-  { id: 'pro_advanced', label: '進階技巧 🏔️', keywords: ['進階', '高級', '黑道', 'PRO'], emoji: '🔒', isPro: true },
+  { id: 'heel', label: '後刃問題', keywords: ['後刃', '後腳', '後膝'], emoji: '🦶' },
+  { id: 'toe', label: '前刃問題', keywords: ['前刃', '前腳', '前膝', '前腿'], emoji: '👣' },
+  { id: 'edge', label: '換刃卡卡', keywords: ['換刃', '換邊', '轉換'], emoji: '🔄' },
+  { id: 'balance', label: '重心不穩', keywords: ['重心', '平衡', '居中'], emoji: '⚖️' },
+  { id: 'speed', label: '速度控制', keywords: ['控速', '減速', '煞車', '太快'], emoji: '🏂' },
+  { id: 'mogul', label: '蘑菇地形', keywords: ['蘑菇', '包', 'mogul'], emoji: '🍄' },
+  { id: 'steep', label: '陡坡技巧', keywords: ['陡坡', '黑道', '陡'], emoji: '⬇️' },
+  { id: 'stance', label: '站姿調整', keywords: ['站姿', '姿勢', '站直'], emoji: '🧍' },
 ]
 
 // 訂閱方案

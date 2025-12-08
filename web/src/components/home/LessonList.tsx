@@ -1,6 +1,5 @@
 import LessonCard from '@/components/LessonCard';
 import { Lesson } from '@/lib/lessons';
-import { useAuth } from '@/components/AuthProvider';
 
 interface LessonListProps {
     loading: boolean;
@@ -23,7 +22,6 @@ export function LessonList({
     hasTagFilter,
     clearFilters,
 }: LessonListProps) {
-    const { subscription } = useAuth();
     const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
     const hasMore = filteredLessons.length > 10 && !showAll;
 
@@ -54,7 +52,6 @@ export function LessonList({
                             key={lesson.id}
                             lesson={lesson}
                             from={from}
-                            showLock={lesson.is_premium && !subscription.isActive}
                         />
                     ))}
                 </div>
