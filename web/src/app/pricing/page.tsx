@@ -175,8 +175,7 @@ export default function PricingPage() {
           label="免費版"
           features={[
             '✓ 28 堂初級課程（完整內容）',
-            '✓ 搜尋 / 篩選',
-            '✓ 試閱中級課程（僅問題區塊）',
+            '✓ 搜尋 / 篩選功能',
           ]}
         />
 
