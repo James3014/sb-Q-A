@@ -237,12 +237,12 @@ export default function PricingPage() {
         <div className="bg-zinc-800 rounded-lg p-4 mb-6">
           <h3 className="font-bold mb-3">📝 如何購買</h3>
           <ol className="text-sm text-zinc-300 space-y-2">
-            <li>1. 選擇方案</li>
-            <li>2. 聯繫我們完成付款</li>
-            <li>3. 提供註冊 Email：<span className="text-amber-400">{user?.email || '請先登入'}</span></li>
-            <li>4. 24 小時內開通</li>
+            <li>1. 登入帳號（Email：<span className="text-amber-400">{user?.email || '請先登入'}</span>）</li>
+            <li>2. 點選方案按鈕</li>
+            <li>3. 前往安全支付頁面完成付款</li>
+            <li>4. 付款成功後立即開通</li>
           </ol>
-          <p className="text-zinc-500 text-xs mt-3">付款方式請洽客服</p>
+          <p className="text-zinc-500 text-xs mt-3">支援信用卡、行動支付等多種付款方式</p>
         </div>
 
         {/* 支付進度模態視窗 */}
@@ -264,16 +264,20 @@ export default function PricingPage() {
           <h3 className="font-bold mb-3">常見問題</h3>
           <div className="space-y-3 text-sm">
             <div>
-              <p className="text-zinc-300">Q: 可以退款嗎？</p>
-              <p className="text-zinc-500">A: 購買後 7 天內可全額退款</p>
+              <p className="text-zinc-300">Q: 付款後多久開通？</p>
+              <p className="text-zinc-500">A: 付款成功後立即開通，可馬上使用所有功能</p>
             </div>
             <div>
               <p className="text-zinc-300">Q: PASS 到期後怎麼辦？</p>
-              <p className="text-zinc-500">A: 可續購或升級年費方案</p>
+              <p className="text-zinc-500">A: 可隨時續購或升級年費方案，不會遺失練習紀錄</p>
             </div>
             <div>
               <p className="text-zinc-300">Q: 會有新課程嗎？</p>
-              <p className="text-zinc-500">A: 會持續更新，PRO 年費用戶免費獲得</p>
+              <p className="text-zinc-500">A: 會持續更新課程內容，PRO 年費用戶可免費使用所有新增課程</p>
+            </div>
+            <div>
+              <p className="text-zinc-300">Q: 可以退款嗎？</p>
+              <p className="text-zinc-500">A: 如有問題請聯繫客服，我們會協助處理</p>
             </div>
           </div>
         </div>
