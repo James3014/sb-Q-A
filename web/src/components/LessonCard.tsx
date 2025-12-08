@@ -9,9 +9,10 @@ import { ProBadge } from '@/components/ui'
 interface LessonCardProps {
   lesson: Lesson
   from?: 'home' | 'search' | 'category' | 'related' | 'filter'
+  showLock?: boolean
 }
 
-export default function LessonCard({ lesson, from = 'home' }: LessonCardProps) {
+export default function LessonCard({ lesson, from = 'home', showLock = false }: LessonCardProps) {
   const cardRef = useCardAnimation()
   const levels = lesson.level_tags.map(t => LEVEL_NAMES[t] || t).join('/')
 
@@ -22,13 +23,32 @@ export default function LessonCard({ lesson, from = 'home' }: LessonCardProps) {
 
   return (
     <Link
-      href={`/lesson/${lesson.id}`}
+      href={showLock ? '/pricing' : `/lesson/${lesson.id}`}
       ref={cardRef}
       onClick={handleClick}
       data-lesson-id={lesson.id}
-      className="block relative opacity-0 mb-6 pt-2"
+      className={`block relative opacity-0 mb-6 pt-2 transition-all ${
+        showLock ? 'opacity-75 grayscale-[30%]' : 'hover:scale-105'
+      }`}
     >
       {lesson.is_premium && <ProBadge />}
+
+      {/* 🆕 鎖定徽章 */}
+      {lesson.is_premium && showLock && (
+        <div className="absolute top-4 right-4 z-20
+          px-3 py-1 rounded-full text-xs font-bold
+          bg-gradient-to-r from-amber-500 to-orange-500
+          text-zinc-900 shadow-lg shadow-amber-500/50
+          transform rotate-6 pointer-events-none
+        ">
+          🔒 PRO
+        </div>
+      )}
+
+      {/* 🆕 鎖定遮罩 */}
+      {showLock && (
+        <div className="absolute inset-0 bg-zinc-900/30 z-10 pointer-events-none rounded-2xl [clip-path:polygon(0_12px,12px_0,100%_0,100%_calc(100%-12px),calc(100%-12px)_100%,0_100%)]" />
+      )}
 
       <div className="
         velocity-shine lesson-card-pulse relative p-6 rounded-2xl

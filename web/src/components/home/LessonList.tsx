@@ -1,5 +1,6 @@
 import LessonCard from '@/components/LessonCard';
 import { Lesson } from '@/lib/lessons';
+import { useAuth } from '@/components/AuthProvider';
 
 interface LessonListProps {
     loading: boolean;
@@ -22,6 +23,7 @@ export function LessonList({
     hasTagFilter,
     clearFilters,
 }: LessonListProps) {
+    const { subscription } = useAuth();
     const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
     const hasMore = filteredLessons.length > 10 && !showAll;
 
@@ -47,7 +49,14 @@ export function LessonList({
                 <p className="text-center text-zinc-500 py-8">找不到相關課程</p>
             ) : (
                 <div className="space-y-6">
-                    {displayLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} from={from} />)}
+                    {displayLessons.map(lesson => (
+                        <LessonCard
+                            key={lesson.id}
+                            lesson={lesson}
+                            from={from}
+                            showLock={lesson.is_premium && !subscription.isActive}
+                        />
+                    ))}
                 </div>
             )}
 
