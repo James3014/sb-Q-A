@@ -32,7 +32,7 @@ function HomeContent() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
   const searchTimer = useRef<NodeJS.Timeout>(null);
 
   // 資料載入完成後恢復滾動位置
@@ -127,12 +127,12 @@ function HomeContent() {
         />
 
         {/* 🆕 升級 CTA - 免費用戶看到 28 筆課程後的升級提示 */}
-        {user && !user.user_metadata?.subscription_tier && !search && !hasTagFilter && (
+        {user && !subscription.isActive && !search && !hasTagFilter && (
           <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-6 text-center">
             <div className="text-3xl mb-3">🏔️</div>
             <h3 className="text-lg font-bold text-white mb-2">想學習進階技巧？</h3>
             <p className="text-sm text-zinc-300 mb-4">
-              升級到 PRO 解鎖 154+ 進階課程，掌握黑道、野雪等高難度技能
+              升級到 PRO 解鎖 185+ 進階課程，掌握黑道、野雪等高難度技能
             </p>
             <Link
               href="/pricing"
