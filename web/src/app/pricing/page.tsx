@@ -174,7 +174,7 @@ export default function PricingPage() {
           price="$0"
           label="免費版"
           features={[
-            '✓ 28 堂初級課程',
+            '✓ 28 堂初級課程（完整內容）',
             '✓ 搜尋 / 篩選',
             '✓ 試閱中級課程（僅問題區塊）',
           ]}
@@ -238,7 +238,7 @@ export default function PricingPage() {
         <div className="bg-zinc-800 rounded-lg p-4 mb-6">
           <h3 className="font-bold mb-3">📝 如何購買</h3>
           <ol className="text-sm text-zinc-300 space-y-2">
-            <li>1. 登入帳號（Email：<span className="text-amber-400">{user?.email || '請先登入'}</span>）</li>
+            <li>1. {user ? '已登入' : '請先登入'}</li>
             <li>2. 點選方案按鈕</li>
             <li>3. 前往安全支付頁面完成付款</li>
             <li>4. 付款成功後立即開通</li>
