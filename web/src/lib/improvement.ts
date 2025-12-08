@@ -33,6 +33,21 @@ export interface ImprovementData {
   totalPractices: number
 }
 
+// 🆕 新增介面：技能練習頻率分析
+export interface SkillFrequency {
+  skill: string
+  practice_count: number
+  avg_rating: number
+  last_practice_date: string
+}
+
+// 🆕 新增介面：技能進步曲線資料點
+export interface ImprovementPoint {
+  date: string
+  avg_rating: number
+  practice_count: number
+}
+
 export async function getImprovementData(userId: string): Promise<ImprovementData | null> {
   const supabase = getSupabase()
   if (!supabase) return null
@@ -74,5 +89,59 @@ export async function getImprovementData(userId: string): Promise<ImprovementDat
     trend: trend.data || [],
     recentPractice,
     totalPractices: scores.data?.length || 0,
+  }
+}
+
+// 🆕 查詢函數：獲取技能練習頻率分析（過去 30 天）
+export async function getPracticeFrequencyBySkill(
+  userId: string,
+  days: number = 30
+): Promise<SkillFrequency[]> {
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  try {
+    const { data, error } = await supabase.rpc('get_practice_frequency_by_skill', {
+      p_user_id: userId,
+      p_days: days,
+    })
+
+    if (error) {
+      console.error('Error fetching practice frequency:', error)
+      return []
+    }
+
+    return data || []
+  } catch (err) {
+    console.error('Exception fetching practice frequency:', err)
+    return []
+  }
+}
+
+// 🆕 查詢函數：獲取單個技能的進步曲線（時間序列）
+export async function getSkillImprovementCurve(
+  userId: string,
+  skill: string,
+  days: number = 30
+): Promise<ImprovementPoint[]> {
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  try {
+    const { data, error } = await supabase.rpc('get_skill_improvement_curve', {
+      p_user_id: userId,
+      p_skill: skill,
+      p_days: days,
+    })
+
+    if (error) {
+      console.error('Error fetching skill curve:', error)
+      return []
+    }
+
+    return data || []
+  } catch (err) {
+    console.error('Exception fetching skill curve:', err)
+    return []
   }
 }
