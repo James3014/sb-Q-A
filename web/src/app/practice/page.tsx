@@ -105,7 +105,10 @@ export default function PracticePage() {
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [improvement, setImprovement] = useState<ImprovementData | null>(null)
   const [loadingData, setLoadingData] = useState(true)
-  const [tab, setTab] = useState<'dashboard' | 'logs'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'logs'>('logs')
+
+  // 🆕 調整③ 功能開關（Day 30 才啟用）
+  const enableAdjustment3 = process.env.NEXT_PUBLIC_ENABLE_ADJUSTMENT_3 === 'true'
 
   useEffect(() => {
     // 等待 auth 載入完成
@@ -142,12 +145,14 @@ export default function PracticePage() {
       <PageHeader title="練習中心" emoji="🏂" />
 
       <div className="flex border-b border-zinc-800">
-        <button
-          onClick={() => setTab('dashboard')}
-          className={`flex-1 py-3 text-sm font-medium ${tab === 'dashboard' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-zinc-400'}`}
-        >
-          📊 改善儀表板
-        </button>
+        {enableAdjustment3 && (
+          <button
+            onClick={() => setTab('dashboard')}
+            className={`flex-1 py-3 text-sm font-medium ${tab === 'dashboard' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-zinc-400'}`}
+          >
+            📊 改善儀表板
+          </button>
+        )}
         <button
           onClick={() => setTab('logs')}
           className={`flex-1 py-3 text-sm font-medium ${tab === 'logs' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-zinc-400'}`}
@@ -156,7 +161,7 @@ export default function PracticePage() {
         </button>
       </div>
 
-      {tab === 'dashboard' ? (
+      {enableAdjustment3 && tab === 'dashboard' ? (
         // 🆕 免費用戶 → 顯示預覽；PRO 用戶 → 顯示完整儀表板
         !subscription.isActive ? (
           <LockedDashboardPreview />
