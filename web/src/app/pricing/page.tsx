@@ -208,10 +208,10 @@ export default function PricingPage() {
             </button>
           </div>
           
-          <ul className="text-sm space-y-1">
+          <ul className="text-sm space-y-1 text-zinc-300">
             <li>✓ 全部 213 堂課程</li>
             <li>✓ 收藏功能</li>
-            <li>✓ 練習紀錄 / 自評 / 趨勢</li>
+            <li>✓ 練習紀錄 / 自評</li>
           </ul>
         </div>
 
@@ -225,8 +225,9 @@ export default function PricingPage() {
             '✓ 全部課程（213+）',
             '✓ 雪季更新內容',
             '✓ 收藏功能',
-            '✓ 練習紀錄 + 改善曲線',
-            '✓ 課程組合推薦（未來）',
+            '✓ 練習紀錄 / 自評',
+            '✓ 深度練習分析（進步曲線、頻率統計）',
+            '✓ 個人化學習建議',
           ]}
           onSelect={() => handleCheckout('pro_yearly')}
           loading={checkoutPlan === 'pro_yearly'}
@@ -242,7 +243,7 @@ export default function PricingPage() {
             <li>3. 前往安全支付頁面完成付款</li>
             <li>4. 付款成功後立即開通</li>
           </ol>
-          <p className="text-zinc-500 text-xs mt-3">支援信用卡、行動支付等多種付款方式</p>
+          <p className="text-zinc-500 text-xs mt-3">支援信用卡付款</p>
         </div>
 
         {/* 支付進度模態視窗 */}
