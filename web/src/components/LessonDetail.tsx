@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Lesson, getLessons, getRelatedLessons } from '@/lib/lessons'
 import { useAuth } from './AuthProvider'
 import { isFavorited, addFavorite, removeFavorite } from '@/lib/favorites'
@@ -8,6 +8,7 @@ import { addPracticeLog, getLessonPracticeLogs, PracticeLog, PracticeRatings } f
 import { getImprovementData, ImprovementData } from '@/lib/improvement'
 import { SKILL_RECOMMENDATIONS } from '@/lib/constants'
 import { useScrollDepth } from '@/hooks/useScrollDepth'
+import { useLessonDetailData } from '@/hooks/useLessonDetailData'
 import {
   LessonHeader,
   LessonTitle,
@@ -25,66 +26,28 @@ import {
 
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const { user, subscription } = useAuth()
-  const [isFav, setIsFav] = useState(false)
-  const [favLoading, setFavLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [showPracticeModal, setShowPracticeModal] = useState(false)
-  const [practiceLogs, setPracticeLogs] = useState<PracticeLog[]>([])
-  const [weakSkill, setWeakSkill] = useState<string | null>(null)
-  const [recommendations, setRecommendations] = useState<{ id: string; title: string }[]>([])
-  const [improvementData, setImprovementData] = useState<ImprovementData | null>(null)
-  const [relatedLessons, setRelatedLessons] = useState<{
-    prerequisite: { id: string; title: string } | null
-    next: { id: string; title: string } | null
-    similar: { id: string; title: string }[]
-  }>({ prerequisite: null, next: null, similar: [] })
 
   const isLocked = lesson.is_premium && !subscription.isActive
   const showActions = !!user && !isLocked
-  const isCompletedToday = practiceLogs[0] && new Date(practiceLogs[0].created_at).toDateString() === new Date().toDateString()
+
+  const {
+    relatedLessons,
+    isFav,
+    favLoading,
+    toggleFavorite,
+    practiceLogs,
+    improvementData,
+    weakSkill,
+    recommendations,
+    saving,
+    completePractice,
+    inlinePractice,
+    isCompletedToday,
+  } = useLessonDetailData(lesson, user)
 
   // 滾動深度追蹤
   useScrollDepth(lesson.id)
-
-  useEffect(() => {
-    getLessons().then(allLessons => {
-      const related = getRelatedLessons(lesson, allLessons)
-      setRelatedLessons({
-        prerequisite: related.prerequisite ? { id: related.prerequisite.id, title: related.prerequisite.title } : null,
-        next: related.next ? { id: related.next.id, title: related.next.title } : null,
-        similar: related.similar.map(l => ({ id: l.id, title: l.title }))
-      })
-
-      if (!user) return
-      
-      isFavorited(user.id, lesson.id).then(setIsFav)
-      getLessonPracticeLogs(user.id, lesson.id).then(setPracticeLogs)
-      
-      getImprovementData(user.id).then(improvement => {
-        setImprovementData(improvement)
-        if (improvement && improvement.skills.length > 0) {
-          const weak = improvement.skills.reduce((min, s) => s.score < min.score ? s : min, improvement.skills[0])
-          if (weak.score < 4) {
-            setWeakSkill(weak.skill)
-            const keywords = SKILL_RECOMMENDATIONS[weak.skill] || []
-            const recs = allLessons
-              .filter(l => l.id !== lesson.id && keywords.some(k => l.title.includes(k) || l.what?.includes(k)))
-              .slice(0, 3)
-              .map(l => ({ id: l.id, title: l.title }))
-            setRecommendations(recs)
-          }
-        }
-      })
-    })
-  }, [user, lesson.id])
-
-  const handleToggleFav = async () => {
-    if (!user || favLoading) return
-    setFavLoading(true)
-    const result = isFav ? await removeFavorite(user.id, lesson.id) : await addFavorite(user.id, lesson.id)
-    if (result.success) setIsFav(!isFav)
-    setFavLoading(false)
-  }
 
   const handleShare = async () => {
     const url = window.location.href
@@ -94,40 +57,6 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
     } else {
       await navigator.clipboard.writeText(url)
       alert('已複製連結！')
-    }
-  }
-
-  const handlePracticeComplete = async (note: string, ratings: PracticeRatings) => {
-    if (!user) return
-    setSaving(true)
-    const result = await addPracticeLog(user.id, lesson.id, note, ratings)
-    if (result.success) {
-      const [logs, improvement] = await Promise.all([
-        getLessonPracticeLogs(user.id, lesson.id),
-        getImprovementData(user.id)
-      ])
-      setPracticeLogs(logs)
-      setImprovementData(improvement)
-    }
-    setSaving(false)
-    setShowPracticeModal(false)
-  }
-
-  // 嵌入式評分卡提交
-  const handleInlinePractice = async (ratings: { r1: number; r2: number; r3: number }) => {
-    if (!user) return
-    const result = await addPracticeLog(user.id, lesson.id, '', { 
-      rating1: ratings.r1, 
-      rating2: ratings.r2, 
-      rating3: ratings.r3 
-    })
-    if (result.success) {
-      const [logs, improvement] = await Promise.all([
-        getLessonPracticeLogs(user.id, lesson.id),
-        getImprovementData(user.id)
-      ])
-      setPracticeLogs(logs)
-      setImprovementData(improvement)
     }
   }
 
@@ -149,7 +78,10 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             {user && subscription.isActive && (
               <>
                 <LessonPracticeCTA 
-                  onComplete={handlePracticeComplete}
+                  onComplete={async (note, ratings) => {
+                    await completePractice(note, ratings)
+                    setShowPracticeModal(false)
+                  }}
                   lastPractice={practiceLogs[0]}
                   saving={saving}
                   totalPractices={improvementData?.totalPractices}
@@ -185,9 +117,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           lessonId={lesson.id}
           isFav={isFav}
           favLoading={favLoading}
-          onToggleFav={handleToggleFav}
+          onToggleFav={toggleFavorite}
           onShare={handleShare}
-          onPractice={handleInlinePractice}
+          onPractice={inlinePractice}
           showPractice={subscription.isActive}
           isCompleted={isCompletedToday}
         />

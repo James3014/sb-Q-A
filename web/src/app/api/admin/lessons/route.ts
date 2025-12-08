@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseServiceRole } from '@/lib/supabaseServer'
+import { authorizeAdmin } from '@/lib/adminGuard'
 
 type LessonRow = {
   id: string
@@ -8,24 +8,9 @@ type LessonRow = {
   level_tags: string[] | null
 }
 
-function requireToken(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  return authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
-}
-
 export async function GET(req: NextRequest) {
-  const supabase = getSupabaseServiceRole()
-  if (!supabase) return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
-
-  const token = requireToken(req)
-  if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 })
-
-  const { data: userResult, error: userError } = await supabase.auth.getUser(token)
-  if (userError || !userResult?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const callerId = userResult.user.id
-  const { data: caller } = await supabase.from('users').select('is_admin').eq('id', callerId).single()
-  if (!caller?.is_admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const { supabase, error } = await authorizeAdmin(req)
+  if (error) return error
 
   const [{ data: lessons }, { data: views }, { data: practices }, { data: favorites }, effectiveness, scrollData, startData, completeData] =
     await Promise.all([

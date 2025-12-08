@@ -1,9 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { getSupabase } from './supabase'
-
-// 管理員 email 白名單
-const ADMIN_EMAILS = ['liligogo523@gmail.com']
+import { isAdminUser } from './adminAuth'
 
 export function useAdminAuth() {
   const [loading, setLoading] = useState(true)
@@ -23,7 +21,7 @@ export function useAdminAuth() {
         return
       }
 
-      setIsAuthorized(ADMIN_EMAILS.includes(user.email || ''))
+      setIsAuthorized(isAdminUser(user))
       setLoading(false)
     }
     check()

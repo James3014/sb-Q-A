@@ -1,34 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SUBSCRIPTION_PLANS } from '@/lib/constants'
-import { getSupabaseServiceRole } from '@/lib/supabaseServer'
+import { authorizeAdmin } from '@/lib/adminGuard'
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseServiceRole()
-  if (!supabase) {
-    return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
-  }
-
-  const authHeader = req.headers.get('authorization')
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
-  if (!token) {
-    return NextResponse.json({ error: 'Missing token' }, { status: 401 })
-  }
-
-  const { data: userResult, error: userError } = await supabase.auth.getUser(token)
-  if (userError || !userResult?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const callerId = userResult.user.id
-  const { data: caller } = await supabase
-    .from('users')
-    .select('is_admin')
-    .eq('id', callerId)
-    .single()
-
-  if (!caller?.is_admin) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  const { supabase, error: authError } = await authorizeAdmin(req)
+  if (authError) return authError
 
   const body = await req.json().catch(() => null) as { userId?: string; planId?: string } | null
   if (!body?.userId || !body?.planId) {
@@ -42,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   const expiresAt = new Date(Date.now() + plan.days * 24 * 60 * 60 * 1000).toISOString()
 
-  const { error } = await supabase
+  const { error: updateError } = await supabase
     .from('users')
     .update({
       subscription_type: plan.id,
@@ -50,9 +26,10 @@ export async function POST(req: NextRequest) {
     })
     .eq('id', body.userId)
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true, expiresAt, plan: plan.id })
 }
+

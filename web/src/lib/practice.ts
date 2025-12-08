@@ -1,7 +1,7 @@
 'use client'
 
-import { getSupabase } from './supabase'
 import { trackEvent } from './analytics'
+import { getClientOrThrow, getSessionOrThrow, logSupabaseError, SupabaseAuthError, SupabaseConfigError } from './supabaseClient'
 
 export interface PracticeLog {
   id: string
@@ -28,41 +28,39 @@ export function getAvgRating(log: PracticeLog): number | null {
 }
 
 export async function getPracticeLogs(userId: string): Promise<PracticeLog[]> {
-  const supabase = getSupabase()
-  if (!supabase) return []
-  
-  const { data, error } = await supabase
-    .from('practice_logs')
-    .select('id, lesson_id, note, rating, rating1, rating2, rating3, created_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-  
-  if (error) {
-    console.error('[Practice] getPracticeLogs error:', error.message)
+  try {
+    const supabase = getClientOrThrow('Practice.getPracticeLogs')
+    const { data, error } = await supabase
+      .from('practice_logs')
+      .select('id, lesson_id, note, rating, rating1, rating2, rating3, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    return (data as PracticeLog[]) || []
+  } catch (error) {
+    logSupabaseError('Practice.getPracticeLogs', error)
     return []
   }
-  
-  return (data as PracticeLog[]) || []
 }
 
 export async function getLessonPracticeLogs(userId: string, lessonId: string): Promise<PracticeLog[]> {
-  const supabase = getSupabase()
-  if (!supabase) return []
-  
-  const { data, error } = await supabase
-    .from('practice_logs')
-    .select('id, lesson_id, note, rating, rating1, rating2, rating3, created_at')
-    .eq('user_id', userId)
-    .eq('lesson_id', lessonId)
-    .order('created_at', { ascending: false })
-    .limit(5)
-  
-  if (error) {
-    console.error('[Practice] getLessonPracticeLogs error:', error.message)
+  try {
+    const supabase = getClientOrThrow('Practice.getLessonPracticeLogs')
+    const { data, error } = await supabase
+      .from('practice_logs')
+      .select('id, lesson_id, note, rating, rating1, rating2, rating3, created_at')
+      .eq('user_id', userId)
+      .eq('lesson_id', lessonId)
+      .order('created_at', { ascending: false })
+      .limit(5)
+    
+    if (error) throw error
+    return (data as PracticeLog[]) || []
+  } catch (error) {
+    logSupabaseError('Practice.getLessonPracticeLogs', error)
     return []
   }
-  
-  return (data as PracticeLog[]) || []
 }
 
 export async function addPracticeLog(
@@ -71,40 +69,39 @@ export async function addPracticeLog(
   note: string,
   ratings?: PracticeRatings
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabase()
-  if (!supabase) return { success: false, error: 'Supabase 未設定' }
-  
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) {
-    return { success: false, error: '請先登入' }
-  }
+  try {
+    const { client } = await getSessionOrThrow('Practice.addPracticeLog')
 
-  const avgRating = ratings 
-    ? Math.round((ratings.rating1 + ratings.rating2 + ratings.rating3) / 3)
-    : null
-  
-  const { error } = await supabase
-    .from('practice_logs')
-    .insert({ 
-      user_id: userId, 
-      lesson_id: lessonId, 
-      note,
-      rating: avgRating,
-      rating1: ratings?.rating1 || null,
-      rating2: ratings?.rating2 || null,
-      rating3: ratings?.rating3 || null,
+    const avgRating = ratings 
+      ? Math.round((ratings.rating1 + ratings.rating2 + ratings.rating3) / 3)
+      : null
+    
+    const { error } = await client
+      .from('practice_logs')
+      .insert({ 
+        user_id: userId, 
+        lesson_id: lessonId, 
+        note,
+        rating: avgRating,
+        rating1: ratings?.rating1 || null,
+        rating2: ratings?.rating2 || null,
+        rating3: ratings?.rating3 || null,
+      })
+    
+    if (error) throw error
+    
+    // 發送事件到 analytics（會同步到 user-core）
+    trackEvent('practice_complete', lessonId, {
+      rating: avgRating || 3,  // 傳送評分，如果沒有則預設 3
+      note: note,
     })
-  
-  if (error) {
-    console.error('[Practice] addPracticeLog error:', error.message)
-    return { success: false, error: error.message }
+    
+    return { success: true }
+  } catch (error) {
+    if (error instanceof SupabaseConfigError || error instanceof SupabaseAuthError) {
+      return { success: false, error: error.message }
+    }
+    logSupabaseError('Practice.addPracticeLog', error)
+    return { success: false, error: error instanceof Error ? error.message : '未知錯誤' }
   }
-  
-  // 發送事件到 analytics（會同步到 user-core）
-  trackEvent('practice_complete', lessonId, {
-    rating: avgRating || 3,  // 傳送評分，如果沒有則預設 3
-    note: note,
-  })
-  
-  return { success: true }
 }

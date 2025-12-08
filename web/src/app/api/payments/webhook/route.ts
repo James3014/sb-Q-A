@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHmac } from 'crypto'
 import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 import { SUBSCRIPTION_PLANS } from '@/lib/constants'
 import {
@@ -53,10 +54,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
   }
 
+  const webhookSecret = process.env.PAYMENT_WEBHOOK_SECRET
+  const signature = req.headers.get('x-webhook-signature')
+  const rawBodyText = webhookSecret ? await req.text() : null
+
+  let rawBody: Record<string, unknown> | null = null
+  try {
+    rawBody = (rawBodyText ? JSON.parse(rawBodyText || '{}') : await req.json()) as Record<string, unknown> | null
+  } catch {
+    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
+  }
+
+  if (webhookSecret) {
+    if (!signature || !rawBodyText) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 })
+    }
+    const expected = createHmac('sha256', webhookSecret).update(rawBodyText).digest('hex')
+    if (expected !== signature) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+    }
+  }
+
   const provider = process.env.PAYMENT_PROVIDER || 'mock'
 
   let webhookPayload: WebhookPayload | null = null
-  const rawBody = (await req.json().catch(() => null)) as Record<string, unknown> | null
 
   if (!rawBody) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })

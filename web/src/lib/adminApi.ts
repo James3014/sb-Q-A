@@ -1,14 +1,17 @@
-import { getSupabase } from './supabase'
+import { getSessionOrThrow, logSupabaseError } from './supabaseClient'
 
 interface ApiError {
   error?: string
 }
 
 async function getToken() {
-  const supabase = getSupabase()
-  if (!supabase) return null
-  const { data: sessionData } = await supabase.auth.getSession()
-  return sessionData.session?.access_token || null
+  try {
+    const { session } = await getSessionOrThrow('AdminApi.getToken')
+    return session.access_token || null
+  } catch (error) {
+    logSupabaseError('AdminApi.getToken', error)
+    return null
+  }
 }
 
 export async function adminGet<T>(path: string): Promise<T | null> {
