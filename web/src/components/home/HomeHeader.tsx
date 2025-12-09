@@ -28,8 +28,41 @@ export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: Hom
                         {snowMode ? '☀️' : '❄️'}
                     </button>
                     <Link href="/feedback" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="意見回報">💬</Link>
-                    {user && <Link href="/practice" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">📝</Link>}
-                    {user && <Link href="/favorites" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">❤️</Link>}
+                    
+                    {/* 練習紀錄 - 總是顯示，未登入時引導 */}
+                    {user ? (
+                        <Link href="/practice" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="練習紀錄">📝</Link>
+                    ) : (
+                        <button 
+                            onClick={() => {
+                                if (confirm('需要登入才能查看練習紀錄，是否前往登入？')) {
+                                    window.location.href = '/login'
+                                }
+                            }}
+                            className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" 
+                            title="練習紀錄"
+                        >
+                            📝
+                        </button>
+                    )}
+                    
+                    {/* 收藏 - 總是顯示，未登入時引導 */}
+                    {user ? (
+                        <Link href="/favorites" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="收藏">❤️</Link>
+                    ) : (
+                        <button 
+                            onClick={() => {
+                                if (confirm('需要登入才能查看收藏，是否前往登入？')) {
+                                    window.location.href = '/login'
+                                }
+                            }}
+                            className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" 
+                            title="收藏"
+                        >
+                            ❤️
+                        </button>
+                    )}
+                    
                     {user ? (
                         <button onClick={() => signOut()} className="h-11 px-3 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg active:scale-95 transition-all">登出</button>
                     ) : (
