@@ -75,21 +75,21 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
                 if (confirm('需要登入才能收藏課程，是否前往登入？')) {
                   window.location.href = '/login'
                 }
-              } else if (isLocked) {
-                if (confirm('需要訂閱才能收藏 PRO 課程，是否查看方案？')) {
+              } else if (!subscription.isActive) {
+                if (confirm('需要訂閱才能使用收藏功能，是否查看方案？')) {
                   window.location.href = '/pricing'
                 }
               } else {
                 toggleFavorite()
               }
             }}
-            disabled={favLoading && !!user && !isLocked}
+            disabled={favLoading && !!user && subscription.isActive}
             className={`
               flex-1 h-12 rounded-xl
               text-sm font-bold tracking-wide
               flex items-center justify-center gap-2
               border-2 transition-all active:scale-95
-              ${!user || isLocked
+              ${!user || !subscription.isActive
                 ? 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-600'
                 : isFav
                   ? 'bg-gradient-to-r from-red-500/20 to-pink-500/20 border-red-400/50 text-red-300'
@@ -97,7 +97,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               }
             `}
           >
-            {favLoading && user && !isLocked ? '⏳' : isFav && user && !isLocked ? '❤️ 已收藏' : '🤍 收藏'}
+            {favLoading && user && subscription.isActive ? '⏳' : isFav && user && subscription.isActive ? '❤️ 已收藏' : '🤍 收藏'}
           </button>
 
           <button
