@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, Suspense, useRef, useMemo } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getLessons, Lesson } from '@/lib/lessons';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/auth';
 import { useFilteredLessons } from '@/lib/useFilteredLessons';
+import { useAccessibleLessons } from '@/hooks/useAccessibleLessons';
 import { trackEvent } from '@/lib/analytics';
 import { PageContainer } from '@/components/ui';
 import { useHomePersistence } from '@/hooks/useHomePersistence';
@@ -31,7 +32,6 @@ function HomeContent() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
   const { user, subscription } = useAuth();
   const searchTimer = useRef<NodeJS.Timeout>(null);
 
@@ -70,32 +70,18 @@ function HomeContent() {
     skillFilter,
   });
 
-  // 課程顯示邏輯：訂閱用戶看全部，未訂閱只看初級
-  const displayableLessons = useMemo(() => {
-    if (subscription.isActive) {
-      // 已訂閱：顯示所有課程
-      return filteredLessons;
-    } else {
-      // 未訂閱：只顯示初級課程（不管 is_premium 狀態）
-      const beginnerLessons = filteredLessons.filter(lesson => 
-        lesson.level_tags?.includes('beginner')
-      );
-      console.log(`[displayableLessons] 初級課程數量: ${beginnerLessons.length}`);
-      return beginnerLessons;
-    }
-  }, [filteredLessons, subscription.isActive]);
+  const accessibleLessons = useAccessibleLessons(filteredLessons, subscription);
 
   // 追蹤搜尋無結果
   useEffect(() => {
-    if (search.length >= 2 && displayableLessons.length === 0 && !loading) {
+    if (search.length >= 2 && accessibleLessons.length === 0 && !loading) {
       trackEvent('search_no_result', undefined, { keyword: search });
     }
-  }, [search, filteredLessons.length, loading]);
+  }, [search, accessibleLessons.length, loading]);
 
   const clearFilters = () => {
     setSearch('');
     setSelectedCategory(null);
-    setShowAll(false);
   };
 
   return (
@@ -105,7 +91,6 @@ function HomeContent() {
         subscription={subscription}
         search={search}
         setSearch={setSearch}
-        setShowAll={setShowAll}
         signOut={signOut}
       />
 
@@ -127,15 +112,12 @@ function HomeContent() {
           <ProblemCategories
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
-            setShowAll={setShowAll}
           />
         )}
 
         <LessonList
           loading={loading}
-          filteredLessons={displayableLessons}
-          showAll={showAll}
-          setShowAll={setShowAll}
+          filteredLessons={accessibleLessons}
           search={search}
           selectedCategory={selectedCategory}
           hasTagFilter={hasTagFilter}

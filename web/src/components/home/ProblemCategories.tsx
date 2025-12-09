@@ -3,10 +3,9 @@ import { PROBLEM_CATEGORIES } from '@/lib/constants';
 interface ProblemCategoriesProps {
     selectedCategory: string | null;
     setSelectedCategory: (id: string | null) => void;
-    setShowAll: (show: boolean) => void;
 }
 
-export function ProblemCategories({ selectedCategory, setSelectedCategory, setShowAll }: ProblemCategoriesProps) {
+export function ProblemCategories({ selectedCategory, setSelectedCategory }: ProblemCategoriesProps) {
     // Priority 2: 定義優先按鈕（最常見問題）
     const PRIORITY_CATEGORIES = ['heel', 'toe'];
 
@@ -31,7 +30,6 @@ export function ProblemCategories({ selectedCategory, setSelectedCategory, setSh
                             key={cat.id}
                             onClick={() => {
                                 setSelectedCategory(isSelected ? null : cat.id);
-                                setShowAll(false);
                                 // 觸覺回饋
                                 if (navigator.vibrate) navigator.vibrate(10);
                             }}

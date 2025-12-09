@@ -1,3 +1,6 @@
+// 課程訪問控制
+export const FREE_LESSON_PREVIEW_COUNT = 5
+
 // 程度標籤
 export const LEVEL_NAMES: Record<string, string> = {
   beginner: '初級',
