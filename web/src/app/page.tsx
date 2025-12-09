@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getLessons, Lesson } from '@/lib/lessons';
@@ -70,9 +70,22 @@ function HomeContent() {
     skillFilter,
   });
 
+  // 未登入或未訂閱用戶只顯示初級課程
+  const displayableLessons = useMemo(() => {
+    if (user && subscription.isActive) {
+      // 已訂閱：顯示所有課程
+      return filteredLessons;
+    } else {
+      // 未登入或未訂閱：只顯示初級課程（beginner）
+      return filteredLessons.filter(lesson => 
+        lesson.level_tags?.includes('beginner')
+      );
+    }
+  }, [filteredLessons, user, subscription.isActive]);
+
   // 追蹤搜尋無結果
   useEffect(() => {
-    if (search.length >= 2 && filteredLessons.length === 0 && !loading) {
+    if (search.length >= 2 && displayableLessons.length === 0 && !loading) {
       trackEvent('search_no_result', undefined, { keyword: search });
     }
   }, [search, filteredLessons.length, loading]);
@@ -118,7 +131,7 @@ function HomeContent() {
 
         <LessonList
           loading={loading}
-          filteredLessons={filteredLessons}
+          filteredLessons={displayableLessons}
           showAll={showAll}
           setShowAll={setShowAll}
           search={search}
