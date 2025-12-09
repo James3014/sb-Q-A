@@ -25,9 +25,9 @@ export function LessonList({
     clearFilters,
     user,
 }: LessonListProps) {
-    // 未登入只顯示 5 堂，已登入顯示全部
-    const displayLessons = (!user && !showAll) ? filteredLessons.slice(0, 5) : filteredLessons;
-    const hasMore = !user && filteredLessons.length > 5 && !showAll;
+    // 未登入永遠只顯示 5 堂，已登入顯示全部
+    const displayLessons = user ? filteredLessons : filteredLessons.slice(0, 5);
+    const hasMore = !user && filteredLessons.length > 5;
 
     // 判斷來源
     const from = search ? 'search' : selectedCategory ? 'category' : hasTagFilter ? 'filter' : 'home';
@@ -62,17 +62,9 @@ export function LessonList({
             )}
 
             {hasMore && (
-                <button
-                    onClick={() => setShowAll(true)}
-                    className="w-full mt-4 py-3 bg-zinc-800 rounded-lg text-sm text-zinc-300 hover:bg-zinc-700"
-                >
-                    顯示更多課程（登入後可看全部 28 堂初級課程）
-                </button>
-            )}
-            
-            {!user && showAll && filteredLessons.length > 5 && (
                 <div className="mt-4 p-4 bg-blue-900/20 border border-blue-700/30 rounded-lg text-center">
                     <p className="text-sm text-blue-300 mb-3">
+                        還有 {filteredLessons.length - 5} 堂初級課程<br/>
                         登入後可查看全部 28 堂初級課程
                     </p>
                     <button
