@@ -1,5 +1,6 @@
 import LessonCard from '@/components/LessonCard';
 import { Lesson } from '@/lib/lessons';
+import { User } from '@supabase/supabase-js';
 
 interface LessonListProps {
     loading: boolean;
@@ -10,6 +11,7 @@ interface LessonListProps {
     selectedCategory: string | null;
     hasTagFilter: boolean;
     clearFilters: () => void;
+    user: User | null;
 }
 
 export function LessonList({
@@ -21,9 +23,12 @@ export function LessonList({
     selectedCategory,
     hasTagFilter,
     clearFilters,
+    user,
 }: LessonListProps) {
-    const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, 10);
-    const hasMore = filteredLessons.length > 10 && !showAll;
+    // 未登入只顯示 5 堂，已登入顯示 10 堂
+    const initialDisplayCount = user ? 10 : 5;
+    const displayLessons = showAll ? filteredLessons : filteredLessons.slice(0, initialDisplayCount);
+    const hasMore = filteredLessons.length > initialDisplayCount && !showAll;
 
     // 判斷來源
     const from = search ? 'search' : selectedCategory ? 'category' : hasTagFilter ? 'filter' : 'home';
@@ -59,10 +64,18 @@ export function LessonList({
 
             {hasMore && (
                 <button
-                    onClick={() => setShowAll(true)}
+                    onClick={() => {
+                        if (!user) {
+                            if (confirm('登入後可查看更多課程，是否前往登入？')) {
+                                window.location.href = '/login'
+                            }
+                        } else {
+                            setShowAll(true)
+                        }
+                    }}
                     className="w-full mt-4 py-3 bg-zinc-800 rounded-lg text-sm text-zinc-300 hover:bg-zinc-700"
                 >
-                    顯示全部 {filteredLessons.length} 筆
+                    {user ? `顯示全部 ${filteredLessons.length} 筆` : '登入查看更多課程'}
                 </button>
             )}
         </section>

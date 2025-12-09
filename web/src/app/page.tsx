@@ -125,6 +125,7 @@ function HomeContent() {
           selectedCategory={selectedCategory}
           hasTagFilter={hasTagFilter}
           clearFilters={clearFilters}
+          user={user}
         />
 
         {/* 🆕 升級 CTA - 免費用戶看到 28 筆課程後的升級提示 */}
