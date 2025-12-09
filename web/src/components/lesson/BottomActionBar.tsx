@@ -14,6 +14,8 @@ interface Props {
   onPractice: (ratings: { r1: number; r2: number; r3: number }) => Promise<void>
   showPractice: boolean
   isCompleted?: boolean
+  isLoggedIn?: boolean
+  isLocked?: boolean
 }
 
 export function BottomActionBar({
@@ -24,7 +26,9 @@ export function BottomActionBar({
   onShare,
   onPractice,
   showPractice,
-  isCompleted
+  isCompleted,
+  isLoggedIn = true,
+  isLocked = false
 }: Props) {
   const [showCard, setShowCard] = useState(false)
 
@@ -108,8 +112,26 @@ export function BottomActionBar({
             </button>
           </div>
 
-          {/* 主按鈕（完成練習） */}
-          {showPractice && (
+          {/* 主按鈕（完成練習 或 解鎖 PRO） */}
+          {isLocked ? (
+            <button
+              onClick={() => {
+                vibrate([50, 30, 50])
+                window.location.href = '/pricing'
+              }}
+              className="
+                velocity-shine
+                w-full h-14
+                rounded-2xl
+                font-bold text-lg tracking-wide
+                transition-all
+                active:scale-[0.98]
+                bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30
+              "
+            >
+              🔓 解鎖 PRO 課程
+            </button>
+          ) : showPractice ? (
             <button
               onClick={handlePracticeClick}
               className={`
@@ -127,7 +149,7 @@ export function BottomActionBar({
             >
               {isCompleted ? '✓ 今天已練習' : '🏂 完成練習'}
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </>

@@ -29,7 +29,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const [showPracticeModal, setShowPracticeModal] = useState(false)
 
   const isLocked = lesson.is_premium && !subscription.isActive
-  const showActions = !!user && !isLocked
+  // 已登入時顯示底部操作欄（無論是否鎖定）
+  const showActions = !!user
 
   const {
     relatedLessons,
@@ -65,6 +66,67 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
       <article className="max-w-lg mx-auto px-4 py-6">
         <LessonHeader skill={lesson.casi?.Primary_Skill} title={lesson.title} />
         <LessonTitle lesson={lesson} />
+        
+        {/* 收藏和練習快捷按鈕 - 總是顯示，引導註冊/訂閱 */}
+        <div className="flex gap-3 mb-6">
+          <button
+            onClick={() => {
+              if (!user) {
+                if (confirm('需要登入才能收藏課程，是否前往登入？')) {
+                  window.location.href = '/login'
+                }
+              } else if (isLocked) {
+                if (confirm('需要訂閱才能收藏 PRO 課程，是否查看方案？')) {
+                  window.location.href = '/pricing'
+                }
+              } else {
+                toggleFavorite()
+              }
+            }}
+            disabled={favLoading && !!user && !isLocked}
+            className={`
+              flex-1 h-12 rounded-xl
+              text-sm font-bold tracking-wide
+              flex items-center justify-center gap-2
+              border-2 transition-all active:scale-95
+              ${!user || isLocked
+                ? 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-600'
+                : isFav
+                  ? 'bg-gradient-to-r from-red-500/20 to-pink-500/20 border-red-400/50 text-red-300'
+                  : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-600'
+              }
+            `}
+          >
+            {favLoading && user && !isLocked ? '⏳' : isFav && user && !isLocked ? '❤️ 已收藏' : '🤍 收藏'}
+          </button>
+
+          <button
+            onClick={() => {
+              if (!user) {
+                if (confirm('需要登入才能記錄練習，是否前往登入？')) {
+                  window.location.href = '/login'
+                }
+              } else if (!subscription.isActive) {
+                if (confirm('需要訂閱才能記錄練習，是否查看方案？')) {
+                  window.location.href = '/pricing'
+                }
+              } else {
+                setShowPracticeModal(true)
+              }
+            }}
+            className="
+              flex-1 h-12 rounded-xl
+              text-sm font-bold tracking-wide
+              flex items-center justify-center gap-2
+              bg-zinc-800 border-2 border-zinc-700
+              text-zinc-300 hover:border-zinc-600
+              transition-all active:scale-95
+            "
+          >
+            📝 練習紀錄
+          </button>
+        </div>
+        
         <LessonWhat what={lesson.what} />
 
         {isLocked ? (
@@ -122,6 +184,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           onPractice={inlinePractice}
           showPractice={subscription.isActive}
           isCompleted={isCompletedToday}
+          isLoggedIn={!!user}
+          isLocked={isLocked}
         />
       )}
     </main>
