@@ -87,6 +87,7 @@ function HomeContent() {
     <PageContainer>
       <HomeHeader
         user={user}
+        subscription={subscription}
         search={search}
         setSearch={setSearch}
         setShowAll={setShowAll}

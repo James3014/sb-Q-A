@@ -4,16 +4,18 @@ import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
 import { User } from '@supabase/supabase-js';
 import { useSnowMode } from '@/hooks/useSnowMode';
+import { Subscription } from '@/lib/subscription';
 
 interface HomeHeaderProps {
     user: User | null;
+    subscription: Subscription;
     search: string;
     setSearch: (value: string) => void;
     setShowAll: (value: boolean) => void;
     signOut: () => void;
 }
 
-export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: HomeHeaderProps) {
+export function HomeHeader({ user, subscription, search, setSearch, setShowAll, signOut }: HomeHeaderProps) {
     const { snowMode, toggle } = useSnowMode();
     
     return (
@@ -29,14 +31,20 @@ export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: Hom
                     </button>
                     <Link href="/feedback" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="意見回報">💬</Link>
                     
-                    {/* 練習紀錄 - 總是顯示，未登入時引導 */}
-                    {user ? (
+                    {/* 練習紀錄 - 總是顯示，未登入或未訂閱時引導 */}
+                    {user && subscription.isActive ? (
                         <Link href="/practice" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="練習紀錄">📝</Link>
                     ) : (
                         <button 
                             onClick={() => {
-                                if (confirm('需要登入才能查看練習紀錄，是否前往登入？')) {
-                                    window.location.href = '/login'
+                                if (!user) {
+                                    if (confirm('需要登入才能查看練習紀錄，是否前往登入？')) {
+                                        window.location.href = '/login'
+                                    }
+                                } else if (!subscription.isActive) {
+                                    if (confirm('需要訂閱才能使用練習紀錄功能，是否查看方案？')) {
+                                        window.location.href = '/pricing'
+                                    }
                                 }
                             }}
                             className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" 
@@ -46,14 +54,20 @@ export function HomeHeader({ user, search, setSearch, setShowAll, signOut }: Hom
                         </button>
                     )}
                     
-                    {/* 收藏 - 總是顯示，未登入時引導 */}
-                    {user ? (
+                    {/* 收藏 - 總是顯示，未登入或未訂閱時引導 */}
+                    {user && subscription.isActive ? (
                         <Link href="/favorites" className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" title="收藏">❤️</Link>
                     ) : (
                         <button 
                             onClick={() => {
-                                if (confirm('需要登入才能查看收藏，是否前往登入？')) {
-                                    window.location.href = '/login'
+                                if (!user) {
+                                    if (confirm('需要登入才能查看收藏，是否前往登入？')) {
+                                        window.location.href = '/login'
+                                    }
+                                } else if (!subscription.isActive) {
+                                    if (confirm('需要訂閱才能使用收藏功能，是否查看方案？')) {
+                                        window.location.href = '/pricing'
+                                    }
                                 }
                             }}
                             className="w-11 h-11 flex items-center justify-center text-xl hover:bg-zinc-800 rounded-lg active:scale-95 transition-all" 
