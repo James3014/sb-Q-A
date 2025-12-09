@@ -70,16 +70,18 @@ function HomeContent() {
     skillFilter,
   });
 
-  // 未訂閱用戶只顯示免費課程（is_premium = false）
+  // 課程顯示邏輯：訂閱用戶看全部，已登入看初級，未登入看 5 堂
   const displayableLessons = useMemo(() => {
-    if (user && subscription.isActive) {
+    if (subscription.isActive) {
       // 已訂閱：顯示所有課程
       return filteredLessons;
     } else {
-      // 未登入或未訂閱：只顯示免費課程
-      return filteredLessons.filter(lesson => !lesson.is_premium);
+      // 未訂閱：只顯示初級免費課程
+      return filteredLessons.filter(lesson => 
+        !lesson.is_premium && lesson.level_tags?.includes('beginner')
+      );
     }
-  }, [filteredLessons, user, subscription.isActive]);
+  }, [filteredLessons, subscription.isActive]);
 
   // 追蹤搜尋無結果
   useEffect(() => {
