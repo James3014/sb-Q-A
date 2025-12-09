@@ -34,6 +34,19 @@ export function BottomActionBar({
 
   const handleFav = () => {
     vibrate(20)
+    // 檢查是否已登入和訂閱
+    if (!isLoggedIn) {
+      if (confirm('需要登入才能收藏課程，是否前往登入？')) {
+        window.location.href = '/login'
+      }
+      return
+    }
+    if (isLocked || !showPractice) {
+      if (confirm('需要訂閱才能使用收藏功能，是否查看方案？')) {
+        window.location.href = '/pricing'
+      }
+      return
+    }
     onToggleFav()
   }
 
