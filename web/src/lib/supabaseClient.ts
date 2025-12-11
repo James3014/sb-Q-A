@@ -1,3 +1,13 @@
+/**
+ * Supabase 客戶端封裝層
+ *
+ * 使用指引：
+ * - getSupabase()       → 不需登入的讀取操作（lessons, 公開資料）
+ * - getClientOrThrow()  → 需要 Supabase 配置但不一定要登入
+ * - getSessionOrThrow() → 需要登入的操作（favorites, practice, payments）
+ * - getSupabaseServiceRole() → 伺服器端操作（webhook, admin API）
+ */
+
 import { SupabaseClient, Session } from '@supabase/supabase-js'
 import { getSupabase } from './supabase'
 
