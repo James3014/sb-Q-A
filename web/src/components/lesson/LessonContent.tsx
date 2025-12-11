@@ -1,4 +1,7 @@
+'use client'
+
 import Image from 'next/image'
+import DOMPurify from 'dompurify'
 
 export function LessonWhat({ what }: { what: string }) {
   return (
@@ -25,14 +28,21 @@ export function LessonSteps({ steps }: { steps: { text: string; image?: string |
   if (!steps?.length) return null
 
   // 格式化文字：粗體 + 換行 + 數字標題前斷行
+  // 使用 DOMPurify 淨化 HTML 防止 XSS 攻擊
   const formatText = (text: string) => {
-    return text
+    const html = text
       .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
       .replace(/\n/g, '<br/>')
       // 數字標題前加換行（1. 2. 3. 或 1、2、3、）
       .replace(/(\d+[\.\、:：]\s*)/g, '<br/><b>$1</b>')
       // 移除開頭多餘的 <br/>
       .replace(/^<br\/>/, '')
+
+    // 只允許安全的 HTML 標籤
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['b', 'br', 'strong', 'em', 'i'],
+      ALLOWED_ATTR: []
+    })
   }
 
   return (
