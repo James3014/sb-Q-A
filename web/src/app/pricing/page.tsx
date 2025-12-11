@@ -9,6 +9,7 @@ import { CheckoutModal } from '@/components/CheckoutModal'
 import { trackEvent } from '@/lib/analytics'
 import { getSupabase } from '@/lib/supabase'
 import { SubscriptionPlanId } from '@/lib/constants'
+import { TurnstileWidget } from '@/components/TurnstileWidget'
 
 function PlanCard({ 
   plan, 
@@ -67,6 +68,8 @@ export default function PricingPage() {
   const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanId | null>(null)
   const [modalStatus, setModalStatus] = useState<'pending' | 'processing' | 'success' | 'error' | null>(null)
   const [modalMessage, setModalMessage] = useState<string>('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const enableTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   useEffect(() => {
     trackEvent('pricing_view')
@@ -75,6 +78,12 @@ export default function PricingPage() {
   const handleCheckout = async (planId: SubscriptionPlanId) => {
     if (!user) {
       router.push('/login?redirect=/pricing')
+      return
+    }
+
+    if (enableTurnstile && !turnstileToken) {
+      setModalStatus('error')
+      setModalMessage('請完成驗證後再嘗試')
       return
     }
 
@@ -106,8 +115,9 @@ export default function PricingPage() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
+          ...(enableTurnstile && turnstileToken ? { 'x-turnstile-token': turnstileToken } : {}),
         },
-        body: JSON.stringify({ planId }),
+        body: JSON.stringify({ planId, turnstileToken }),
         credentials: 'include', // 帶著 cookie/auth 信息
       })
 
@@ -168,6 +178,12 @@ export default function PricingPage() {
       </header>
 
       <div className="p-4 max-w-lg mx-auto">
+        {enableTurnstile && (
+          <div className="mb-4">
+            <p className="text-sm text-zinc-400 mb-2">為防止機器人濫用，請完成驗證：</p>
+            <TurnstileWidget onToken={setTurnstileToken} />
+          </div>
+        )}
         
         <PlanCard 
           plan="free"

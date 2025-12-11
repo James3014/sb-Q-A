@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { signInWithEmail, signUpWithEmail } from '@/lib/auth'
+import { TurnstileWidget } from '@/components/TurnstileWidget'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -13,11 +14,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const enableTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
+
+    if (enableTurnstile && !turnstileToken) {
+      setError('請完成驗證後再試')
+      setLoading(false)
+      return
+    }
 
     const { error } = isLogin
       ? await signInWithEmail(email, password)
@@ -64,6 +73,10 @@ export default function LoginPage() {
             required
             minLength={6}
           />
+
+          {enableTurnstile && (
+            <TurnstileWidget onToken={setTurnstileToken} />
+          )}
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 

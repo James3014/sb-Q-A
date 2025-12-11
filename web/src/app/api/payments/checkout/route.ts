@@ -3,9 +3,11 @@ import { SUBSCRIPTION_PLANS } from '@/lib/constants'
 import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 import { createCheckoutSession } from '@/lib/payments'
 import { recordPurchaseEvent } from '@/lib/analyticsServer'
+import { verifyTurnstile } from '@/lib/botDefense'
 
 interface CheckoutBody {
   planId?: string
+  turnstileToken?: string
 }
 
 export async function POST(req: NextRequest) {
@@ -30,6 +32,14 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as CheckoutBody | null
   if (!body?.planId) {
     return NextResponse.json({ error: 'Missing planId' }, { status: 400 })
+  }
+
+  // 機器人防護（可選）
+  const turnstileHeader = req.headers.get('x-turnstile-token')
+  const turnstileToken = turnstileHeader || body.turnstileToken || null
+  const turnstileOk = await verifyTurnstile(turnstileToken)
+  if (!turnstileOk) {
+    return NextResponse.json({ error: 'Turnstile verification failed' }, { status: 400 })
   }
 
   const plan = SUBSCRIPTION_PLANS.find(p => p.id === body.planId)
