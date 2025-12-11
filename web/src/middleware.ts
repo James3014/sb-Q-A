@@ -43,5 +43,10 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/mock-checkout'],
+  matcher: [
+    '/admin/:path*',
+    '/mock-checkout/:path*',
+    '/payment-success/:path*',
+    '/payment-failure/:path*',
+  ],
 }

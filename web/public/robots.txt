@@ -1,0 +1,18 @@
+# 允許搜尋引擎爬取公開頁面
+User-Agent: *
+Allow: /
+
+# 禁止爬蟲訪問敏感頁面
+Disallow: /admin
+Disallow: /api
+Disallow: /mock-checkout
+Disallow: /payment-success
+Disallow: /payment-failure
+
+# 防止重複索引
+Disallow: /_next
+Disallow: /*.json$
+Disallow: /favicon.ico
+
+# Sitemap 位置
+Sitemap: https://www.snowskill.app/sitemap.xml
