@@ -134,6 +134,7 @@ export function resetConfig(): void {
  * 打印當前配置（用於調試）
  */
 export function printConfig(): void {
+  if (process.env.NODE_ENV !== 'development') return
   console.group('[UserCoreConfig] Current Configuration')
   console.log('API URL:', currentConfig.apiUrl)
   console.log('Timeout:', `${currentConfig.timeout}ms`)
@@ -156,6 +157,7 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     resetConfig,
     printConfig,
   }
+  // eslint-disable-next-line no-console
   console.log(
     '[UserCoreConfig] Config functions available at window.__userCoreConfig'
   )

@@ -51,10 +51,16 @@ function PaymentSuccessContent() {
 
         if (data.status === 'active') {
           // 先刷新訂閱狀態，確保狀態更新後再跳轉
-          console.log('[PaymentSuccess] Payment confirmed, refreshing subscription...')
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.log('[PaymentSuccess] Payment confirmed, refreshing subscription...')
+          }
           try {
             await refreshSubscription()
-            console.log('[PaymentSuccess] Subscription refreshed successfully')
+            if (process.env.NODE_ENV === 'development') {
+              // eslint-disable-next-line no-console
+              console.log('[PaymentSuccess] Subscription refreshed successfully')
+            }
           } catch (err) {
             console.error('[PaymentSuccess] Failed to refresh subscription:', err)
           }

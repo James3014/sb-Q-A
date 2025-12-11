@@ -51,7 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const sub = await getSubscription(userId)
       setSubscription(sub)
       setSubscriptionVersion(v => v + 1)  // 增加版本號，觸發依賴此值的組件重新載入
-      console.log('[AuthProvider] Subscription refreshed:', sub)
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('[AuthProvider] Subscription refreshed:', sub)
+      }
     } catch (err) {
       console.error('[AuthProvider] Failed to refresh subscription:', err)
     }
