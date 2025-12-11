@@ -1,27 +1,26 @@
 'use client'
-import { PageContainer } from '@/components/ui';
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { PageContainer } from '@/components/ui'
 import { useAuth } from '@/components/AuthProvider'
 import { CheckoutModal } from '@/components/CheckoutModal'
-import { trackEvent } from '@/lib/analytics'
-import { getSupabase } from '@/lib/supabase'
-import { SubscriptionPlanId } from '@/lib/constants'
 import { TurnstileWidget } from '@/components/TurnstileWidget'
+import { useCheckout } from '@/hooks/useCheckout'
+import { trackEvent } from '@/lib/analytics'
+import { SubscriptionPlanId } from '@/lib/constants'
 
-function PlanCard({ 
-  plan, 
-  price, 
-  label, 
-  features, 
+function PlanCard({
+  plan,
+  price,
+  label,
+  features,
   highlight,
   badge,
   onSelect,
   loading,
   disabled,
-}: { 
+}: {
   plan: string
   price: string
   label?: string
@@ -34,13 +33,13 @@ function PlanCard({
 }) {
   const clickable = !!onSelect
   return (
-    <div 
+    <div
       onClick={disabled ? undefined : onSelect}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
       className={`rounded-lg p-4 mb-4 transition-all ${
-        highlight 
-          ? 'bg-gradient-to-b from-amber-900/50 to-zinc-800 border border-amber-600/50' 
+        highlight
+          ? 'bg-gradient-to-b from-amber-900/50 to-zinc-800 border border-amber-600/50'
           : 'bg-zinc-800'
       } ${clickable ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
       style={{
@@ -64,93 +63,20 @@ function PlanCard({
 
 export default function PricingPage() {
   const { user, loading } = useAuth()
-  const router = useRouter()
-  const [checkoutPlan, setCheckoutPlan] = useState<SubscriptionPlanId | null>(null)
-  const [modalStatus, setModalStatus] = useState<'pending' | 'processing' | 'success' | 'error' | null>(null)
-  const [modalMessage, setModalMessage] = useState<string>('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const enableTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+  const {
+    checkoutPlan,
+    modalStatus,
+    modalMessage,
+    handleCheckout,
+    handleCloseModal,
+  } = useCheckout({ user, turnstileToken, enableTurnstile })
 
   useEffect(() => {
     trackEvent('pricing_view')
   }, [])
-
-  const handleCheckout = async (planId: SubscriptionPlanId) => {
-    if (!user) {
-      router.push('/login?redirect=/pricing')
-      return
-    }
-
-    if (enableTurnstile && !turnstileToken) {
-      setModalStatus('error')
-      setModalMessage('請完成驗證後再嘗試')
-      return
-    }
-
-    setCheckoutPlan(planId)
-    setModalStatus('pending')
-    setModalMessage('準備建立訂單...')
-    trackEvent('plan_selected', undefined, { plan: planId })
-
-    try {
-      // 直接使用 Supabase client 取得當前 session
-      const supabase = getSupabase()
-      if (!supabase) {
-        throw new Error('系統尚未設定 Supabase')
-      }
-
-      // 取得當前使用者的 session token
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      if (sessionError || !session?.access_token) {
-        throw new Error('無法取得認證 token，請重新登入')
-      }
-
-      // 更新模態窗口狀態
-      setModalStatus('processing')
-      setModalMessage('建立訂單中... 請稍候')
-
-      // 呼叫 API 並傳遞 Bearer token
-      const res = await fetch('/api/payments/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          ...(enableTurnstile && turnstileToken ? { 'x-turnstile-token': turnstileToken } : {}),
-        },
-        body: JSON.stringify({ planId, turnstileToken }),
-        credentials: 'include', // 帶著 cookie/auth 信息
-      })
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        const detail = body.detail || body.error || res.statusText
-        throw new Error(detail || '建立訂單失敗')
-      }
-
-      const data = await res.json()
-      if (data.checkoutUrl) {
-        setModalStatus('success')
-        setModalMessage('訂單建立成功！即將跳轉到支付頁面...')
-        // 添加短暫延遲以確保 UI 更新
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        window.location.href = data.checkoutUrl
-      } else {
-        throw new Error('訂單已建立，但缺少導向網址')
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '建立訂單失敗'
-      setModalStatus('error')
-      setModalMessage(message)
-      console.error('[Checkout] Error:', error)
-    } finally {
-      setCheckoutPlan(null)
-    }
-  }
-
-  const handleCloseModal = () => {
-    setModalStatus(null)
-    setModalMessage('')
-  }
 
   return (
     <PageContainer>
@@ -184,8 +110,8 @@ export default function PricingPage() {
             <TurnstileWidget onToken={setTurnstileToken} />
           </div>
         )}
-        
-        <PlanCard 
+
+        <PlanCard
           plan="free"
           price="$0"
           label="免費版"
@@ -199,7 +125,7 @@ export default function PricingPage() {
         <div className="bg-gradient-to-b from-blue-900/50 to-zinc-800 rounded-lg p-4 mb-4 border border-blue-600/50">
           <h3 className="font-bold mb-2 text-blue-400">短期 PASS</h3>
           <p className="text-zinc-400 text-sm mb-3">適合短期雪旅</p>
-          
+
           <div className="grid grid-cols-2 gap-3 mb-4">
             <button
               onClick={() => handleCheckout('pass_7')}
@@ -222,7 +148,7 @@ export default function PricingPage() {
               <p className="text-xs opacity-90">30 天方案</p>
             </button>
           </div>
-          
+
           <ul className="text-sm space-y-1 text-zinc-300">
             <li>✓ 全部 213 堂課程</li>
             <li>✓ 收藏功能</li>
@@ -230,7 +156,7 @@ export default function PricingPage() {
           </ul>
         </div>
 
-        <PlanCard 
+        <PlanCard
           plan="year"
           price="$690/年"
           label="PRO 年費"
