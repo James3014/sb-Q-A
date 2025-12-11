@@ -1,6 +1,18 @@
 'use client'
 
+import { captureException } from '@/lib/monitoring'
+
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  // 發送錯誤到監控服務
+  try {
+    captureException(error, {
+      digest: error.digest,
+      timestamp: new Date().toISOString(),
+    })
+  } catch (e) {
+    // 監控失敗，繼續顯示錯誤頁
+  }
+
   return (
     <html>
       <body className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-6">
