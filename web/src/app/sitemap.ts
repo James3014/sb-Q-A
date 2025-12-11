@@ -1,12 +1,21 @@
 import { MetadataRoute } from 'next'
-import { getLessons } from '@/lib/lessons'
+import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 
 const BASE_URL = 'https://www.snowskill.app'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    // 取得所有課程用於動態 URLs
-    const lessons = await getLessons()
+    // 使用服務角色客戶端取得所有課程（包括免費和付費）
+    const supabase = getSupabaseServiceRole()
+    if (!supabase) {
+      throw new Error('Cannot initialize Supabase service client')
+    }
+
+    const { data: lessons, error } = await supabase
+      .from('lessons')
+      .select('id, is_premium')
+
+    if (error) throw error
 
     // 靜態頁面
     const staticPages: MetadataRoute.Sitemap = [
@@ -49,9 +58,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]
 
     // 動態課程頁面
-    const lessonPages: MetadataRoute.Sitemap = lessons
-      .filter((lesson) => !lesson.is_premium) // 只包含免費課程在公開 sitemap
-      .map((lesson) => ({
+    const lessonPages: MetadataRoute.Sitemap = (lessons || [])
+      .filter((lesson: any) => !lesson.is_premium) // 只包含免費課程在公開 sitemap
+      .map((lesson: any) => ({
         url: `${BASE_URL}/lesson/${lesson.id}`,
         lastModified: new Date(),
         changeFrequency: 'monthly' as const,
