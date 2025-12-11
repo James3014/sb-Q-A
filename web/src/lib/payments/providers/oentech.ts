@@ -1,5 +1,54 @@
-import { CheckoutSessionInput, CheckoutSessionResult } from '@/lib/payments/types'
+import { CheckoutSessionInput, CheckoutSessionResult, WebhookPayload, ProviderStatus } from '@/lib/payments/types'
 import { PaymentConfig } from '@/lib/config/payments'
+import { PaymentProvider } from './types'
+
+interface OenTechWebhookPayload {
+  merchantId: string
+  id: string
+  success?: boolean
+  charged?: boolean
+  failed?: boolean
+  status?: string
+  message?: string
+  customId?: string
+  [key: string]: unknown
+}
+
+/**
+ * ŌEN Tech Webhook 解析（策略模式）
+ */
+export const oentechProvider: PaymentProvider = {
+  name: 'oentech',
+
+  canHandle(rawBody: Record<string, unknown>): boolean {
+    return 'merchantId' in rawBody
+  },
+
+  parseWebhook(rawBody: Record<string, unknown>): WebhookPayload {
+    const payload = rawBody as OenTechWebhookPayload
+    const customId = payload.customId as string | undefined
+    const oentechStatus = payload.status as string | undefined
+
+    let status: ProviderStatus = 'failed'
+    if (payload.success === true || oentechStatus === 'charged' || payload.charged === true) {
+      status = 'success'
+    } else if (oentechStatus === 'failed' || payload.failed === true) {
+      status = 'failed'
+    }
+
+    return {
+      paymentId: customId,
+      providerPaymentId: payload.id,
+      status,
+      reason: payload.message as string | undefined,
+      payload: payload,
+    }
+  },
+}
+
+/**
+ * ŌEN Tech Checkout Session 建立
+ */
 
 export async function createOenTechCheckoutSession(
   input: CheckoutSessionInput,

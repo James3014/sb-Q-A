@@ -10,43 +10,8 @@ import {
   validatePaymentPayload,
   logPaymentEvent,
 } from '@/lib/payments/webhookUtils'
-import { WebhookPayload, ProviderStatus, PaymentStatus } from '@/lib/payments/types'
-
-interface OenTechWebhookPayload {
-  merchantId: string
-  id: string
-  success?: boolean
-  charged?: boolean
-  failed?: boolean
-  status?: string
-  message?: string
-  customId?: string
-  [key: string]: unknown
-}
-
-/**
- * 解析 ŌEN Tech webhook 格式
- */
-function parseOenTechWebhook(rawBody: OenTechWebhookPayload): WebhookPayload {
-  const customId = rawBody.customId as string | undefined // 這是我們存的 paymentId
-  const oentechStatus = rawBody.status as string | undefined
-
-  // ŌEN Tech 狀態對應
-  let status: ProviderStatus = 'failed'
-  if (rawBody.success === true || oentechStatus === 'charged' || rawBody.charged === true) {
-    status = 'success'
-  } else if (oentechStatus === 'failed' || rawBody.failed === true) {
-    status = 'failed'
-  }
-
-  return {
-    paymentId: customId,
-    providerPaymentId: rawBody.id,
-    status,
-    reason: rawBody.message as string | undefined,
-    payload: rawBody,
-  }
-}
+import { PaymentStatus } from '@/lib/payments/types'
+import { parseWebhookPayload, getProviderName } from '@/lib/payments/providers'
 
 export async function POST(req: NextRequest) {
   const supabase = getSupabaseServiceRole()
@@ -75,22 +40,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const provider = process.env.PAYMENT_PROVIDER || 'mock'
-
-  let webhookPayload: WebhookPayload | null = null
-
   if (!rawBody) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
   }
 
-  // 判斷是哪個供應商的 webhook
-  if (provider === 'oentech' && 'merchantId' in rawBody) {
-    // ŌEN Tech webhook
-    webhookPayload = parseOenTechWebhook(rawBody as OenTechWebhookPayload)
-  } else {
-    // Generic webhook
-    webhookPayload = rawBody as WebhookPayload
-  }
+  // 使用策略模式解析 webhook（自動判斷供應商）
+  const webhookPayload = parseWebhookPayload(rawBody)
+  const provider = getProviderName(rawBody)
 
   if (!webhookPayload) {
     return NextResponse.json({ error: 'Failed to parse webhook' }, { status: 400 })
