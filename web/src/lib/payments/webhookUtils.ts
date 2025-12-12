@@ -73,7 +73,8 @@ export async function updateUserForStatus(
   planId: string,
   mappedStatus: PaymentStatus,
   referenceId: string | null,
-  provider: string
+  provider: string,
+  referralCode?: string
 ) {
   if (mappedStatus === 'active') {
     const { data: userProfile } = await supabase
@@ -84,15 +85,22 @@ export async function updateUserForStatus(
 
     const extendedExpiry = computeExtendedExpiry(planId, userProfile?.subscription_expires_at)
 
+    const updateData: any = {
+      subscription_type: planId,
+      subscription_expires_at: extendedExpiry,
+      payment_status: 'active',
+      last_payment_provider: provider,
+      last_payment_reference: referenceId,
+    }
+
+    // 如果有推廣來源，記錄到 trial_coupon_code
+    if (referralCode) {
+      updateData.trial_coupon_code = referralCode
+    }
+
     await supabase
       .from('users')
-      .update({
-        subscription_type: planId,
-        subscription_expires_at: extendedExpiry,
-        payment_status: 'active',
-        last_payment_provider: provider,
-        last_payment_reference: referenceId,
-      })
+      .update(updateData)
       .eq('id', userId)
     return
   }

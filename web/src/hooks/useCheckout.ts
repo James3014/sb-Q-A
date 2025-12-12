@@ -75,6 +75,9 @@ export function useCheckout({
       setModalStatus('processing')
       setModalMessage('建立訂單中... 請稍候')
 
+      // 獲取推廣來源
+      const referralCode = localStorage.getItem('referral_code') || undefined
+
       const res = await fetch('/api/payments/checkout', {
         method: 'POST',
         headers: {
@@ -82,7 +85,11 @@ export function useCheckout({
           'Authorization': `Bearer ${session.access_token}`,
           ...(enableTurnstile && turnstileToken ? { 'x-turnstile-token': turnstileToken } : {}),
         },
-        body: JSON.stringify({ planId, turnstileToken }),
+        body: JSON.stringify({ 
+          planId, 
+          turnstileToken,
+          referral_code: referralCode
+        }),
         credentials: 'include',
       })
 

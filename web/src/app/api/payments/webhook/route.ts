@@ -143,13 +143,16 @@ export async function POST(req: NextRequest) {
   const referenceId = providerPaymentId || payment.provider_payment_id
 
   if (mappedStatus === 'active' && payment.status !== 'active') {
+    const referralCode = payment.metadata?.referral_code || null
+    
     await updateUserForStatus(
       supabase,
       payment.user_id,
       plan.id,
       mappedStatus,
       referenceId,
-      provider
+      provider,
+      referralCode
     )
 
     // 11.1 檢測試用轉付費並記錄分潤

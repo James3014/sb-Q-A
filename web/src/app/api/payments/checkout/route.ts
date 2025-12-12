@@ -8,6 +8,7 @@ import { verifyTurnstile } from '@/lib/botDefense'
 interface CheckoutBody {
   planId?: string
   turnstileToken?: string
+  referral_code?: string
 }
 
 export async function POST(req: NextRequest) {
@@ -117,6 +118,7 @@ export async function POST(req: NextRequest) {
         metadata: {
           user_email: userEmail,
           previous_plan: existingPlan || 'free',
+          referral_code: body.referral_code || null,
           checkout_payload: session.payload || null,
         },
       })
