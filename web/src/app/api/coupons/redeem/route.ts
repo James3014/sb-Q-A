@@ -120,7 +120,16 @@ async function redeemCoupon(supabase: any, coupon: any, userId: string, ip: stri
     })
     .eq('id', userId)
 
-  if (userError) throw userError
+  if (userError) {
+    console.error('[Coupon] 用戶更新失敗:', userError)
+    if (userError.message?.includes('subscription_type_check')) {
+      throw new Error(`折扣碼方案「${coupon.plan_id}」無效，請聯繫客服處理`)
+    }
+    if (userError.message?.includes('violates check constraint')) {
+      throw new Error(`資料驗證失敗：${userError.message}，請聯繫客服並提供此錯誤訊息`)
+    }
+    throw new Error(`訂閱啟用失敗：${userError.message}，請稍後再試或聯繫客服`)
+  }
 
   // 記錄使用
   await supabase.from('coupon_usages').insert({
