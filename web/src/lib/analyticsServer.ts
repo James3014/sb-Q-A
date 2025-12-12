@@ -35,3 +35,21 @@ export async function recordPurchaseEvent(
 
   queueEventSync(userId, mapped, metadata)
 }
+
+export async function recordTrialActivation(
+  supabase: SupabaseClient,
+  userId: string,
+  metadata: Record<string, unknown>
+) {
+  try {
+    await supabase.from('event_log').insert({
+      user_id: userId,
+      event_type: 'trial_redeemed',
+      metadata,
+    })
+  } catch (error) {
+    console.error('[Analytics] failed to record trial event', error)
+  }
+
+  queueEventSync(userId, 'snowboard.trial.redeemed', metadata)
+}

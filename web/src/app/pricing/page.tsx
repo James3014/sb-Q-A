@@ -1,14 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { PageContainer } from '@/components/ui'
 import { useAuth } from '@/components/AuthProvider'
 import { CheckoutModal } from '@/components/CheckoutModal'
 import { TurnstileWidget } from '@/components/TurnstileWidget'
+import { CouponBanner } from '@/components/CouponBanner'
 import { useCheckout } from '@/hooks/useCheckout'
 import { trackEvent } from '@/lib/analytics'
 import { SubscriptionPlanId } from '@/lib/constants'
+import { getSupabase } from '@/lib/supabase'
+import { CouponValidationResult, CouponRedeemResult } from '@/types/coupon'
 
 function PlanCard({
   plan,
@@ -62,9 +66,16 @@ function PlanCard({
 }
 
 export default function PricingPage() {
-  const { user, loading } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const couponParam = searchParams.get('coupon')?.trim() || ''
+  const { user, loading, refreshSubscription } = useAuth()
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const enableTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+  const [couponResult, setCouponResult] = useState<CouponValidationResult | null>(null)
+  const [couponStatus, setCouponStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const [couponMessage, setCouponMessage] = useState<string | null>(null)
+  const [redeemingTrial, setRedeemingTrial] = useState(false)
 
   const {
     checkoutPlan,
@@ -73,6 +84,110 @@ export default function PricingPage() {
     handleCheckout,
     handleCloseModal,
   } = useCheckout({ user, turnstileToken, enableTurnstile })
+
+  const fetchAccessToken = useCallback(async () => {
+    const supabase = getSupabase()
+    if (!supabase) throw new Error('Supabase 未設定')
+    const { data, error } = await supabase.auth.getSession()
+    if (error) {
+      throw error
+    }
+    return data.session?.access_token || null
+  }, [])
+
+  useEffect(() => {
+    if (!couponParam) {
+      setCouponResult(null)
+      setCouponStatus('idle')
+      setCouponMessage(null)
+      return
+    }
+
+    let cancelled = false
+    const validate = async () => {
+      setCouponStatus('loading')
+      setCouponMessage('驗證折扣碼中...')
+      const token = user ? await fetchAccessToken().catch(() => null) : null
+
+      try {
+        const res = await fetch('/api/coupons/validate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ code: couponParam }),
+        })
+        const data: CouponValidationResult = await res.json()
+        if (cancelled) return
+        if (data.ok && data.coupon) {
+          setCouponResult(data)
+          setCouponStatus('ready')
+          setCouponMessage(`已套用 ${data.coupon.plan_label}`)
+        } else {
+          setCouponResult(null)
+          setCouponStatus('error')
+          setCouponMessage(data.error || '折扣碼無法使用')
+        }
+      } catch (err) {
+        if (cancelled) return
+        setCouponResult(null)
+        setCouponStatus('error')
+        setCouponMessage(err instanceof Error ? err.message : '折扣碼驗證失敗')
+      }
+    }
+
+    validate()
+    return () => {
+      cancelled = true
+    }
+  }, [couponParam, user?.id, fetchAccessToken])
+
+  const handleRedeemTrial = useCallback(async () => {
+    if (!couponResult?.coupon) return
+    if (!user) {
+      const redirectTarget = couponParam ? `/pricing?coupon=${encodeURIComponent(couponParam)}` : '/pricing'
+      router.push(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+      return
+    }
+
+    try {
+      setRedeemingTrial(true)
+      setCouponStatus('loading')
+      setCouponMessage('啟用試用中...')
+      const token = await fetchAccessToken()
+      if (!token) {
+        throw new Error('無法取得登入資訊，請重新登入')
+      }
+
+      const res = await fetch('/api/coupons/redeem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ code: couponResult.coupon.code }),
+      })
+      const data: CouponRedeemResult = await res.json()
+      if (!res.ok || !data.ok || !data.subscription) {
+        throw new Error(data.error || '啟用失敗')
+      }
+
+      setCouponStatus('ready')
+      setCouponMessage('免費試用已啟用！')
+      await refreshSubscription().catch(() => {})
+
+      const params = new URLSearchParams()
+      if (data.subscription.plan_label) params.set('plan', data.subscription.plan_label)
+      if (data.subscription.expires_at) params.set('expires', data.subscription.expires_at)
+      router.push(`/trial-success?${params.toString()}`)
+    } catch (err) {
+      setCouponStatus('error')
+      setCouponMessage(err instanceof Error ? err.message : '啟用失敗')
+    } finally {
+      setRedeemingTrial(false)
+    }
+  }, [couponResult, user, couponParam, router, fetchAccessToken, refreshSubscription])
 
   useEffect(() => {
     trackEvent('pricing_view')
@@ -108,6 +223,25 @@ export default function PricingPage() {
           <div className="mb-4">
             <p className="text-sm text-zinc-400 mb-2">為防止機器人濫用，請完成驗證：</p>
             <TurnstileWidget onToken={setTurnstileToken} />
+          </div>
+        )}
+
+        {couponResult?.coupon && (
+          <div className="mb-4">
+            <CouponBanner
+              coupon={couponResult.coupon}
+              loading={couponStatus === 'loading' || redeemingTrial}
+              disabled={redeemingTrial}
+              statusMessage={couponMessage || undefined}
+              statusVariant={couponStatus === 'error' ? 'error' : 'success'}
+              onRedeem={handleRedeemTrial}
+            />
+          </div>
+        )}
+
+        {couponParam && !couponResult?.coupon && couponStatus === 'error' && couponMessage && (
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-900/40 px-3 py-2 text-sm text-red-100">
+            {couponMessage}
           </div>
         )}
 

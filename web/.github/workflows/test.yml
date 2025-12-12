@@ -1,0 +1,41 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: web/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd web
+        npm ci
+    
+    - name: Run tests
+      run: |
+        cd web
+        npm test
+    
+    - name: Generate coverage
+      run: |
+        cd web
+        npm run test:coverage
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        directory: web/coverage
