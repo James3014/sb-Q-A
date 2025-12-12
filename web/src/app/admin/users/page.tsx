@@ -9,43 +9,16 @@ import { ActivationPanel } from '@/components/ActivationPanel'
 import { getSubscriptionStatus } from '@/lib/subscription'
 import { formatDate } from '@/lib/constants'
 
-interface UserWithCoupon extends AdminUser {
-  coupon_code?: string
-  coupon_used_at?: string
-}
-
 export default function UsersPage() {
   const { isReady } = useAdminAuth()
-  const [users, setUsers] = useState<UserWithCoupon[]>([])
+  const [users, setUsers] = useState<AdminUser[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<UserWithCoupon | null>(null)
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
 
   const loadUsers = async () => {
     const data = await fetchAdminUsers()
-    if (data?.users) {
-      // 獲取折扣碼使用記錄
-      const usersWithCoupons = await Promise.all(
-        data.users.map(async (user) => {
-          try {
-            const res = await fetch('/api/admin/users/coupon-usage', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: user.id })
-            })
-            const couponData = await res.json()
-            return {
-              ...user,
-              coupon_code: couponData.coupon_code,
-              coupon_used_at: couponData.used_at
-            }
-          } catch {
-            return user
-          }
-        })
-      )
-      setUsers(usersWithCoupons)
-    }
+    if (data?.users) setUsers(data.users)
     setLoadingData(false)
   }
 
@@ -118,11 +91,6 @@ export default function UsersPage() {
                             {status.isExpired ? '已於 ' : '到期：'}
                             {formatDate(u.subscription_expires_at)}
                             {status.isExpired && ' 過期'}
-                          </span>
-                        )}
-                        {u.coupon_code && (
-                          <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded">
-                            折扣碼：{u.coupon_code}
                           </span>
                         )}
                           </span>
