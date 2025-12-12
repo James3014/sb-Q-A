@@ -110,7 +110,14 @@ export async function validateCoupon({
       return { result: errorResult('server_error') }
     }
 
-    userProfile = profile ?? undefined
+    userProfile = profile ? {
+      id: profile.id,
+      subscription_type: profile.subscription_type,
+      subscription_expires_at: profile.subscription_expires_at,
+      trial_used: profile.trial_used,
+      trial_activated_at: null,
+      trial_source: null
+    } : undefined
     const alreadyUsed = (usageCount ?? 0) > 0
     if (alreadyUsed) {
       return { result: errorResult('already_used') }

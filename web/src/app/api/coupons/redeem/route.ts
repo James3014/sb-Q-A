@@ -28,11 +28,17 @@ const DB_ERROR_MESSAGE_MAP: Record<string, string> = {
 }
 
 function getClientIp(req: NextRequest) {
-  const header = req.headers.get('x-forwarded-for')
-  if (header) {
-    return header.split(',')[0]?.trim() || null
+  const forwardedFor = req.headers.get('x-forwarded-for')
+  if (forwardedFor) {
+    return forwardedFor.split(',')[0]?.trim() || null
   }
-  return req.ip || null
+  
+  const realIp = req.headers.get('x-real-ip')
+  if (realIp) {
+    return realIp.trim()
+  }
+  
+  return req.headers.get('cf-connecting-ip') || '127.0.0.1'
 }
 
 export async function POST(req: NextRequest) {

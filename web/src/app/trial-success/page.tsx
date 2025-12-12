@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { PageContainer } from '@/components/ui'
 import { formatDate } from '@/lib/constants'
 
-export default function TrialSuccessPage() {
+function TrialSuccessContent() {
   const searchParams = useSearchParams()
   const planLabel = searchParams.get('plan') || '7天 PASS'
   const expires = searchParams.get('expires')
@@ -44,5 +45,15 @@ export default function TrialSuccessPage() {
         </Link>
       </div>
     </PageContainer>
+  )
+}
+
+export default function TrialSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+      <div className="text-white">載入中...</div>
+    </div>}>
+      <TrialSuccessContent />
+    </Suspense>
   )
 }

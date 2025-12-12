@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PageContainer } from '@/components/ui'
@@ -65,7 +65,7 @@ function PlanCard({
   )
 }
 
-export default function PricingPage() {
+function PricingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const couponParam = searchParams.get('coupon')?.trim() || ''
@@ -359,5 +359,15 @@ export default function PricingPage() {
         </div>
       </div>
     </PageContainer>
+  )
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+      <div className="text-white">載入中...</div>
+    </div>}>
+      <PricingContent />
+    </Suspense>
   )
 }
