@@ -18,11 +18,23 @@ interface Affiliate {
   created_at: string
 }
 
+interface AffiliateUser {
+  id: string
+  email: string
+  subscription_type: string
+  subscription_expires_at: string
+  trial_used: boolean
+  created_at: string
+}
+
 export default function AdminAffiliatesPage() {
   const { isReady } = useAdminAuth()
   const [affiliates, setAffiliates] = useState<Affiliate[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [expandedAffiliate, setExpandedAffiliate] = useState<string | null>(null)
+  const [affiliateUsers, setAffiliateUsers] = useState<Record<string, AffiliateUser[]>>({})
+  const [loadingUsers, setLoadingUsers] = useState<Record<string, boolean>>({})
   const [formData, setFormData] = useState({
     partner_name: '',
     contact_email: '',
@@ -40,6 +52,34 @@ export default function AdminAffiliatesPage() {
       console.error('Failed to load affiliates:', error)
     }
     setLoading(false)
+  }
+
+  const loadAffiliateUsers = async (partnerId: string) => {
+    if (affiliateUsers[partnerId]) return // 已載入過
+
+    setLoadingUsers(prev => ({ ...prev, [partnerId]: true }))
+    
+    try {
+      const res = await fetch(`/api/admin/affiliates/users?partner_id=${partnerId}`)
+      const data = await res.json()
+      
+      if (data.users) {
+        setAffiliateUsers(prev => ({ ...prev, [partnerId]: data.users }))
+      }
+    } catch (error) {
+      console.error('Failed to load affiliate users:', error)
+    } finally {
+      setLoadingUsers(prev => ({ ...prev, [partnerId]: false }))
+    }
+  }
+
+  const toggleExpand = (partnerId: string) => {
+    if (expandedAffiliate === partnerId) {
+      setExpandedAffiliate(null)
+    } else {
+      setExpandedAffiliate(partnerId)
+      loadAffiliateUsers(partnerId)
+    }
   }
 
   const createAffiliate = async (e: React.FormEvent) => {
@@ -80,6 +120,23 @@ export default function AdminAffiliatesPage() {
       loadAffiliates()
     } catch (error) {
       console.error('Failed to toggle affiliate:', error)
+    }
+  }
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('zh-TW')
+  }
+
+  const getSubscriptionStatus = (user: AffiliateUser) => {
+    if (!user.subscription_expires_at) return '無訂閱'
+    
+    const expiresAt = new Date(user.subscription_expires_at)
+    const now = new Date()
+    
+    if (expiresAt > now) {
+      return `${user.subscription_type} (到期：${formatDate(user.subscription_expires_at)})`
+    } else {
+      return '已過期'
     }
   }
 
@@ -183,9 +240,17 @@ export default function AdminAffiliatesPage() {
               {affiliates.map(affiliate => (
                 <div key={affiliate.id} className="bg-zinc-800 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-bold">{affiliate.partner_name}</h3>
-                      <p className="text-sm text-zinc-400">{affiliate.contact_email}</p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleExpand(affiliate.id)}
+                        className="text-blue-400 hover:text-blue-300"
+                      >
+                        {expandedAffiliate === affiliate.id ? '▼' : '▶'} 
+                      </button>
+                      <div>
+                        <h3 className="font-bold">{affiliate.partner_name}</h3>
+                        <p className="text-sm text-zinc-400">{affiliate.contact_email}</p>
+                      </div>
                     </div>
                     <button
                       onClick={() => toggleAffiliate(affiliate.id, affiliate.is_active)}
@@ -223,6 +288,48 @@ export default function AdminAffiliatesPage() {
                       <span className="text-purple-400">NT${Math.round(affiliate.total_commissions)}</span>
                     </div>
                   </div>
+
+                  {/* 展開的用戶列表 */}
+                  {expandedAffiliate === affiliate.id && (
+                    <div className="mt-4 pt-4 border-t border-zinc-700">
+                      <h4 className="font-medium mb-3 text-zinc-300">
+                        👥 合作方用戶 ({affiliate.total_trials} 人)
+                      </h4>
+                      
+                      {loadingUsers[affiliate.id] ? (
+                        <p className="text-zinc-500 text-sm">載入用戶中...</p>
+                      ) : affiliateUsers[affiliate.id]?.length === 0 ? (
+                        <p className="text-zinc-500 text-sm">尚無用戶</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {affiliateUsers[affiliate.id]?.map(user => (
+                            <div key={user.id} className="bg-zinc-700 rounded p-3 text-sm">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-medium">{user.email}</p>
+                                  <p className="text-zinc-400">
+                                    註冊：{formatDate(user.created_at)}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className={`font-medium ${
+                                    user.subscription_expires_at && new Date(user.subscription_expires_at) > new Date()
+                                      ? 'text-green-400' 
+                                      : 'text-zinc-400'
+                                  }`}>
+                                    {getSubscriptionStatus(user)}
+                                  </p>
+                                  <p className="text-zinc-500">
+                                    {user.trial_used ? '已使用試用' : '未使用試用'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
