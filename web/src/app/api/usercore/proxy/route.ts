@@ -2,6 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const USER_CORE_API_BASE = 'https://user-core.zeabur.app'
 
+// 🎯 單一職責：錯誤處理
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown error'
+}
+
+// 🎯 單一職責：靜默回應
+function silentResponse(message: string) {
+  return NextResponse.json({ 
+    success: false, 
+    error: message 
+  }, { status: 200 })
+}
+
+// 🎯 單一職責：超時控制
+function createTimeoutController(ms: number) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), ms)
+  return { controller, cleanup: () => clearTimeout(timeoutId) }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { endpoint, body, headers } = await req.json()
@@ -10,9 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing endpoint' }, { status: 400 })
     }
 
-    // 🔧 修復：更短超時 + 重試機制
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3秒超時
+    const { controller, cleanup } = createTimeoutController(3000)
 
     try {
       const url = new URL(endpoint, USER_CORE_API_BASE)
@@ -27,37 +45,25 @@ export async function POST(req: NextRequest) {
         signal: controller.signal,
       })
 
-      clearTimeout(timeoutId)
+      cleanup()
 
       if (!response.ok) {
-        // 🔧 靜默處理 UserCore 錯誤，不影響主功能
         console.warn(`[UserCore] ${response.status}: ${endpoint}`)
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Analytics service unavailable' 
-        }, { status: 200 }) // 返回 200 避免前端錯誤
+        return silentResponse('Analytics service unavailable')
       }
 
       const data = await response.json()
       return NextResponse.json(data)
 
     } catch (fetchError) {
-      clearTimeout(timeoutId)
-      
-      // 🔧 超時或連線錯誤時靜默處理
-      console.warn('[UserCore] Service unavailable:', fetchError.message)
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Analytics service temporarily unavailable' 
-      }, { status: 200 })
+      cleanup()
+      console.warn('[UserCore] Service unavailable:', getErrorMessage(fetchError))
+      return silentResponse('Analytics service temporarily unavailable')
     }
 
   } catch (error) {
-    console.error('[UserCore Proxy] Error:', error)
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Proxy error' 
-    }, { status: 200 }) // 靜默處理，不影響主功能
+    console.error('[UserCore Proxy] Error:', getErrorMessage(error))
+    return silentResponse('Proxy error')
   }
 }
 
@@ -70,8 +76,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing endpoint' }, { status: 400 })
     }
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 3000)
+    const { controller, cleanup } = createTimeoutController(3000)
 
     try {
       const url = new URL(endpoint, USER_CORE_API_BASE)
@@ -82,33 +87,24 @@ export async function GET(req: NextRequest) {
         signal: controller.signal,
       })
 
-      clearTimeout(timeoutId)
+      cleanup()
 
       if (!response.ok) {
         console.warn(`[UserCore] ${response.status}: ${endpoint}`)
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Service unavailable' 
-        }, { status: 200 })
+        return silentResponse('Service unavailable')
       }
 
       const data = await response.json()
       return NextResponse.json(data)
 
     } catch (fetchError) {
-      clearTimeout(timeoutId)
-      console.warn('[UserCore] Service unavailable:', fetchError.message)
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Service temporarily unavailable' 
-      }, { status: 200 })
+      cleanup()
+      console.warn('[UserCore] Service unavailable:', getErrorMessage(fetchError))
+      return silentResponse('Service temporarily unavailable')
     }
 
   } catch (error) {
-    console.error('[UserCore Proxy] Error:', error)
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Proxy error' 
-    }, { status: 200 })
+    console.error('[UserCore Proxy] Error:', getErrorMessage(error))
+    return silentResponse('Proxy error')
   }
 }
