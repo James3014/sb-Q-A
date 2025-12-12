@@ -107,7 +107,24 @@ async function checkDuplicateUsage(supabase: any, couponId: string, userId: stri
 
 async function redeemCoupon(supabase: any, coupon: any, userId: string, ip: string) {
   const now = new Date()
-  const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+  
+  // 根據 plan_id 計算到期時間
+  let days = 7 // 預設 7 天
+  switch (coupon.plan_id) {
+    case 'pass_7':
+      days = 7
+      break
+    case 'pass_30':
+      days = 30
+      break
+    case 'pro_yearly':
+      days = 365
+      break
+    default:
+      console.warn(`[Coupon] 未知的 plan_id: ${coupon.plan_id}，使用預設 7 天`)
+  }
+  
+  const expiresAt = new Date(now.getTime() + days * 24 * 60 * 60 * 1000)
 
   // 原子操作：更新用戶
   const { error: userError } = await supabase
