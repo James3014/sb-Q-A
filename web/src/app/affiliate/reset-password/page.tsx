@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 
-export default function AffiliateResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
@@ -155,5 +155,17 @@ export default function AffiliateResetPasswordPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AffiliateResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+        <div className="text-white">載入中...</div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }

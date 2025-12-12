@@ -13,6 +13,10 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = getSupabaseServiceRole()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
+    }
+    
     const lastQuarter = getPreviousQuarter()
     
     console.log(`[Quarterly Settlement] 開始處理 ${lastQuarter} 季結...`)

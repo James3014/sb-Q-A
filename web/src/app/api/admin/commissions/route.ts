@@ -1,24 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseServiceRole } from '@/lib/supabaseServer'
+import { authorizeAdmin } from '@/lib/adminGuard'
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = getSupabaseServiceRole()
-    
-    // 驗證管理員權限
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: '需要登入' }, { status: 401 })
-    }
+    const { supabase, error: authError } = await authorizeAdmin(req)
+    if (authError) return authError
 
-    const { data: adminUser } = await supabase
-      .from('users')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser?.is_admin) {
-      return NextResponse.json({ error: '需要管理員權限' }, { status: 403 })
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
     }
 
     // 獲取篩選參數
@@ -57,11 +46,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: '查詢失敗' }, { status: 500 })
     }
 
-    const formattedCommissions = commissions?.map(c => ({
+    const formattedCommissions = commissions?.map((c: any) => ({
       id: c.id,
-      partner_name: c.affiliate_partners.partner_name,
+      partner_name: c.affiliate_partners?.partner_name || 'Unknown',
       coupon_code: c.coupon_code,
-      user_email: c.users.email,
+      user_email: c.users?.email || 'Unknown',
       paid_amount: c.paid_amount,
       commission_amount: c.commission_amount,
       settlement_quarter: c.settlement_quarter,
@@ -84,22 +73,11 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const supabase = getSupabaseServiceRole()
-    
-    // 驗證管理員權限
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: '需要登入' }, { status: 401 })
-    }
+    const { supabase, error: authError } = await authorizeAdmin(req)
+    if (authError) return authError
 
-    const { data: adminUser } = await supabase
-      .from('users')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single()
-
-    if (!adminUser?.is_admin) {
-      return NextResponse.json({ error: '需要管理員權限' }, { status: 403 })
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
     }
 
     const { ids, status } = await req.json()

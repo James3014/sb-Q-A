@@ -4,6 +4,9 @@ import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 export async function GET(req: NextRequest) {
   try {
     const supabase = getSupabaseServiceRole()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 500 })
+    }
     
     // 1. 驗證合作方身份
     const token = req.headers.get('authorization')?.replace('Bearer ', '')
@@ -87,7 +90,7 @@ export async function GET(req: NextRequest) {
       .gte('created_at', thirtyDaysAgo.toISOString())
 
     // 8. 處理時間序列數據
-    const timeSeriesData = generateTimeSeriesData(dailyTrials, dailyConversions)
+    const timeSeriesData = generateTimeSeriesData(dailyTrials || [], dailyConversions || [])
 
     // 9. 獲取季結統計
     const currentQuarter = getCurrentQuarter()
@@ -97,7 +100,7 @@ export async function GET(req: NextRequest) {
       .eq('partner_id', partner.id)
       .order('settlement_quarter', { ascending: false })
 
-    const quarterlyData = processQuarterlyData(quarterlyStats)
+    const quarterlyData = processQuarterlyData(quarterlyStats || [])
 
     return NextResponse.json({
       ok: true,
