@@ -124,11 +124,11 @@
 
 ### 資料庫層
 
-- [ ] **7.1** 建立 migration 檔案 `docs/migration_affiliates.sql`
-  - [ ] 建立 `affiliate_partners` 表（含 `supabase_user_id` 欄位）
-  - [ ] 建立 `affiliate_commissions` 表
-  - [ ] `ALTER TABLE coupons ADD COLUMN partner_id UUID REFERENCES affiliate_partners(id)`
-  - [ ] 執行 migration 驗證
+- [x] **7.1** 建立 migration 檔案 `docs/migration_affiliates.sql`
+  - [x] 建立 `affiliate_partners` 表（含 `supabase_user_id` 欄位）✅
+  - [x] 建立 `affiliate_commissions` 表 ✅
+  - [x] `ALTER TABLE coupons ADD COLUMN partner_id UUID REFERENCES affiliate_partners(id)` ✅
+  - [ ] 執行 migration 驗證 ⚠️ (需手動在 Supabase Dashboard 執行)
 
 ### 合作方帳號管理
 
