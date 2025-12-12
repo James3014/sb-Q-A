@@ -37,6 +37,7 @@ export function AdminHeader({ title }: { title: string }) {
           <Link href="/admin/monetization" className="text-blue-400">付費</Link>
           <Link href="/admin/affiliates" className="text-blue-400">合作方</Link>
           <Link href="/admin/commissions" className="text-blue-400">分潤</Link>
+          <Link href="/admin/analytics" className="text-blue-400">分析</Link>
           <Link href="/" className="text-zinc-400">← 前台</Link>
         </div>
       </div>
