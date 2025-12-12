@@ -57,11 +57,21 @@ export default function AdminCommissionsPage() {
       if (filter.status) params.set('status', filter.status)
       if (filter.partner) params.set('partner', filter.partner)
 
-      const res = await fetch(`/api/admin/commissions?${params}`)
-      const data = await res.json()
-      if (data.commissions) setCommissions(data.commissions)
+      console.log('載入分潤記錄，篩選條件:', filter)
+      
+      const data = await adminGet<{ commissions: Commission[] }>(`/api/admin/commissions?${params}`)
+      console.log('分潤 API 回應:', data)
+      
+      if (data?.commissions) {
+        setCommissions(data.commissions)
+        console.log('設置分潤記錄:', data.commissions.length, '筆')
+      } else {
+        console.log('沒有分潤資料')
+        setCommissions([])
+      }
     } catch (error) {
       console.error('Failed to load commissions:', error)
+      setCommissions([])
     }
     setLoading(false)
   }
@@ -199,7 +209,15 @@ export default function AdminCommissionsPage() {
           {loading ? (
             <p className="text-zinc-500">載入中...</p>
           ) : commissions.length === 0 ? (
-            <p className="text-zinc-500">無分潤記錄</p>
+            <div className="bg-zinc-800 rounded-lg p-6">
+              <p className="text-zinc-500 mb-4">無分潤記錄</p>
+              <div className="text-sm text-zinc-600">
+                <p>調試資訊：</p>
+                <p>• 篩選條件: {JSON.stringify(filter)}</p>
+                <p>• 合作方數量: {partners.length}</p>
+                <p>• 載入狀態: {loading ? '載入中' : '已完成'}</p>
+              </div>
+            </div>
           ) : (
             <div className="bg-zinc-800 rounded-lg overflow-hidden">
               <div className="p-4 border-b border-zinc-700 flex justify-between items-center">
