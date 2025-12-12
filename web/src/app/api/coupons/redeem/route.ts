@@ -6,10 +6,13 @@ async function validateAuth(req: NextRequest, supabase: any) {
   const token = req.headers.get('authorization')?.replace('Bearer ', '')
   if (!token) throw new Error('請先登入')
   
-  const { data: user, error } = await supabase.auth.getUser(token)
-  if (error || !user?.user) throw new Error('登入已過期')
-  
-  return user.user
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token)
+    if (error || !user) throw new Error('登入已過期')
+    return user
+  } catch (error) {
+    throw new Error('登入驗證失敗')
+  }
 }
 
 async function validateCoupon(supabase: any, code: string) {
