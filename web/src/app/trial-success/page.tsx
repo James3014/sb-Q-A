@@ -5,11 +5,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { PageContainer } from '@/components/ui'
 import { useAuth } from '@/components/AuthProvider'
+import { getSupabase } from '@/lib/supabase'
 
 export default function TrialSuccessPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [referralCode, setReferralCode] = useState<string | null>(null)
+  const [userStatus, setUserStatus] = useState<{
+    trial_used: boolean
+    subscription_type: string | null
+    subscription_expires_at: string | null
+  } | null>(null)
+  const [statusLoading, setStatusLoading] = useState(true)
 
   useEffect(() => {
     // 獲取推廣來源
@@ -24,7 +31,62 @@ export default function TrialSuccessPage() {
     }
   }, [user, loading, router])
 
-  if (loading) {
+  useEffect(() => {
+    // 檢查用戶試用狀態
+    const checkUserStatus = async () => {
+      if (!user) return
+
+      try {
+        const supabase = getSupabase()
+        if (!supabase) {
+          console.error('Supabase client not available')
+          return
+        }
+        
+        const { data, error } = await supabase
+          .from('users')
+          .select('trial_used, subscription_type, subscription_expires_at')
+          .eq('id', user.id)
+          .single()
+
+        if (error) {
+          console.error('Failed to check user status:', error)
+          return
+        }
+
+        setUserStatus(data)
+
+        // 安全檢查：如果用戶沒有試用過，不應該在這個頁面
+        if (!data.trial_used) {
+          console.warn('User has not used trial, redirecting to pricing')
+          router.push('/pricing')
+          return
+        }
+
+        // 如果用戶已經有付費訂閱，導向首頁
+        const hasActiveSubscription = data.subscription_type && 
+          data.subscription_type !== 'free' &&
+          data.subscription_expires_at &&
+          new Date(data.subscription_expires_at) > new Date()
+
+        if (hasActiveSubscription) {
+          router.push('/')
+          return
+        }
+
+      } catch (error) {
+        console.error('Error checking user status:', error)
+      } finally {
+        setStatusLoading(false)
+      }
+    }
+
+    if (user) {
+      checkUserStatus()
+    }
+  }, [user, router])
+
+  if (loading || statusLoading) {
     return (
       <PageContainer>
         <div className="text-center py-8">載入中...</div>
@@ -32,8 +94,8 @@ export default function TrialSuccessPage() {
     )
   }
 
-  if (!user) {
-    return null // 會被重導向到登入頁
+  if (!user || !userStatus?.trial_used) {
+    return null // 會被重導向
   }
 
   const partnerName = referralCode?.replace('COACH-', '教練 ') || '推薦教練'

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseServiceRole } from '@/lib/supabaseServer'
+import { checkTrialSecurity, logTrialActivation } from '@/lib/trialSecurity'
 
 // 🎯 模組化：每個函數單一職責
 async function validateAuth(req: NextRequest, supabase: any) {
@@ -59,9 +60,17 @@ async function validateCoupon(supabase: any, code: string) {
   return coupon
 }
 
-async function validateUser(supabase: any, userId: string) {
+async function validateUser(supabase: any, userId: string, email: string, clientIP?: string) {
   console.log(`[Coupon] 檢查用戶資格: ${userId}`)
   
+  // 使用增強的安全檢查
+  const securityCheck = await checkTrialSecurity(userId, email, clientIP)
+  
+  if (!securityCheck.allowed) {
+    console.warn(`[Coupon] 安全檢查失敗: ${email} - ${securityCheck.reason}`)
+    throw new Error(securityCheck.reason || '試用資格驗證失敗')
+  }
+
   const { data: user, error } = await supabase
     .from('users')
     .select('trial_used, subscription_expires_at, email')
@@ -71,11 +80,6 @@ async function validateUser(supabase: any, userId: string) {
   if (error) {
     console.error(`[Coupon] 用戶資料查詢失敗: ${userId}`, error)
     throw new Error('無法查詢用戶資料，請稍後再試或聯繫客服')
-  }
-  
-  if (user?.trial_used) {
-    console.warn(`[Coupon] 用戶已使用過試用: ${user.email}`)
-    throw new Error('您已經使用過免費試用，每個帳號僅能使用一次。如需協助請聯繫客服')
   }
   
   // 檢查是否已有有效訂閱
@@ -199,14 +203,24 @@ export async function POST(req: NextRequest) {
     const user = await validateAuth(req, supabase)
     userId = user.id
     const coupon = await validateCoupon(supabase, code)
-    await validateUser(supabase, user.id)
+    
+    // 獲取客戶端 IP
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     req.headers.get('x-real-ip') || 
+                     '127.0.0.1'
+    
+    await validateUser(supabase, user.id, user.email, clientIP)
     await checkDuplicateUsage(supabase, coupon.id, user.id)
 
     // 4. 執行兌換
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
     const result = await redeemCoupon(supabase, coupon, user.id, ip)
 
-    // 5. 成功日誌
+    // 5. 記錄試用啟動（用於安全追蹤）
+    const referralCode = req.headers.get('x-referral-code') || undefined
+    await logTrialActivation(user.id, referralCode, clientIP)
+
+    // 6. 成功日誌
     const duration = Date.now() - startTime
     console.log(`[Coupon] 兌換成功: ${user.email} 使用 ${code}, 耗時: ${duration}ms`)
 
