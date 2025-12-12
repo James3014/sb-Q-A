@@ -9,16 +9,28 @@ import { ActivationPanel } from '@/components/ActivationPanel'
 import { getSubscriptionStatus } from '@/lib/subscription'
 import { formatDate } from '@/lib/constants'
 
+interface UserWithCoupon extends AdminUser {
+  coupon_code?: string
+  coupon_used_at?: string
+}
+
 export default function UsersPage() {
   const { isReady } = useAdminAuth()
-  const [users, setUsers] = useState<AdminUser[]>([])
+  const [users, setUsers] = useState<UserWithCoupon[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
+  const [selectedUser, setSelectedUser] = useState<UserWithCoupon | null>(null)
 
   const loadUsers = async () => {
-    const data = await fetchAdminUsers()
-    if (data?.users) setUsers(data.users)
+    try {
+      const data = await fetchAdminUsers()
+      if (data?.users) {
+        // 簡化版本：先載入用戶，後續再載入折扣碼資訊
+        setUsers(data.users.map(user => ({ ...user })))
+      }
+    } catch (error) {
+      console.error('Failed to load users:', error)
+    }
     setLoadingData(false)
   }
 
@@ -93,12 +105,18 @@ export default function UsersPage() {
                             {status.isExpired && ' 過期'}
                           </span>
                         )}
+                        {u.trial_used && (
+                          <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded">
+                            已使用試用
                           </span>
                         )}
                       </div>
                     </div>
-                    <button onClick={() => setSelectedUser(u)} className="px-3 py-1 bg-blue-600 rounded text-sm">
-                      開通
+                    <button
+                      onClick={() => setSelectedUser(u)}
+                      className="text-xs bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded"
+                    >
+                      管理
                     </button>
                   </div>
                 )
