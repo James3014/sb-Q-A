@@ -8,6 +8,7 @@ import { useAuth } from '@/components/AuthProvider'
 import { CheckoutModal } from '@/components/CheckoutModal'
 import { TurnstileWidget } from '@/components/TurnstileWidget'
 import { CouponBanner } from '@/components/CouponBanner'
+import { ReferralBanner } from '@/components/ReferralBanner'
 import { useCheckout } from '@/hooks/useCheckout'
 import { trackEvent } from '@/lib/analytics'
 import { SubscriptionPlanId } from '@/lib/constants'
@@ -235,6 +236,14 @@ function PricingContent() {
       </header>
 
       <div className="p-4 max-w-lg mx-auto">
+        {/* 推廣橫幅 */}
+        {refParam && (
+          <ReferralBanner 
+            referralCode={refParam}
+            partnerName={refParam.replace('COACH-', '教練 ')}
+          />
+        )}
+
         {enableTurnstile && (
           <div className="mb-4">
             <p className="text-sm text-zinc-400 mb-2">為防止機器人濫用，請完成驗證：</p>
@@ -260,6 +269,11 @@ function PricingContent() {
             {couponMessage}
           </div>
         )}
+
+        {/* 方案選擇 */}
+        <div id="plans">
+          <h2 className="text-lg font-bold mb-4">選擇方案</h2>
+        </div>
 
         <PlanCard
           plan="free"

@@ -23,7 +23,7 @@ export const getSubscriptionStatus = (user: {
 }
 
 export const generateReferralLink = (couponCode: string): string => {
-  return `https://www.snowskill.app/pricing?ref=${couponCode}`
+  return `https://www.snowskill.app/pricing?ref=${couponCode}&trial=1`
 }
 
 export const formatCurrency = (amount: number): string => {
