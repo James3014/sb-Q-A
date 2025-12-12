@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { StatCard } from '@/components/ui'
+import { adminGet } from '@/lib/adminApi'
 
 interface Commission {
   id: string
@@ -19,15 +20,35 @@ interface Commission {
   paid_at?: string
 }
 
+interface Partner {
+  id: string
+  partner_name: string
+  coupon_code: string
+}
+
 export default function AdminCommissionsPage() {
   const { isReady } = useAdminAuth()
   const [commissions, setCommissions] = useState<Commission[]>([])
+  const [partners, setPartners] = useState<Partner[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState({
     quarter: '',
     status: '',
     partner: ''
   })
+
+  const loadPartners = async () => {
+    try {
+      const data = await adminGet<{ affiliates: Partner[] }>('/api/admin/affiliates')
+      if (data?.affiliates) {
+        // 按名稱排序
+        const sortedPartners = data.affiliates.sort((a, b) => a.partner_name.localeCompare(b.partner_name))
+        setPartners(sortedPartners)
+      }
+    } catch (error) {
+      console.error('Failed to load partners:', error)
+    }
+  }
 
   const loadCommissions = async () => {
     try {
@@ -65,8 +86,17 @@ export default function AdminCommissionsPage() {
   }
 
   useEffect(() => {
-    if (isReady) loadCommissions()
-  }, [isReady, filter])
+    if (isReady) {
+      loadPartners()
+      loadCommissions()
+    }
+  }, [isReady])
+
+  useEffect(() => {
+    if (isReady) {
+      loadCommissions()
+    }
+  }, [filter])
 
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
@@ -127,13 +157,18 @@ export default function AdminCommissionsPage() {
                 <option value="paid">已支付</option>
               </select>
 
-              <input
-                type="text"
-                placeholder="合作方名稱"
+              <select
                 value={filter.partner}
                 onChange={(e) => setFilter({...filter, partner: e.target.value})}
                 className="px-3 py-2 bg-zinc-700 border border-zinc-600 rounded"
-              />
+              >
+                <option value="">所有合作方</option>
+                {partners.map(partner => (
+                  <option key={partner.id} value={partner.partner_name}>
+                    {partner.partner_name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
