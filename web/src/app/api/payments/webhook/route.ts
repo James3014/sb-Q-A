@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createHmac } from 'crypto'
 import { getSupabaseServiceRole } from '@/lib/supabaseServer'
 import { SUBSCRIPTION_PLANS } from '@/lib/constants'
+import { getSettlementPeriod } from '@/lib/affiliate/commission'
 import {
   buildRawPayload,
   mapStatus,
@@ -150,6 +151,60 @@ export async function POST(req: NextRequest) {
       referenceId,
       provider
     )
+
+    // 11.1 檢測試用轉付費並記錄分潤
+    const { data: user } = await supabase
+      .from('users')
+      .select('trial_used, trial_source')
+      .eq('id', payment.user_id)
+      .single()
+
+    if (user?.trial_used && user?.trial_source) {
+      console.log(`[Webhook] 檢測到試用轉付費: ${user.trial_source}`)
+      
+      // 查找合作方
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select('partner_id')
+        .eq('code', user.trial_source)
+        .single()
+
+      if (coupon?.partner_id) {
+        // 獲取合作方分潤率
+        const { data: partner } = await supabase
+          .from('affiliate_partners')
+          .select('commission_rate')
+          .eq('id', coupon.partner_id)
+          .single()
+
+        if (partner) {
+          const commissionAmount = Math.round(payment.amount * partner.commission_rate * 100) / 100
+          const quarter = getSettlementPeriod()
+
+          // 插入分潤記錄
+          const { error: commissionError } = await supabase
+            .from('affiliate_commissions')
+            .insert({
+              partner_id: coupon.partner_id,
+              payment_id: payment.id,
+              user_id: payment.user_id,
+              coupon_code: user.trial_source,
+              trial_amount: 0,
+              paid_amount: payment.amount,
+              commission_rate: partner.commission_rate,
+              commission_amount: commissionAmount,
+              settlement_quarter: quarter,
+              status: 'pending'
+            })
+
+          if (commissionError) {
+            console.error('[Webhook] 分潤記錄失敗:', commissionError)
+          } else {
+            console.log(`[Webhook] 分潤記錄成功: ${user.trial_source} -> NT$${commissionAmount}`)
+          }
+        }
+      }
+    }
   } else if (mappedStatus === 'refunded' || mappedStatus === 'failed' || mappedStatus === 'canceled') {
     await updateUserForStatus(
       supabase,

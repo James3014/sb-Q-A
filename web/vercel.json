@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/expire-trials",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/quarterly-settlement",
+      "schedule": "0 3 1 1,4,7,10 *"
     }
   ]
 }
