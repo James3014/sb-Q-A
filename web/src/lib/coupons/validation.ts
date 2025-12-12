@@ -95,7 +95,7 @@ export async function validateCoupon({
     ] = await Promise.all([
         supabase
           .from('users')
-          .select('id, subscription_type, subscription_expires_at, trial_used')
+          .select('id, subscription_type, subscription_expires_at, trial_used, trial_activated_at, trial_source')
           .eq('id', userId)
           .maybeSingle(),
         supabase
@@ -114,9 +114,9 @@ export async function validateCoupon({
       id: profile.id,
       subscription_type: profile.subscription_type,
       subscription_expires_at: profile.subscription_expires_at,
-      trial_used: profile.trial_used,
-      trial_activated_at: null,
-      trial_source: null
+      trial_used: profile.trial_used || false,
+      trial_activated_at: profile.trial_activated_at || null,
+      trial_source: profile.trial_source || null
     } : undefined
     const alreadyUsed = (usageCount ?? 0) > 0
     if (alreadyUsed) {
