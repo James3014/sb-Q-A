@@ -6,6 +6,7 @@ export interface AdminUser {
   email: string
   subscription_type: string
   subscription_expires_at: string | null
+  trial_used: boolean
   created_at: string
 }
 
