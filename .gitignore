@@ -6,6 +6,14 @@
 docs/*.sql
 scripts/*.sql
 
+# 課程內容 Markdown
+*_cleaned/
+huang_cleaned/
+sam_cleaned/
+snowboard_course/
+all_lessons_merged.md
+*lessons*.md
+
 # 課程資料 JSON
 docs/lessons_parsed.json
 docs/prerequisites_analysis.json
