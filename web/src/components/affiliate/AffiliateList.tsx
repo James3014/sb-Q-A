@@ -44,6 +44,7 @@ export const AffiliateList = ({
 
             <div className="flex items-center gap-4">
               <div className="text-right text-sm">
+                <div>點擊: {affiliate.total_clicks}</div>
                 <div>試用: {affiliate.total_trials}</div>
                 <div>轉換: {affiliate.total_conversions}</div>
                 <div>轉換率: {(affiliate.conversion_rate * 100).toFixed(1)}%</div>

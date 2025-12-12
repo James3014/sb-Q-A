@@ -44,6 +44,12 @@ export async function GET(req: NextRequest) {
       const affiliatesWithStats = await Promise.all(
         (affiliates || []).map(async (affiliate) => {
           try {
+            // 查詢點擊數
+            const { count: totalClicks } = await supabase
+              .from('affiliate_clicks')
+              .select('*', { count: 'exact', head: true })
+              .eq('coupon_code', affiliate.coupon_code || '')
+
             // 查詢試用數（使用該折扣碼的用戶）
             const { count: totalTrials } = await supabase
               .from('users')
@@ -66,10 +72,12 @@ export async function GET(req: NextRequest) {
             const totalCommissions = commissions?.reduce((sum, c) => sum + (c.commission_amount || 0), 0) || 0
             const trialsCount = totalTrials || 0
             const conversionsCount = totalConversions || 0
+            const clicksCount = totalClicks || 0
             const conversionRate = trialsCount > 0 ? Math.round((conversionsCount / trialsCount) * 100) : 0
 
             return {
               ...affiliate,
+              total_clicks: clicksCount,
               total_trials: trialsCount,
               total_conversions: conversionsCount,
               conversion_rate: conversionRate,
@@ -80,6 +88,7 @@ export async function GET(req: NextRequest) {
             // 如果統計計算失敗，返回基本資料
             return {
               ...affiliate,
+              total_clicks: 0,
               total_trials: 0,
               total_conversions: 0,
               conversion_rate: 0,

@@ -5,6 +5,7 @@ export interface Affiliate {
   coupon_code: string
   commission_rate: number
   is_active: boolean
+  total_clicks: number
   total_trials: number
   total_conversions: number
   conversion_rate: number

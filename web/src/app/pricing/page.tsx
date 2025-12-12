@@ -94,13 +94,35 @@ function PricingContent() {
       // 儲存推廣來源到 localStorage，供後續付費時使用
       localStorage.setItem('referral_code', refParam)
       
+      // 記錄推廣點擊到資料庫
+      const recordClick = async () => {
+        try {
+          const supabase = getSupabase()
+          if (!supabase) return
+
+          await supabase
+            .from('affiliate_clicks')
+            .insert({
+              coupon_code: refParam,
+              client_ip: null, // 前端無法獲取真實 IP
+              user_agent: navigator.userAgent,
+              referrer: document.referrer || null,
+              user_id: user?.id || null
+            })
+        } catch (error) {
+          console.error('Failed to record click:', error)
+        }
+      }
+
+      recordClick()
+      
       // 追蹤推廣點擊事件
       trackEvent('referral_click', undefined, {
         referral_code: refParam,
         page: 'pricing'
       })
     }
-  }, [refParam])
+  }, [refParam, user])
 
   const fetchAccessToken = useCallback(async () => {
     const supabase = getSupabase()

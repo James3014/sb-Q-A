@@ -46,6 +46,7 @@ export const useAffiliates = () => {
   const stats = {
     total: affiliates.length,
     active: affiliates.filter(a => a.is_active).length,
+    totalClicks: affiliates.reduce((sum, a) => sum + a.total_clicks, 0),
     totalTrials: affiliates.reduce((sum, a) => sum + a.total_trials, 0),
     totalCommissions: affiliates.reduce((sum, a) => sum + a.total_commissions, 0)
   }
