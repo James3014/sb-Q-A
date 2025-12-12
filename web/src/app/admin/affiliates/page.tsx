@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { StatCard } from '@/components/ui'
+import { adminGet } from '@/lib/adminApi'
 
 interface Affiliate {
   id: string
@@ -45,9 +46,8 @@ export default function AdminAffiliatesPage() {
 
   const loadAffiliates = async () => {
     try {
-      const res = await fetch('/api/admin/affiliates')
-      const data = await res.json()
-      if (data.affiliates) setAffiliates(data.affiliates)
+      const data = await adminGet<{ affiliates: Affiliate[] }>('/api/admin/affiliates')
+      if (data?.affiliates) setAffiliates(data.affiliates)
     } catch (error) {
       console.error('Failed to load affiliates:', error)
     }
@@ -60,10 +60,9 @@ export default function AdminAffiliatesPage() {
     setLoadingUsers(prev => ({ ...prev, [partnerId]: true }))
     
     try {
-      const res = await fetch(`/api/admin/affiliates/users?partner_id=${partnerId}`)
-      const data = await res.json()
+      const data = await adminGet<{ users: AffiliateUser[] }>(`/api/admin/affiliates/users?partner_id=${partnerId}`)
       
-      if (data.users) {
+      if (data?.users) {
         setAffiliateUsers(prev => ({ ...prev, [partnerId]: data.users }))
       }
     } catch (error) {
