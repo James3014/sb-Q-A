@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { StatCard } from '@/components/ui'
-import { adminGet } from '@/lib/adminApi'
+import { adminGet, adminPost } from '@/lib/adminApi'
 
 interface Affiliate {
   id: string
@@ -86,23 +86,18 @@ export default function AdminAffiliatesPage() {
     setCreating(true)
 
     try {
-      const res = await fetch('/api/admin/affiliates/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-
-      const result = await res.json()
+      const result = await adminPost<{ partner: any }>('/api/admin/affiliates/create', formData)
       
-      if (res.ok) {
+      if (result?.partner) {
         alert(`合作方帳號建立成功！\n\n帳號: ${result.partner.contact_email}\n折扣碼: ${result.partner.coupon_code}\n\n請將登入資訊發送給合作方。`)
         setFormData({ partner_name: '', contact_email: '', coupon_code: '', commission_rate: 0.15 })
         setShowCreateForm(false)
         loadAffiliates()
       } else {
-        alert(`建立失敗: ${result.error}`)
+        alert('建立失敗，請稍後再試')
       }
     } catch (error) {
+      console.error('建立合作方失敗:', error)
       alert('建立失敗，請稍後再試')
     } finally {
       setCreating(false)
