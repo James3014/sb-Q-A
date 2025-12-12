@@ -69,6 +69,7 @@ function PricingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const couponParam = searchParams.get('coupon')?.trim() || ''
+  const refParam = searchParams.get('ref')?.trim() || '' // 推廣來源
   const { user, loading, refreshSubscription } = useAuth()
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const enableTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
@@ -84,6 +85,21 @@ function PricingContent() {
     handleCheckout,
     handleCloseModal,
   } = useCheckout({ user, turnstileToken, enableTurnstile })
+
+  // 追蹤推廣來源
+  useEffect(() => {
+    if (refParam) {
+      console.log('推廣來源:', refParam)
+      // 儲存推廣來源到 localStorage，供後續付費時使用
+      localStorage.setItem('referral_code', refParam)
+      
+      // 追蹤推廣點擊事件
+      trackEvent('referral_click', undefined, {
+        referral_code: refParam,
+        page: 'pricing'
+      })
+    }
+  }, [refParam])
 
   const fetchAccessToken = useCallback(async () => {
     const supabase = getSupabase()

@@ -10,6 +10,7 @@ interface Affiliate {
   id: string
   partner_name: string
   contact_email: string
+  coupon_code: string
   commission_rate: number
   is_active: boolean
   total_trials: number
@@ -258,7 +259,7 @@ export default function AdminAffiliatesPage() {
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-5 gap-4 text-sm">
+                  <div className="grid grid-cols-5 gap-4 text-sm mb-4">
                     <div>
                       <span className="text-zinc-500">狀態：</span>
                       <span className={affiliate.is_active ? 'text-green-400' : 'text-red-400'}>
@@ -281,6 +282,26 @@ export default function AdminAffiliatesPage() {
                       <span className="text-zinc-500">總分潤：</span>
                       <span className="text-purple-400">NT${Math.round(affiliate.total_commissions)}</span>
                     </div>
+                  </div>
+
+                  {/* 推廣連結 */}
+                  <div className="bg-zinc-700 rounded p-3 mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-zinc-400 text-sm">🔗 推廣連結</span>
+                      <button
+                        onClick={() => {
+                          const referralLink = `https://www.snowskill.app/pricing?ref=${affiliate.coupon_code}`
+                          navigator.clipboard.writeText(referralLink)
+                          alert('推廣連結已複製到剪貼簿！')
+                        }}
+                        className="text-blue-400 hover:text-blue-300 text-xs"
+                      >
+                        複製連結
+                      </button>
+                    </div>
+                    <code className="text-xs text-green-400 break-all">
+                      https://www.snowskill.app/pricing?ref={affiliate.coupon_code}
+                    </code>
                   </div>
 
                   {/* 展開的用戶列表 */}

@@ -13,6 +13,7 @@ type EventType =
   | 'practice_complete'
   | 'practice_start'      // 新增：開始練習
   | 'scroll_depth'        // 新增：滾動深度
+  | 'referral_click'      // 新增：推廣點擊
 
 // 映射單板教學事件到 user-core 事件類型
 const EVENT_TYPE_MAPPING: Record<EventType, string> = {
@@ -27,6 +28,7 @@ const EVENT_TYPE_MAPPING: Record<EventType, string> = {
   'practice_complete': 'snowboard.practice.completed',
   'practice_start': 'snowboard.practice.started',
   'scroll_depth': 'snowboard.content.scrolled',
+  'referral_click': 'snowboard.referral.clicked',
 }
 
 export async function trackEvent(
