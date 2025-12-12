@@ -96,6 +96,7 @@ export default function UsersPage() {
                   <div key={u.id} className="bg-zinc-800 rounded-lg p-3 flex justify-between items-center">
                     <div>
                       <p className="text-sm">{u.email}</p>
+                      <p className="text-xs text-zinc-500 mb-1">註冊：{formatDate(u.created_at)}</p>
                       <div className="flex gap-2 mt-1 items-center">
                         <span className={`text-xs px-2 py-0.5 rounded ${status.color}`}>{status.label}</span>
                         {u.subscription_expires_at && u.subscription_type !== 'free' && (
