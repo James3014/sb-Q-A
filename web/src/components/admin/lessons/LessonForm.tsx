@@ -22,7 +22,16 @@ export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
 
   const form = useLessonForm({
     lessonId,
-    initialState: initialLesson ?? undefined,
+    initialState: initialLesson ? {
+      title: initialLesson.title,
+      what: initialLesson.what,
+      why: initialLesson.why,
+      how: initialLesson.how,
+      signals: initialLesson.signals,
+      level_tags: initialLesson.level_tags,
+      slope_tags: initialLesson.slope_tags,
+      is_premium: initialLesson.is_premium,
+    } : undefined,
     onSuccess: () => {
       setStatusMessage(lessonId ? '課程已更新' : '課程建立成功')
       onSuccess?.()
