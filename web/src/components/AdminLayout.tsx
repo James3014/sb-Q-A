@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useAdminAuth } from '@/lib/useAdminAuth'
+import { CommandPalette } from './admin/CommandPalette'
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { loading, isAuthorized } = useAdminAuth()
@@ -21,7 +22,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     )
   }
 
-  return <>{children}</>
+  return (
+    <>
+      <CommandPalette />
+      {children}
+    </>
+  )
 }
 
 export function AdminHeader({ title }: { title: string }) {
