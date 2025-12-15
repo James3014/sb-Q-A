@@ -6,6 +6,7 @@ import { useAdminAuth } from '@/lib/useAdminAuth'
 import { ModernStatCard, LoadingSpinner, EmptyStateNew as EmptyState } from '@/components/ui'
 import { adminGet } from '@/lib/adminApi'
 import { ConversionFunnel } from '@/components/admin/analytics/ConversionFunnel'
+import { exportToCSV } from '@/lib/admin/export'
 
 interface AnalyticsData {
   overview: {
@@ -167,7 +168,17 @@ export default function AdminAnalyticsPage() {
 
           {/* 合作方排行榜 */}
           <div className="bg-zinc-800 rounded-lg p-6 mb-8">
-            <h3 className="font-bold mb-4">🏆 合作方排行榜</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold">🏆 合作方排行榜</h3>
+              <button
+                onClick={() => exportToCSV(data.topPerformers, 'analytics-top-performers')}
+                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm font-medium transition-colors
+                           flex items-center gap-2"
+              >
+                <span>📥</span>
+                <span>匯出 CSV</span>
+              </button>
+            </div>
             <div className="space-y-3">
               {data.topPerformers.map((performer, index) => (
                 <div key={performer.coupon_code} className="flex items-center justify-between p-3 bg-zinc-700 rounded">
