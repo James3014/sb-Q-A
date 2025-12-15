@@ -1,147 +1,139 @@
 'use client'
 
-import type { UseLessonFormReturn } from '@/hooks/lessons/useLessonForm'
+import Image from 'next/image'
+import type { UseLessonFormState } from '@/hooks/lessons/useLessonForm'
+import { StatusBadge } from '@/components/ui'
 
-interface LessonPreviewProps {
-  form: UseLessonFormReturn
+export interface LessonPreviewProps {
+  formState: UseLessonFormState
 }
 
-/**
- * 課程預覽組件 - 實時顯示課程最終排版
- * 手機友好的設計，模擬學生看到的樣子
- */
-export function LessonPreview({ form }: LessonPreviewProps) {
-  const { state } = form
+export function LessonPreview({ formState }: LessonPreviewProps) {
+  const { title, what, why, how, signals, level_tags, slope_tags, is_premium } = formState
 
   return (
-    <div className="bg-slate-900 text-white rounded-lg overflow-hidden border border-zinc-700">
-      {/* 預覽標題 */}
-      <div className="bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-400">
-        📱 課程預覽（手機版）
+    <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-6">
+      {/* 標題和標籤 */}
+      <div className="mb-6">
+        <div className="flex items-start justify-between mb-2">
+          <h2 className="text-2xl font-bold text-white">
+            {title || '（未設定標題）'}
+          </h2>
+          {is_premium && (
+            <StatusBadge variant="warning" size="sm">
+              PRO
+            </StatusBadge>
+          )}
+        </div>
+
+        {/* 標籤 */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {level_tags?.map(tag => (
+            <span key={tag} className="px-2 py-1 text-xs rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              {tag}
+            </span>
+          ))}
+          {slope_tags?.map(tag => (
+            <span key={tag} className="px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
 
-      {/* 預覽內容 - 模擬手機屏幕 */}
-      <div className="bg-black aspect-video sm:aspect-auto sm:max-h-[600px] overflow-y-auto">
-        <div className="bg-slate-900 text-white p-4 space-y-4">
-          {/* 課程標題 */}
-          <div className="space-y-2">
-            <h1 className="text-xl font-bold break-words">
-              {state.title || '（課程標題）'}
-            </h1>
-            <div className="flex flex-wrap gap-2">
-              {state.is_premium && (
-                <span className="inline-block bg-amber-600 px-2 py-1 text-xs rounded font-semibold">
-                  🔒 PRO
-                </span>
-              )}
-              {state.level_tags && state.level_tags.length > 0 && (
-                <div className="flex gap-1">
-                  {state.level_tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="inline-block bg-blue-600 px-2 py-1 text-xs rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+      {/* WHAT 章節 */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-white mb-3">這個練習學什麼</h3>
+        <p className="text-zinc-300 leading-relaxed">
+          {what || '（未填寫說明）'}
+        </p>
+      </div>
+
+      {/* WHY 章節 */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-white mb-3">為什麼要練</h3>
+        {why && why.length > 0 ? (
+          <ul className="space-y-2">
+            {why.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-zinc-300">
+                <span className="text-blue-400 mt-1">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-zinc-500 text-sm">（未填寫）</p>
+        )}
+      </div>
+
+      {/* HOW 章節 */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-white mb-3">怎麼練</h3>
+        {how && how.length > 0 ? (
+          <div className="space-y-4">
+            {how.map((step, idx) => (
+              <div key={idx} className="rounded-lg border border-zinc-800 bg-zinc-900/80 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-blue-600 text-white">
+                    步驟 {idx + 1}
+                  </span>
                 </div>
-              )}
-              {state.slope_tags && state.slope_tags.length > 0 && (
-                <div className="flex gap-1">
-                  {state.slope_tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="inline-block bg-green-600 px-2 py-1 text-xs rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+                {step.image && (
+                  <div className="mb-3 rounded-lg overflow-hidden">
+                    <Image
+                      src={step.image}
+                      alt={'步驟 ' + (idx + 1)}
+                      width={400}
+                      height={300}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                )}
+                <p className="text-zinc-300 leading-relaxed">{step.text}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-zinc-500 text-sm">（未填寫）</p>
+        )}
+      </div>
+
+      {/* SIGNALS 章節 */}
+      <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 正確信號 */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3">做對的訊號 ✅</h3>
+            {signals?.correct && signals.correct.length > 0 ? (
+              <ul className="space-y-2">
+                {signals.correct.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-zinc-300">
+                    <span className="text-green-400 mt-1">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-zinc-500 text-sm">（未填寫）</p>
+            )}
           </div>
 
-          {/* 課程目標 */}
-          {state.what && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-semibold text-zinc-300">📌 課程問題</h2>
-              <div className="text-sm text-zinc-400 leading-relaxed whitespace-pre-wrap">
-                {state.what}
-              </div>
-            </div>
-          )}
-
-          {/* 為什麼重要 */}
-          {state.why && state.why.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-semibold text-zinc-300">🎯 為什麼重要</h2>
-              <ul className="text-sm text-zinc-400 space-y-1 ml-4">
-                {state.why.map((item, i) => (
-                  <li key={i} className="list-disc">
-                    {item}
+          {/* 錯誤信號 */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3">做錯的訊號 ❌</h3>
+            {signals?.wrong && signals.wrong.length > 0 ? (
+              <ul className="space-y-2">
+                {signals.wrong.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-zinc-300">
+                    <span className="text-red-400 mt-1">✗</span>
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
-
-          {/* 教學步驟 */}
-          {state.how && state.how.length > 0 && (
-            <div className="space-y-3">
-              <h2 className="text-sm font-semibold text-zinc-300">📖 教學步驟</h2>
-              {state.how.map((step, i) => (
-                <div key={i} className="bg-zinc-800 rounded p-3 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center w-6 h-6 bg-zinc-700 rounded-full text-xs font-bold">
-                      {i + 1}
-                    </span>
-                    <span className="text-xs font-semibold text-zinc-300">步驟 {i + 1}</span>
-                  </div>
-                  <p className="text-sm text-zinc-400 whitespace-pre-wrap">
-                    {step.text || '（步驟內容）'}
-                  </p>
-                  {step.image && (
-                    <img
-                      src={step.image}
-                      alt={`步驟 ${i + 1}`}
-                      className="w-full h-40 object-cover rounded"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* 做對的信號 */}
-          {state.signals?.correct && state.signals.correct.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-semibold text-emerald-400">✅ 做對的信號</h2>
-              <ul className="text-sm text-zinc-400 space-y-1 ml-4">
-                {state.signals.correct.map((item, i) => (
-                  <li key={i} className="list-disc">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* 做錯的信號 */}
-          {state.signals?.wrong && state.signals.wrong.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-semibold text-red-400">❌ 做錯的信號</h2>
-              <ul className="text-sm text-zinc-400 space-y-1 ml-4">
-                {state.signals.wrong.map((item, i) => (
-                  <li key={i} className="list-disc">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* 空白 */}
-          <div className="h-8" />
+            ) : (
+              <p className="text-zinc-500 text-sm">（未填寫）</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
