@@ -34,3 +34,8 @@ export { useHomePersistence } from './useHomePersistence'
 export { useScrollRestoration } from './useScrollRestoration'
 export { useScrollDepth } from './useScrollDepth'
 export { useCardAnimation } from './useCardAnimation'
+
+// Lesson CMS hooks
+export { useLessonForm } from './lessons/useLessonForm'
+export { useImageUpload } from './lessons/useImageUpload'
+export { useFormValidation } from './lessons/useFormValidation'

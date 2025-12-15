@@ -3,14 +3,14 @@
  */
 
 // Mock Supabase
+const builder = {
+  eq: jest.fn().mockReturnThis(),
+  single: jest.fn(),
+}
 const mockSupabase = {
   from: jest.fn(() => ({
-    select: jest.fn(() => ({
-      eq: jest.fn(() => ({
-        single: jest.fn()
-      }))
-    }))
-  }))
+    select: jest.fn(() => builder),
+  })),
 }
 
 // Mock 驗證函數
@@ -43,6 +43,8 @@ async function validateCoupon(supabase, code, userId = null) {
 describe('validateCoupon 函數測試', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    builder.eq.mockClear()
+    builder.single.mockReset()
   })
 
   test('有效折扣碼應該通過驗證', async () => {
@@ -55,7 +57,7 @@ describe('validateCoupon 函數測試', () => {
       max_uses: 100
     }
 
-    mockSupabase.from().select().eq().single.mockResolvedValue({
+    builder.single.mockResolvedValue({
       data: mockCoupon,
       error: null
     })
@@ -67,7 +69,7 @@ describe('validateCoupon 函數測試', () => {
   })
 
   test('不存在的折扣碼應該被拒絕', async () => {
-    mockSupabase.from().select().eq().single.mockResolvedValue({
+    builder.single.mockResolvedValue({
       data: null,
       error: { message: 'No rows returned' }
     })
@@ -88,7 +90,7 @@ describe('validateCoupon 函數測試', () => {
       max_uses: 100
     }
 
-    mockSupabase.from().select().eq().single.mockResolvedValue({
+    builder.single.mockResolvedValue({
       data: expiredCoupon,
       error: null
     })
@@ -109,7 +111,7 @@ describe('validateCoupon 函數測試', () => {
       max_uses: 100
     }
 
-    mockSupabase.from().select().eq().single.mockResolvedValue({
+    builder.single.mockResolvedValue({
       data: limitReachedCoupon,
       error: null
     })

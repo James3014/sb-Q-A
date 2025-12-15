@@ -1,43 +1,79 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { Lesson } from '@/lib/lessons'
 import { fetchAdminLessons, LessonStat, LessonEffectiveness, LessonHealth } from '@/lib/adminData'
 import { LessonHeatmap } from '@/components/LessonHeatmap'
+import { LessonManageTable } from '@/components/admin/lessons/LessonManageTable'
+import { adminDelete } from '@/lib/adminApi'
+import { LESSON_API_ENDPOINTS } from '@/constants/lesson'
 
 export default function LessonsPage() {
   const { isReady } = useAdminAuth()
+  const router = useRouter()
   const [lessons, setLessons] = useState<LessonStat[]>([])
   const [allLessons, setAllLessons] = useState<Lesson[]>([])
   const [effectiveness, setEffectiveness] = useState<LessonEffectiveness[]>([])
   const [health, setHealth] = useState<LessonHealth[]>([])
-  const [tab, setTab] = useState<'stats' | 'effectiveness' | 'health' | 'heatmap'>('stats')
+  const [tab, setTab] = useState<'stats' | 'effectiveness' | 'health' | 'heatmap' | 'manage'>('stats')
   const [sortBy, setSortBy] = useState<'views' | 'practices' | 'favorites'>('views')
   const [filterLevel, setFilterLevel] = useState<string>('all')
   const [filterPremium, setFilterPremium] = useState<string>('all')
   const [loading, setLoading] = useState(true)
+  const [manageError, setManageError] = useState<string | null>(null)
+  const [manageActionLoading, setManageActionLoading] = useState(false)
+
+  const loadLessons = useCallback(async () => {
+    if (!isReady) return
+    setLoading(true)
+    const body = await fetchAdminLessons()
+    if (body) {
+      setLessons(body.lessonStats || [])
+      setEffectiveness(body.effectiveness || [])
+      setAllLessons(body.lessons || [])
+      setHealth(body.lessonHealth || [])
+    }
+    setLoading(false)
+  }, [isReady])
 
   useEffect(() => {
-    async function load() {
-      const body = await fetchAdminLessons()
-      if (body) {
-        setLessons(body.lessonStats || [])
-        setEffectiveness(body.effectiveness || [])
-        setAllLessons(body.lessons || [])
-        setHealth(body.lessonHealth || [])
-      }
-      setLoading(false)
-    }
-    if (isReady) load()
-  }, [isReady])
+    loadLessons()
+  }, [loadLessons])
 
   let filtered = lessons
   if (filterLevel !== 'all') filtered = filtered.filter(l => l.level_tags?.includes(filterLevel))
   if (filterPremium === 'free') filtered = filtered.filter(l => !l.is_premium)
   else if (filterPremium === 'pro') filtered = filtered.filter(l => l.is_premium)
   const sorted = [...filtered].sort((a, b) => b[sortBy] - a[sortBy])
+
+  const visibleLessons = useMemo(
+    () => allLessons.filter(lesson => !lesson.deleted_at),
+    [allLessons]
+  )
+
+  const handleDeleteLesson = useCallback(async (id: string) => {
+    if (!window.confirm('確定要刪除此課程嗎？此動作不可逆。')) {
+      return
+    }
+    setManageError(null)
+    setManageActionLoading(true)
+    const result = await adminDelete<{ ok: boolean }>(`${LESSON_API_ENDPOINTS.lessons}/${id}`)
+    if (!result?.ok) {
+      setManageError('刪除失敗，請稍後再試。')
+      setManageActionLoading(false)
+      return
+    }
+    setAllLessons(prev => prev.filter(lesson => lesson.id !== id))
+    await loadLessons()
+    setManageActionLoading(false)
+  }, [loadLessons])
+
+  const handleRefresh = useCallback(() => {
+    loadLessons()
+  }, [loadLessons])
 
   return (
     <AdminLayout>
@@ -50,6 +86,7 @@ export default function LessonsPage() {
             { key: 'effectiveness', label: '🎯 有效度' },
             { key: 'health', label: '🩺 健康度' },
             { key: 'heatmap', label: '🔥 熱力圖' },
+            { key: 'manage', label: '🛠 課程管理' },
           ].map(t => (
             <button
               key={t.key}
@@ -177,6 +214,36 @@ export default function LessonsPage() {
                   })}
                 </div>
               )}
+            </div>
+          ) : tab === 'manage' ? (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-lg font-semibold">課程管理</p>
+                  <p className="text-sm text-zinc-500">建立 / 編輯 / 軟刪除</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={handleRefresh}
+                    className="rounded border border-zinc-600 px-3 py-1 text-sm text-zinc-100 hover:border-zinc-400"
+                  >
+                    重新整理
+                  </button>
+                  <button
+                    onClick={() => router.push('/admin/lessons/create')}
+                    className="rounded bg-emerald-500 px-3 py-1 text-sm font-semibold text-white hover:bg-emerald-400"
+                  >
+                    + 建立課程
+                  </button>
+                </div>
+              </div>
+              {manageError && <p className="text-sm text-red-400">{manageError}</p>}
+              <LessonManageTable
+                lessons={visibleLessons}
+                isLoading={loading || manageActionLoading}
+                onEdit={id => router.push(`/admin/lessons/${id}/edit`)}
+                onDelete={handleDeleteLesson}
+              />
             </div>
           ) : (
             <LessonHeatmap lessons={allLessons} stats={lessons} />

@@ -61,7 +61,7 @@ export default function LessonCard({ lesson, from = 'home' }: LessonCardProps) {
             {levels}
           </span>
           <span className="px-4 py-2 bg-gradient-to-r from-purple-500/25 to-pink-500/25 border border-purple-400/40 text-purple-300 rounded-lg text-sm font-bold tracking-wide backdrop-blur-sm skew-x-2">
-            {lesson.casi?.Primary_Skill || '技能'}
+            {(lesson.casi?.Primary_Skill as string) || '技能'}
           </span>
         </div>
 

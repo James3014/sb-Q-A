@@ -1,17 +1,7 @@
-import { getSupabase } from './supabase'
+import { getSupabase } from '@/lib/supabase'
+import type { Lesson } from '@/types/lessons'
 
-export interface Lesson {
-  id: string
-  title: string
-  level_tags: string[]
-  slope_tags: string[]
-  what: string
-  why: string[]
-  how: { text: string; image?: string | null }[]
-  signals: { correct: string[]; wrong: string[] }
-  casi: { Primary_Skill?: string | null; Core_Competency?: string | null }
-  is_premium?: boolean
-}
+export type { Lesson }
 
 export async function getLessons(): Promise<Lesson[]> {
   const supabase = getSupabase()

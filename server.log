@@ -1,0 +1,14 @@
+
+> web@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use by process 7278, using available port 3001 instead.
+   ▲ Next.js 16.0.7 (Turbopack)
+   - Local:         http://localhost:3001
+   - Network:       http://172.20.10.3:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ⨯ Unable to acquire lock at /Users/jameschen/Downloads/diyski/project/specs/單板教學/web/.next/dev/lock, is another instance of next dev running?
+   Suggestion: If you intended to restart next dev, terminate the other process, and then try again.
+[?25h

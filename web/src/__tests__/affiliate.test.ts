@@ -1,8 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, beforeEach, jest } from '@jest/globals'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { useAffiliates } from '@/hooks/useAffiliates'
 import { formatDate, calculateCommission, getSubscriptionStatus } from '@/utils/affiliateUtils'
-import { AffiliateService } from '@/services/affiliateService'
+import { AffiliateService, affiliateServiceDeps } from '@/services/affiliateService'
+
+const adminGetMock = jest.fn()
+const adminPostMock = jest.fn()
+
+beforeEach(() => {
+  adminGetMock.mockReset()
+  adminPostMock.mockReset()
+  affiliateServiceDeps.adminGet = adminGetMock as any
+  affiliateServiceDeps.adminPost = adminPostMock as any
+})
+
+afterEach(() => {
+  jest.restoreAllMocks()
+})
 
 // 測試工具函數
 describe('Affiliate Utils', () => {
@@ -43,7 +57,7 @@ describe('Affiliate Utils', () => {
 // 測試 Hook
 describe('useAffiliates Hook', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    jest.clearAllMocks()
   })
 
   it('should load affiliates on mount', async () => {
@@ -51,7 +65,7 @@ describe('useAffiliates Hook', () => {
       { id: '1', partner_name: 'Test Partner', total_trials: 10 }
     ]
     
-    vi.spyOn(AffiliateService, 'getAll').mockResolvedValue(mockAffiliates)
+    jest.spyOn(AffiliateService, 'getAll').mockResolvedValue(mockAffiliates as any)
     
     const { result } = renderHook(() => useAffiliates())
     
@@ -69,7 +83,7 @@ describe('useAffiliates Hook', () => {
       commission_rate: 0.15
     }
 
-    vi.spyOn(AffiliateService, 'create').mockResolvedValue({ id: '2', ...newAffiliate })
+    jest.spyOn(AffiliateService, 'create').mockResolvedValue({ id: '2', ...newAffiliate } as any)
     
     const { result } = renderHook(() => useAffiliates())
     
@@ -84,27 +98,21 @@ describe('useAffiliates Hook', () => {
 // 測試服務層
 describe('AffiliateService', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    jest.clearAllMocks()
   })
 
   it('should fetch affiliates from API', async () => {
     const mockResponse = { affiliates: [{ id: '1', partner_name: 'Test' }] }
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockResponse)
-    })
+    adminGetMock.mockResolvedValue(mockResponse)
 
     const result = await AffiliateService.getAll()
     
-    expect(fetch).toHaveBeenCalledWith('/api/admin/affiliates')
+    expect(adminGetMock).toHaveBeenCalledWith('/api/admin/affiliates')
     expect(result).toEqual(mockResponse.affiliates)
   })
 
   it('should handle API errors gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 500
-    })
+    adminGetMock.mockRejectedValue(new Error('boom'))
 
     await expect(AffiliateService.getAll()).rejects.toThrow('Failed to fetch affiliates')
   })

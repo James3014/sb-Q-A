@@ -1,0 +1,35 @@
+
+> web@0.1.0 dev
+> next dev
+
+   ▲ Next.js 16.0.7 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://172.20.10.3:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ✓ Ready in 770ms
+[UserCoreConfig] Current Configuration
+  API URL: https://user-core.zeabur.app
+  Timeout: 5000ms
+  Batch Size: 10
+  Batch Interval: 5000ms
+  Max Retries: 0
+  Retry Delay: 1000ms
+  Enable User Sync: true
+  Enable Event Sync: true
+  Enable Monitoring: true
+  Debug Mode: true
+ GET / 200 in 1261ms (compile: 1163ms, render: 98ms)
+ GET / 200 in 25ms (compile: 2ms, render: 23ms)
+ GET /admin 200 in 285ms (compile: 233ms, proxy.ts: 33ms, render: 20ms)
+ GET / 200 in 51ms (compile: 10ms, render: 42ms)
+ GET /admin/lessons 200 in 454ms (compile: 406ms, proxy.ts: 4ms, render: 44ms)
+ GET /admin/lessons/create 200 in 507ms (compile: 449ms, proxy.ts: 3ms, render: 56ms)
+[Supabase] Missing service role env vars
+ GET /api/admin/lessons 500 in 233ms (compile: 222ms, render: 11ms)
+ GET /admin/lessons 200 in 90ms (compile: 9ms, proxy.ts: 13ms, render: 68ms)
+ GET /icon-192.png 404 in 287ms (compile: 254ms, render: 33ms)
+ GET /login 200 in 662ms (compile: 590ms, render: 72ms)
+ GET /icon-192.png 404 in 96ms (compile: 28ms, render: 68ms)

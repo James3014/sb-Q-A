@@ -64,7 +64,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   return (
     <main className="min-h-screen bg-zinc-900 text-white pb-24">
       <article className="max-w-lg mx-auto px-4 py-6">
-        <LessonHeader skill={lesson.casi?.Primary_Skill} title={lesson.title} />
+        <LessonHeader skill={(lesson.casi?.Primary_Skill as string | undefined)} title={lesson.title} />
         <LessonTitle lesson={lesson} />
         
         {/* 收藏和練習快捷按鈕 - 總是顯示，引導註冊/訂閱 */}
@@ -165,8 +165,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             {(lesson.casi?.Primary_Skill || lesson.casi?.Core_Competency) && (
               <section className="bg-zinc-800 rounded-lg p-4 mb-4">
                 <h2 className="font-semibold mb-2">📚 CASI 分類</h2>
-                <p className="text-zinc-300 text-sm">技能：{lesson.casi.Primary_Skill}</p>
-                <p className="text-zinc-300 text-sm">能力：{lesson.casi.Core_Competency}</p>
+                <p className="text-zinc-300 text-sm">技能：{lesson.casi?.Primary_Skill as string}</p>
+                <p className="text-zinc-300 text-sm">能力：{lesson.casi?.Core_Competency as string}</p>
               </section>
             )}
           </>

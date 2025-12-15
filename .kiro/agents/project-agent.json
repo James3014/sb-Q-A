@@ -1,0 +1,30 @@
+{
+  "name": "project-agent",
+  "description": "單板教學 App 專案助手 - 專精於 Next.js、Supabase、滑雪教學內容管理",
+  "allowedTools": [
+    "fs_read",
+    "fs_write", 
+    "execute_bash",
+    "web_search",
+    "web_fetch"
+  ],
+  "resources": [
+    "file://README.md",
+    "file://docs/**/*.md",
+    "file://web/src/**/*.ts",
+    "file://web/src/**/*.tsx",
+    "file://web/package.json"
+  ],
+  "toolsSettings": {
+    "fs_read": {
+      "allowedPaths": ["./", "~/Downloads/diyski/project/specs/單板教學/**"]
+    },
+    "fs_write": {
+      "allowedPaths": ["./web/**", "./docs/**"]
+    },
+    "execute_bash": {
+      "allowedCommands": ["npm.*", "git.*", "cd.*"],
+      "autoAllowReadonly": true
+    }
+  }
+}

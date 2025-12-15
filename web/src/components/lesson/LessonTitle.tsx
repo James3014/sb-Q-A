@@ -3,9 +3,12 @@ import { Lesson } from '@/lib/lessons'
 import { LEVEL_NAMES, SLOPE_NAMES } from '@/lib/constants'
 
 export function LessonTitle({ lesson }: { lesson: Lesson }) {
+  const primarySkill = lesson.casi?.Primary_Skill as string | undefined
+  const levelTags = lesson.level_tags ?? []
+  const slopeTags = lesson.slope_tags ?? []
+
   return (
     <div className="mb-6">
-      {/* 標題區：Alpine Velocity 風格 */}
       <div className="flex items-start gap-3 mb-5">
         <h1
           className="
@@ -20,8 +23,7 @@ export function LessonTitle({ lesson }: { lesson: Lesson }) {
           {lesson.title}
         </h1>
 
-        {/* PRO 徽章（美化版） */}
-        {lesson.is_premium && (
+        {lesson.is_premium ? (
           <span className="
             flex-shrink-0
             px-4 py-1.5
@@ -33,15 +35,13 @@ export function LessonTitle({ lesson }: { lesson: Lesson }) {
           ">
             PRO
           </span>
-        )}
+        ) : null}
       </div>
 
-      {/* 徽章區：斜向排列 + 漸層美化 */}
       <div className="flex flex-wrap gap-3 transform -skew-x-1">
-        {/* 技能徽章 */}
-        {lesson.casi?.Primary_Skill && (
+        {primarySkill ? (
           <Link
-            href={`/?skill=${lesson.casi.Primary_Skill}`}
+            href={`/?skill=${primarySkill}`}
             className="
               px-5 py-2.5
               text-base font-bold tracking-wide
@@ -56,12 +56,11 @@ export function LessonTitle({ lesson }: { lesson: Lesson }) {
               skew-x-1
             "
           >
-            {lesson.casi.Primary_Skill}
+            {primarySkill}
           </Link>
-        )}
+        ) : null}
 
-        {/* 等級徽章 */}
-        {lesson.level_tags?.map(t => (
+        {levelTags.map(t => (
           <Link
             key={t}
             href={`/?level=${t}`}
@@ -83,8 +82,7 @@ export function LessonTitle({ lesson }: { lesson: Lesson }) {
           </Link>
         ))}
 
-        {/* 雪道徽章 */}
-        {lesson.slope_tags?.map(t => (
+        {slopeTags.map(t => (
           <Link
             key={t}
             href={`/?slope=${t}`}

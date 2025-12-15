@@ -1,0 +1,86 @@
+proj: SnowSkill
+desc: Professional ski lesson platform with CMS, user authentication, payments, and practice tracking
+v: 1.0
+ts: 2025-12-15T00:00:00Z
+split: none
+tech:
+  lang: TypeScript
+  fw: Next.js 16
+  db: Supabase PostgreSQL
+  auth: Supabase Auth
+  payment: Stripe
+entry: src/app/layout.tsx
+r[30]{route,handler,tables,tpl}:
+  GET /,page.tsx,,Home
+  GET /lesson/:id,page.tsx,lessons,LessonDetail
+  GET /practice,page.tsx,practice_logs|lessons,PracticeHistory
+  GET /favorites,page.tsx,favorites|lessons,FavoritesList
+  GET /pricing,page.tsx,,PricingPage
+  GET /login,page.tsx,,LoginPage
+  GET /admin/lessons,page.tsx,lessons,LessonManageTable
+  GET /admin/lessons/create,page.tsx,,LessonForm
+  GET /admin/lessons/:id/edit,page.tsx,lessons,LessonForm
+  POST /api/admin/lessons,route.ts,lessons,LessonCreate
+  PATCH /api/admin/lessons/:id,route.ts,lessons,LessonUpdate
+  DELETE /api/admin/lessons/:id,route.ts,lessons,LessonDelete
+  GET /api/admin/lessons/:id,route.ts,lessons,LessonGet
+  POST /api/admin/upload,route.ts,,ImageUpload
+  POST /api/admin/users,route.ts,users|subscriptions,UserManage
+  GET /api/payments/status,route.ts,payments|subscriptions,PaymentStatus
+  POST /api/payments/checkout,route.ts,payments|users,CheckoutCreate
+  POST /api/payments/webhook,route.ts,payments|subscriptions,WebhookHandler
+  POST /api/coupons/validate,route.ts,coupons,CouponValidate
+  POST /api/coupons/redeem,route.ts,coupons|users,CouponRedeem
+  GET /api/cron/expire-trials,route.ts,subscriptions,TrialExpiry
+  POST /api/cron/quarterly-settlement,route.ts,payments,Settlement
+  POST /api/usercore/proxy,route.ts,,UserCoreProxy
+  GET /api/affiliate/dashboard,route.ts,affiliates|commissions,AffiliateStats
+  GET /admin/affiliates,page.tsx,affiliates,AffiliateTable
+  GET /admin/coupons,page.tsx,coupons,CouponManage
+  GET /admin/analytics,page.tsx,lessons|practice_logs,Analytics
+  GET /admin/feedback,page.tsx,feedback,FeedbackList
+m.hook[5]{name,path,desc,deps}:
+  useAuth,src/hooks/useAuth.ts,auth state,AuthProvider
+  useLessonDetailData,src/hooks/useLessonDetailData.ts,lesson detail logic,lessons|favorites|practice
+  useScrollDepth,src/hooks/useScrollDepth.ts,scroll tracking,analytics
+  useCardAnimation,src/hooks/useCardAnimation.ts,card entrance animation,
+  useAdminAuth,src/lib/useAdminAuth.ts,admin auth guard,useAuth
+m.lib[12]{name,path,desc,deps}:
+  lessons,src/lib/lessons/index.ts,lesson crud,Supabase
+  practice,src/lib/practice.ts,practice log management,Supabase
+  favorites,src/lib/favorites.ts,favorite management,Supabase
+  adminApi,src/lib/adminApi.ts,admin api helpers,fetch
+  auth,src/lib/auth.ts,authentication,Supabase Auth
+  payments,src/lib/payments.ts,stripe integration,stripe
+  coupons,src/lib/coupons.ts,coupon validation,Supabase
+  improvement,src/lib/improvement.ts,skill improvement tracking,practice_logs
+  constants,src/lib/constants.ts,app constants,
+  adminGuard,src/lib/adminGuard.ts,admin authorization,useAuth
+  userCoreClient,src/lib/userCoreClient.ts,usercore api client,fetch
+  validateAdmin,src/lib/validateAdmin.ts,admin validation,auth
+m.cmp[15]{name,path,desc,deps}:
+  LessonDetail,src/components/LessonDetail.tsx,lesson page layout,lessons|favorites|practice
+  LessonCard,src/components/LessonCard.tsx,lesson card ui,LessonCard.module.css
+  LessonTitle,src/components/lesson/LessonTitle.tsx,lesson title section,lessons
+  LessonForm,src/components/admin/lessons/LessonForm.tsx,lesson editor,RichTextEditor|ImageUploadZone|StepEditor
+  RichTextEditor,src/components/admin/lessons/RichTextEditor.tsx,tiptap editor,@tiptap/react
+  StepEditor,src/components/admin/lessons/StepEditor.tsx,drag-drop step editor,@dnd-kit/core
+  ImageUploadZone,src/components/admin/ImageUploadZone.tsx,image upload,Supabase Storage
+  LessonManageTable,src/components/admin/LessonManageTable.tsx,admin lesson list,lessons
+  BottomActionBar,src/components/lesson/BottomActionBar.tsx,floating action bar,favorites|practice
+  ProblemCategories,src/components/home/ProblemCategories.tsx,home filters,lessons
+  AuthProvider,src/components/AuthProvider.tsx,auth context,Supabase Auth
+  PricingCard,src/components/PricingCard.tsx,pricing ui,subscriptions
+  FeedbackForm,src/components/FeedbackForm.tsx,feedback submission,feedback tbl
+  ProBadge,src/components/ui/ProBadge.tsx,pro badge indicator,
+  SearchInput,src/components/ui/SearchInput.tsx,search field,
+db[6]{table,columns,desc,indexes}:
+  lessons,id|title|what|why|how|signals|level_tags|slope_tags|casi|is_premium|created_at|updated_at,lesson content,id|is_premium
+  practice_logs,id|user_id|lesson_id|notes|ratings|created_at,user practice records,user_id|lesson_id
+  favorites,id|user_id|lesson_id|created_at,saved lessons,user_id|lesson_id
+  subscriptions,id|user_id|status|plan_id|expires_at|trial_ends_at|created_at,user subscriptions,user_id|status
+  payments,id|user_id|amount|status|stripe_id|created_at,payment history,user_id|stripe_id
+  coupons,code|discount|usage_limit|used_count|valid_from|valid_until|created_at,discount codes,code
+cfg[4]: next.config.ts,tsconfig.json,package.json,.env.local
+patterns[4]: Repository Pattern|MVC|Custom Hooks|Context API
+deps[8]: next|react|@supabase/supabase-js|stripe|@tiptap/react|@dnd-kit/core|playwright|jest

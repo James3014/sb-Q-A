@@ -1,0 +1,196 @@
+proj: snowskill-web
+desc: DIY Ski teaching lesson platform - ski instructor evaluation & student progress tracking with affiliate marketing system
+v: 0.1.0
+ts: 2025-12-13T23:51:00Z
+split: none
+tech:
+  lang: TypeScript
+  fw: Next.js 16.0.7
+  db: Supabase PostgreSQL
+  auth: Supabase Auth
+  ui: React 19.2.0 + Tailwind CSS
+entry: web/src/app/layout.tsx
+r[42]{route,handler,tables,tpl}:
+  GET /,page.tsx,lessons|users,RootLayout
+  GET /pricing,page.tsx,,PricingPage
+  GET /lesson/:id,page.tsx,lessons|practice|users,LessonDetailPage
+  GET /practice,page.tsx,practice|lessons,PracticePage
+  GET /dashboard,:page.tsx,practice|improvement,DashboardPage
+  GET /favorites,page.tsx,favorites|lessons,FavoritesPage
+  GET /admin,page.tsx,users|payments,AdminDashboard
+  GET /admin/users,page.tsx,users,UserManagement
+  GET /admin/lessons,page.tsx,lessons,LessonManagement
+  GET /admin/affiliates,page.tsx,affiliate_partners|affiliate_clicks,AffiliateManagement
+  GET /admin/commissions,page.tsx,affiliate_commissions,CommissionDashboard
+  GET /admin/analytics,page.tsx,affiliate_clicks|affiliate_commissions|event_log,AnalyticsDashboard
+  GET /admin/monetization,page.tsx,payments|coupons,MonetizationDashboard
+  GET /admin/feedback,page.tsx,feedback,FeedbackManagement
+  GET /affiliate/dashboard,page.tsx,affiliate_partners|affiliate_commissions,AffiliateDashboard
+  GET /affiliate/login,page.tsx,affiliate_partners,AffiliateLogin
+  GET /affiliate/reset-password,page.tsx,affiliate_partners,AffiliateResetPassword
+  GET /feedback,page.tsx,feedback,FeedbackPage
+  GET /payment-success,page.tsx,payments,SuccessPage
+  GET /payment-failure,page.tsx,payments,FailurePage
+  GET /trial-success,page.tsx,users,TrialSuccessPage
+  GET /mock-checkout,page.tsx,payments,MockCheckoutPage
+  POST /api/payments/checkout,route.ts,payments,CheckoutAPI
+  POST /api/payments/status,route.ts,payments,StatusAPI
+  POST /api/payments/webhook,route.ts,payments|users|affiliate_commissions,WebhookAPI
+  GET /api/admin/users,route.ts,users,UserListAPI
+  GET /api/admin/lessons,route.ts,lessons,LessonListAPI
+  POST /api/admin/affiliates/create,route.ts,affiliate_partners,AffiliateCreateAPI
+  GET /api/admin/affiliates,route.ts,affiliate_partners|affiliate_clicks|users,AffiliateListAPI
+  GET /api/admin/affiliates/users,route.ts,users,AffiliateUsersAPI
+  GET /api/admin/commissions,route.ts,affiliate_commissions|affiliate_partners,CommissionListAPI
+  PATCH /api/admin/commissions,route.ts,affiliate_commissions,CommissionUpdateAPI
+  GET /api/admin/analytics,route.ts,affiliate_clicks|affiliate_commissions|affiliate_partners,AnalyticsAPI
+  GET /api/admin/dashboard,route.ts,event_log|users,DashboardDataAPI
+  GET /api/admin/monetization,route.ts,payments|coupons,MonetizationDataAPI
+  GET /api/affiliate/dashboard,route.ts,affiliate_partners|affiliate_commissions|users,AffiliateDashboardAPI
+  POST /api/coupons/redeem,route.ts,coupons|coupon_usages|users,CouponRedeemAPI
+  GET /api/coupons/validate,route.ts,coupons|users,CouponValidateAPI
+  POST /api/cron/expire-trials,route.ts,users,TrialExpiryAPI
+  POST /api/cron/quarterly-settlement,route.ts,affiliate_commissions,QuarterlySettlementAPI
+  GET /api/usercore/proxy,route.ts,users,UserCoreProxyAPI
+m.ctrl[12]{name,path,desc,deps}:
+  LessonCtrl,src/components/lesson/,lesson details & recommendations,useLessonDetailData
+  CheckoutCtrl,src/components/checkout/,payment checkout flow,useCheckout|payments
+  AdminCtrl,src/components/admin/,admin dashboards,adminData|adminGuard
+  AffiliateCtrl,src/components/affiliate/,affiliate management UI,useAffiliates|useAffiliateUsers|useAffiliateForm
+  AnalyticsCtrl,src/lib/analytics.ts,event tracking & analytics,logger|analytics
+  AffiliateAPICtrl,src/app/api/admin/affiliates/,affiliate management API,supabaseServer|affiliateService
+  CommissionCtrl,src/app/api/admin/commissions/,commission tracking,affiliate_commissions tbl
+  AnalyticsAPICtrl,src/app/api/admin/analytics/,affiliate analytics API,affiliate_clicks|affiliate_commissions
+  PracticeCtrl,src/components/practice/,practice recording UI,practice lib
+  DashboardCtrl,src/components/dashboard/,student progress dashboard,improvement lib|useChartStats
+  ReferralCtrl,src/components/ReferralBanner.tsx,referral tracking UI,trialSecurity
+  SecurityCtrl,src/lib/trialSecurity.ts,anti-abuse mechanisms,rateLimit|botDefense
+m.svc[15]{name,path,desc,deps}:
+  LessonSvc,src/lib/lessons.ts,lesson data & access control,accessControl
+  SubscriptionSvc,src/lib/subscription.ts,subscription state management,users tbl
+  PaymentSvc,src/lib/payments.ts,payment processing,Stripe API|payments tbl
+  UserCoreSvc,src/lib/userCoreClient.ts,UserCore integration,userCoreConfig|userCoreSync
+  PracticeSvc,src/lib/practice.ts,practice records CRUD,practice tbl
+  FavoritesSvc,src/lib/favorites.ts,favorites management,favorites tbl
+  ImprovementSvc,src/lib/improvement.ts,skill rating tracking,improvement tbl
+  AnalyticsSvc,src/lib/analytics.ts,event logging,event_log tbl|logger
+  TrialSecuritySvc,src/lib/trialSecurity.ts,anti-abuse mechanisms,rateLimit|botDefense
+  AdminDataSvc,src/lib/adminData.ts,admin dashboard queries,accessControl|adminAuth
+  AffiliateSvc,src/services/affiliateService.ts,affiliate CRUD operations,adminApi
+  AffiliateUtilsSvc,src/utils/affiliateUtils.ts,affiliate utility functions,formatters
+  ErrorHandlerSvc,src/utils/errorHandler.ts,unified error handling,AffiliateError
+  AdminApiSvc,src/lib/adminApi.ts,admin API client wrapper,token management
+  AdminGuardSvc,src/lib/adminGuard.ts,admin authorization,supabaseServer
+m.repo[18]{name,path,desc,deps}:
+  LessonsRepo,src/lib/lessons.ts,lessons tbl,supabaseClient
+  UsersRepo,src/lib/userCoreClient.ts,users tbl sync,supabaseClient
+  PaymentsRepo,src/lib/adminData.ts,payments tbl,supabaseClient
+  PracticeRepo,src/lib/practice.ts,practice tbl,supabaseClient
+  FavoritesRepo,src/lib/favorites.ts,favorites tbl,supabaseClient
+  ImprovementRepo,src/lib/improvement.ts,improvement tbl,supabaseClient
+  EventLogRepo,src/lib/analytics.ts,event_log tbl,supabaseClient
+  CouponsRepo,src/app/api/coupons/validate/route.ts,coupons tbl,supabaseClient
+  CouponUsagesRepo,src/app/api/coupons/redeem/route.ts,coupon_usages tbl,supabaseClient
+  AffiliatePartnerRepo,src/app/api/admin/affiliates/route.ts,affiliate_partners tbl,supabaseServer
+  AffiliateCommissionRepo,src/app/api/admin/commissions/route.ts,affiliate_commissions tbl,supabaseServer
+  AffiliateClicksRepo,src/app/pricing/page.tsx,affiliate_clicks tbl,supabaseClient
+  TrialExpiryRepo,src/app/api/cron/expire-trials/route.ts,users tbl,supabaseServer
+  QuarterlySettlementRepo,src/app/api/cron/quarterly-settlement/route.ts,affiliate_commissions tbl,supabaseServer
+  FeedbackRepo,src/lib/feedback.ts,feedback tbl,supabaseClient
+  EventLogServerRepo,src/lib/analyticsServer.ts,event_log tbl,supabaseServer
+  AdminUsersRepo,src/app/api/admin/users/route.ts,users tbl,supabaseServer
+  AdminLessonsRepo,src/app/api/admin/lessons/route.ts,lessons tbl,supabaseServer
+m.cmp[35]{name,path,desc,deps}:
+  RootLayout,src/app/layout.tsx,root layout wrapper,useSnowMode|useScrollRestoration
+  LessonCard,src/components/LessonCard.tsx,lesson list item with alpine velocity design,useAccessibleLessons
+  SkillImprovementChart,src/components/dashboard/SkillImprovementChart.tsx,progress chart visualization,useChartStats|improvement lib
+  ProblemCategories,src/components/home/ProblemCategories.tsx,skill category selector,useAccessibleLessons
+  CouponBanner,src/components/CouponBanner.tsx,free trial offer display,
+  ReferralBanner,src/components/ReferralBanner.tsx,referral promotion display,useAuth|trialSecurity
+  PricingCard,src/components/pricing/PricingCard.tsx,subscription plan card,
+  CheckoutForm,src/components/checkout/CheckoutForm.tsx,payment form,useCheckout|Stripe
+  AdminUserList,src/components/admin/AdminUserList.tsx,user management table,adminData lib
+  AdminAffiliateList,src/components/admin/AdminAffiliateList.tsx,affiliate partner table,adminData lib
+  CommissionChart,src/components/admin/CommissionChart.tsx,commission tracking chart,affiliate_commissions tbl
+  AffiliateStats,src/components/affiliate/AffiliateStats.tsx,affiliate KPI cards,formatCurrency
+  AffiliateForm,src/components/affiliate/AffiliateForm.tsx,affiliate creation form,useAffiliateForm|errorHandler
+  AffiliateList,src/components/affiliate/AffiliateList.tsx,affiliate management list,affiliateUtils
+  AffiliateUserList,src/components/affiliate/AffiliateUserList.tsx,affiliate user display,affiliateUtils
+  PracticeCard,src/components/practice/PracticeCard.tsx,practice record item,practice lib
+  SkillRatingForm,src/components/practice/SkillRatingForm.tsx,3-star rating interface,practice lib
+  DashboardMetrics,src/components/dashboard/DashboardMetrics.tsx,KPI cards display,improvement lib
+  FeedbackForm,src/components/feedback/FeedbackForm.tsx,user feedback collection,feedback lib
+  EventLogger,src/components/analytics/EventLogger.tsx,event tracking component,analytics lib
+  BottomActionBar,src/components/lesson/BottomActionBar.tsx,favorite + complete buttons,favorites|practice
+  LessonTitle,src/components/lesson/LessonTitle.tsx,course header with badges,lessons lib
+  RecommendationCard,src/components/lesson/RecommendationCard.tsx,similar course suggestions,lessons lib
+  UserProfile,src/components/user/UserProfile.tsx,user account info,subscription lib
+  SnowModeToggle,src/components/SnowModeToggle.tsx,theme switcher,useSnowMode
+  ScrollDepthTracker,src/components/analytics/ScrollDepthTracker.tsx,scroll engagement,useScrollDepth
+  CardAnimation,src/components/animations/CardAnimation.tsx,motion effects,useCardAnimation|framer-motion
+  AuthGuard,src/components/auth/AuthGuard.tsx,login gate,auth lib
+  AdminGuard,src/components/auth/AdminGuard.tsx,admin only gate,adminGuard lib
+  AdminLayout,src/components/AdminLayout.tsx,admin page wrapper,useAdminAuth
+  ErrorBoundary,src/components/error/ErrorBoundary.tsx,error handler,logger lib
+  TurnstileWidget,src/components/TurnstileWidget.tsx,bot protection,Cloudflare Turnstile
+  CheckoutModal,src/components/CheckoutModal.tsx,payment status modal,
+  AuthProvider,src/components/AuthProvider.tsx,authentication context,supabase auth
+  LessonDetail,src/components/LessonDetail.tsx,lesson content display,lesson data
+hook[18]{name,path,desc,deps}:
+  useAccessibleLessons,src/hooks/useAccessibleLessons.ts,permission-based lesson filtering,lessons|subscription
+  useLessonDetailData,src/hooks/useLessonDetailData.ts,lesson detail page data,lessons|practice|improvement|favorites
+  useCheckout,src/hooks/useCheckout.ts,payment flow state mgmt,payments API|subscription
+  useChartStats,src/hooks/useChartStats.ts,chart calculation functions,improvement
+  useSnowMode,src/hooks/useSnowMode.ts,theme toggle persistence,
+  useHomePersistence,src/hooks/useHomePersistence.ts,homepage scroll state,
+  useScrollRestoration,src/hooks/useScrollRestoration.ts,restore scroll position,
+  useScrollDepth,src/hooks/useScrollDepth.ts,track scroll engagement,analytics
+  useCardAnimation,src/hooks/useCardAnimation.ts,card motion control,framer-motion
+  useFavoritesOptimistic,src/hooks/useFavoritesOptimistic.ts,optimistic favorite toggle,favorites
+  usePracticeRecord,src/hooks/usePracticeRecord.ts,practice data submission,practice
+  useUserCoreSync,src/hooks/useUserCoreSync.ts,UserCore auth sync,userCoreSync
+  useAffiliates,src/hooks/useAffiliates.ts,affiliate CRUD operations,affiliateService
+  useAffiliateUsers,src/hooks/useAffiliateUsers.ts,affiliate user management,affiliateService
+  useAffiliateForm,src/hooks/useAffiliateForm.ts,affiliate form validation,affiliateConstants
+  useAdminAuth,src/lib/useAdminAuth.ts,admin authentication hook,adminAuth
+  useFilteredLessons,src/lib/useFilteredLessons.ts,lesson filtering logic,lessons
+  useRetry,src/lib/retry.ts,exponential backoff hook,
+util[12]{name,path,desc,deps}:
+  accessControl.ts,src/lib/accessControl.ts,permission checking utilities,subscription
+  auth.ts,src/lib/auth.ts,authentication helpers,Supabase Auth
+  adminAuth.ts,src/lib/adminAuth.ts,admin role verification,users tbl
+  adminGuard.ts,src/lib/adminGuard.ts,admin authorization middleware,supabaseServer
+  constants.ts,src/lib/constants.ts,global configuration constants,
+  affiliateConstants.ts,src/constants/affiliate.ts,affiliate system constants,
+  logger.ts,src/lib/logger.ts,event logging utility,
+  retry.ts,src/lib/retry.ts,exponential backoff,
+  botDefense.ts,src/lib/botDefense.ts,Turnstile validation,Cloudflare
+  rateLimit.ts,src/lib/rateLimit.ts,request throttling,
+  affiliateUtils.ts,src/utils/affiliateUtils.ts,affiliate formatting utilities,
+  errorHandler.ts,src/utils/errorHandler.ts,unified error handling,AffiliateError
+type[7]{file,desc}:
+  lesson-v3.ts,lesson domain models
+  rider-v3.ts,user/rider profile models
+  coupon.ts,trial system types
+  affiliate.ts,affiliate marketing types
+  path.ts,URL path utilities
+  index.ts,type barrel export
+  global.d.ts,global type declarations
+db[13]{tbl,desc,key}:
+  lessons,course catalog,id
+  users,user accounts & subscription,id
+  practice,practice records,id
+  improvement,skill ratings,id
+  favorites,bookmarked courses,id
+  payments,payment transactions,id
+  coupons,discount codes,code
+  coupon_usages,code redemption history,coupon_id|user_id
+  affiliate_partners,partner accounts,email
+  affiliate_commissions,partner earnings,partner_id|settlement_period
+  affiliate_clicks,referral click tracking,affiliate_id|clicked_at
+  event_log,analytics events,user_id|event_type
+  feedback,user feedback,id
+cfg[3]: web/package.json,web/tsconfig.json,web/.env.example
+patterns[8]: Subscription State,API Routes,Custom Hooks,Optimistic Updates,Transaction-based Coupon Redemption,TDD Component Architecture,Service Layer Abstraction,Clean Code Principles
+security[6]: Supabase Auth,RLS Policies,Rate Limiting,Bot Defense via Turnstile,Trial Abuse Prevention,IP-based Protection
+features[12]: Free Trial via Coupon Code,Affiliate Commission Tracking,Referral Click Tracking,User Progress Dashboard,Practice Recording,Favorite Lessons,Admin Management,Analytics Tracking,Payment Processing,Affiliate Analytics Dashboard,Trial Security System,TDD Refactored Components

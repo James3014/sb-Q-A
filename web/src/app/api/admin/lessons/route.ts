@@ -1,11 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authorizeAdmin } from '@/lib/adminGuard'
+import { createLessonWithValidation } from '@/lib/lessons/services/lessonService'
+import { setSupabaseGetter, resetSupabaseGetter } from '@/lib/lessons/repositories/lessonRepository'
+import type { CreateLessonInput } from '@/types/lessons'
+import { ValidationError, NotFoundError } from '@/types/lessons'
 
 type LessonRow = {
   id: string
   title: string
   is_premium: boolean | null
   level_tags: string[] | null
+}
+
+async function withLessonSupabase<T>(client: any, callback: () => Promise<T>): Promise<T> {
+  setSupabaseGetter(() => client)
+  try {
+    return await callback()
+  } finally {
+    resetSupabaseGetter()
+  }
+}
+
+function handleLessonError(error: unknown): NextResponse {
+  if (error instanceof ValidationError) {
+    return NextResponse.json({ ok: false, error: error.errors }, { status: 400 })
+  }
+  if (error instanceof NotFoundError) {
+    return NextResponse.json({ ok: false, error: error.message }, { status: 404 })
+  }
+  return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 })
 }
 
 export async function GET(req: NextRequest) {
@@ -83,4 +106,25 @@ export async function GET(req: NextRequest) {
     effectiveness: effectiveness.data || [],
     lessonHealth,
   })
+}
+
+export async function POST(req: NextRequest) {
+  const auth = await authorizeAdmin(req)
+  if (auth.error) return auth.error
+
+  let payload: unknown
+  try {
+    payload = await req.json()
+  } catch {
+    return NextResponse.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  try {
+    const lesson = await withLessonSupabase(auth.supabase, () =>
+      createLessonWithValidation(payload as CreateLessonInput)
+    )
+    return NextResponse.json({ ok: true, lesson }, { status: 200 })
+  } catch (error) {
+    return handleLessonError(error)
+  }
 }
