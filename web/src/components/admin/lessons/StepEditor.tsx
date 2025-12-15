@@ -32,17 +32,22 @@ interface StepEditorProps {
 
 /**
  * 可排序的單個步驟項目
- * 支援拖拉、高亮、視覺反饋
+ * 支援拖拉、高亮、視覺反饋、編輯
  */
 function SortableStepItem({
   step,
   index,
   onDelete,
+  onUpdate,
 }: {
   step: Step
   index: number
   onDelete: (id: string) => void
+  onUpdate: (id: string, text: string) => void
 }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editText, setEditText] = useState(step.text)
+
   const {
     attributes,
     listeners,
@@ -58,6 +63,16 @@ function SortableStepItem({
     opacity: isDragging ? 0.5 : 1,
   }
 
+  const handleSaveEdit = () => {
+    onUpdate(step.id, editText)
+    setIsEditing(false)
+  }
+
+  const handleCancelEdit = () => {
+    setEditText(step.text)
+    setIsEditing(false)
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -65,6 +80,8 @@ function SortableStepItem({
       className={`flex gap-3 p-3 border rounded-lg mb-2 ${
         isDragging
           ? 'border-blue-500 bg-blue-50 shadow-lg'
+          : isEditing
+          ? 'border-amber-500 bg-zinc-900'
           : 'border-zinc-600 bg-zinc-900'
       }`}
     >
@@ -83,17 +100,50 @@ function SortableStepItem({
         {index + 1}
       </div>
 
-      {/* 步驟內容 */}
-      <div className="flex-1 flex flex-col gap-2">
-        <p className="text-sm text-zinc-300 line-clamp-2">{step.text}</p>
-        {step.image && (
-          <img
-            src={step.image}
-            alt={`Step ${index + 1}`}
-            className="w-full h-24 object-cover rounded"
+      {/* 步驟內容 - 編輯模式 */}
+      {isEditing ? (
+        <div className="flex-1 flex flex-col gap-2">
+          <textarea
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            className="w-full rounded border border-zinc-500 bg-zinc-800 px-2 py-1 text-sm text-white focus:border-amber-500 focus:outline-none"
+            rows={4}
+            placeholder="輸入步驟內容..."
           />
-        )}
-      </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSaveEdit}
+              className="flex-1 px-2 py-1 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 transition"
+            >
+              保存
+            </button>
+            <button
+              onClick={handleCancelEdit}
+              className="flex-1 px-2 py-1 bg-zinc-700 text-white text-sm rounded hover:bg-zinc-600 transition"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* 步驟內容 - 查看模式 */
+        <div
+          className="flex-1 flex flex-col gap-2 cursor-pointer hover:opacity-80 transition"
+          onClick={() => setIsEditing(true)}
+          role="button"
+          tabIndex={0}
+        >
+          <p className="text-sm text-zinc-300 whitespace-pre-wrap">{step.text}</p>
+          {step.image && (
+            <img
+              src={step.image}
+              alt={`Step ${index + 1}`}
+              className="w-full h-24 object-cover rounded"
+            />
+          )}
+          <p className="text-xs text-zinc-500">點擊編輯</p>
+        </div>
+      )}
 
       {/* 刪除按鈕 */}
       <button
@@ -140,6 +190,14 @@ export function StepEditor({ steps, onChange }: StepEditorProps) {
     onChange(newSteps)
   }
 
+  const handleUpdateStep = (id: string, text: string) => {
+    const newSteps = localSteps.map((step) =>
+      step.id === id ? { ...step, text } : step
+    )
+    setLocalSteps(newSteps)
+    onChange(newSteps)
+  }
+
   const handleAddStep = () => {
     const newStep: Step = {
       id: `step-${Date.now()}`,
@@ -178,6 +236,7 @@ export function StepEditor({ steps, onChange }: StepEditorProps) {
                 step={step}
                 index={index}
                 onDelete={handleDeleteStep}
+                onUpdate={handleUpdateStep}
               />
             ))}
           </SortableContext>
