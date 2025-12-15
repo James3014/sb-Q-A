@@ -1,0 +1,704 @@
+# 🔧 後台管理系統重構計劃
+
+**原則**: Clean Code + Linus 原則 + TDD 方式
+**更新日期**: 2025-12-15
+
+---
+
+## 📊 執行狀態總覽
+
+- ⏳ **進行中**: 0 項
+- ✅ **已完成**: 0 項
+- 📋 **待執行**: 10 項
+- **總進度**: 0% (0/10)
+
+---
+
+## 🎯 第 1 層：關鍵基礎設施（必須先做）
+
+### ✅ P0-1: 建立統一的測試框架
+**狀態**: 📋 待執行
+**優先級**: 🔴 P0 (最高)
+**工作量**: 高
+**預估時間**: 3-4 天
+
+**WHY**:
+- 無測試的重構就是在玩火
+- 必須先有安全網才能重構
+
+**現狀問題**:
+- ❌ 零測試覆蓋
+- ❌ 無法驗證重構正確性
+- ❌ 無法追蹤邊界情況
+
+**具體改進**:
+1. [ ] 設置測試框架 (Jest 或 Vitest)
+2. [ ] 配置 React Testing Library
+3. [ ] 設置測試工具函數 (renderWithProviders, mockSupabase)
+4. [ ] 為 5 個關鍵 Hook 寫單元測試:
+   - [ ] `useLessonForm.test.ts`
+   - [ ] `useAffiliates.test.ts`
+   - [ ] `useImageUpload.test.ts`
+   - [ ] `useFormValidation.test.ts`
+   - [ ] `useAdminAuth.test.ts`
+5. [ ] 為 3 個 API 函數寫集成測試:
+   - [ ] `adminApi.test.ts`
+   - [ ] `adminData.test.ts`
+   - [ ] `affiliateService.test.ts`
+6. [ ] 設置 E2E 測試基礎 (Playwright)
+7. [ ] 配置測試覆蓋率報告 (>80% 目標)
+
+**驗收標準**:
+- ✅ `npm test` 可以運行
+- ✅ 至少 8 個測試文件
+- ✅ 至少 50+ 個測試案例
+- ✅ 測試覆蓋率 >60% (關鍵模組 >80%)
+
+**新增文件**:
+```
+__tests__/
+├── setup.ts                          # 測試環境設置
+├── utils/
+│   ├── renderWithProviders.tsx      # 測試工具
+│   └── mockSupabase.ts              # Supabase mock
+├── hooks/
+│   ├── useLessonForm.test.ts
+│   ├── useAffiliates.test.ts
+│   ├── useImageUpload.test.ts
+│   ├── useFormValidation.test.ts
+│   └── useAdminAuth.test.ts
+├── lib/
+│   ├── adminApi.test.ts
+│   ├── adminData.test.ts
+│   └── affiliateService.test.ts
+└── e2e/
+    └── admin-lessons.spec.ts         # E2E 範例
+
+jest.config.js (或 vitest.config.ts)
+```
+
+**完成日期**: _待填寫_
+
+---
+
+### ✅ P0-2: 建立統一的錯誤處理和 Logging
+**狀態**: 📋 待執行
+**優先級**: 🔴 P0
+**工作量**: 中
+**預估時間**: 2-3 天
+
+**WHY**:
+- 沒有統一的錯誤處理，無法 debug、無法監控、無法恢復
+
+**現狀問題**:
+- ❌ 大量 `console.error()` 無結構化
+- ❌ API 錯誤無統一的重試邏輯
+- ❌ 用戶端無友善的錯誤提示
+
+**具體改進**:
+1. [ ] 創建 `lib/errors.ts` - 統一錯誤定義
+2. [ ] 創建 `lib/logging.ts` - 結構化日誌工具
+3. [ ] 創建 `lib/apiRetry.ts` - 重試機制 (exponential backoff)
+4. [ ] 創建 `components/ErrorBoundary.tsx` - React 錯誤邊界
+5. [ ] 為所有 API 函數加入重試邏輯
+6. [ ] 為所有頁面加上 ErrorBoundary
+7. [ ] 替換所有 console.error 為結構化 logging
+
+**驗收標準**:
+- ✅ 所有 API 調用失敗後自動重試 3 次
+- ✅ 所有頁面都有 ErrorBoundary 保護
+- ✅ 所有錯誤都有結構化日誌 (timestamp, level, context)
+- ✅ 用戶看到友善的錯誤提示而非白屏
+
+**新增文件**:
+```
+lib/
+├── errors.ts              # 錯誤類定義 (AppError, ApiError, ValidationError)
+├── logging.ts             # Logger 類 (info, warn, error, debug)
+└── apiRetry.ts            # retryWithBackoff 函數
+
+components/
+└── ErrorBoundary.tsx      # React ErrorBoundary 組件
+```
+
+**修改文件**:
+- `lib/adminApi.ts` - 加入 retry 邏輯
+- `app/admin/layout.tsx` - 包裹 ErrorBoundary
+- 所有 `page.tsx` - 替換 console.error
+
+**完成日期**: _待填寫_
+
+---
+
+## 🔄 第 2 層：API 層重構（減少耦合）
+
+### ✅ P1-1: 統一 API 層結構
+**狀態**: 📋 待執行
+**優先級**: 🟠 P1
+**工作量**: 高
+**預估時間**: 5-6 天
+
+**WHY**:
+- 目前 API 分散 (fetchAdmin*, adminGet/Post, AffiliateService)，混亂且難維護
+
+**現狀問題**:
+```typescript
+// 3 種不同的 API 調用模式
+fetchAdminDashboard()           // 模式 1
+adminGet('/api/admin/lessons')  // 模式 2
+AffiliateService.getAll()       // 模式 3
+```
+
+**具體改進**:
+1. [ ] 創建 `services/BaseService.ts` - 共同邏輯基類
+2. [ ] 創建 7 個 Service 類:
+   - [ ] `AdminDashboardService.ts`
+   - [ ] `AdminUserService.ts`
+   - [ ] `AdminLessonService.ts`
+   - [ ] `AdminAffiliateService.ts`
+   - [ ] `AdminCommissionService.ts`
+   - [ ] `AdminAnalyticsService.ts`
+   - [ ] `AdminMonetizationService.ts`
+3. [ ] 為每個 Service 配套單元測試
+4. [ ] 創建對應的 Hook (useAdminDashboard, useAdminUsers 等)
+5. [ ] 逐個遷移頁面使用新 Hook
+6. [ ] 刪除舊的 `lib/adminData.ts` 和 `fetchAdmin*` 函數
+
+**驗收標準**:
+- ✅ 所有 API 調用統一為 `useAdmin*` Hook 模式
+- ✅ BaseService 處理認證、重試、快取
+- ✅ 每個 Service 都有 >80% 測試覆蓋率
+- ✅ 所有頁面使用統一的數據獲取模式
+
+**新增文件結構**:
+```
+services/
+├── admin/
+│   ├── AdminDashboardService.ts
+│   ├── AdminUserService.ts
+│   ├── AdminLessonService.ts
+│   ├── AdminAffiliateService.ts
+│   ├── AdminCommissionService.ts
+│   ├── AdminAnalyticsService.ts
+│   └── AdminMonetizationService.ts
+├── BaseService.ts
+└── index.ts
+
+hooks/
+├── useAdminDashboard.ts
+├── useAdminUsers.ts
+├── useAdminLessons.ts
+├── useAdminAffiliates.ts
+├── useAdminCommissions.ts
+├── useAdminAnalytics.ts
+└── useAdminMonetization.ts
+
+__tests__/
+└── services/
+    ├── BaseService.test.ts
+    ├── AdminDashboardService.test.ts
+    └── ... (7 個測試文件)
+```
+
+**完成日期**: _待填寫_
+
+---
+
+### ✅ P1-2: 提取通用的表格/列表邏輯
+**狀態**: 📋 待執行
+**優先級**: 🟠 P1
+**工作量**: 高
+**預估時間**: 4-5 天
+
+**WHY**:
+- Lessons、Commissions、Analytics 都有類似的表格邏輯，代碼重複率 60%+
+
+**現狀問題**:
+- 每個頁面都有 200+ 行重複的 useState、useCallback、useMemo
+- 篩選、排序、分頁邏輯散落各處
+- 難以統一修改行為
+
+**具體改進**:
+1. [ ] 創建 `hooks/useDataTable.ts` - 統一表格邏輯
+   - 狀態管理 (data, loading, error)
+   - 篩選邏輯 (filter, setFilter)
+   - 排序邏輯 (sort, setSort)
+   - 分頁邏輯 (page, pageSize)
+   - 搜尋邏輯 (search, setSearch)
+2. [ ] 創建 `components/ui/DataTable.tsx` - 通用表格組件
+3. [ ] 配套測試 `useDataTable.test.ts`
+4. [ ] 遷移 3 個頁面:
+   - [ ] `admin/lessons/page.tsx` - 課程管理表格
+   - [ ] `admin/commissions/page.tsx` - 分潤記錄表格
+   - [ ] `admin/users/page.tsx` - 用戶管理表格
+
+**驗收標準**:
+- ✅ `useDataTable` Hook 可處理任意類型的資料
+- ✅ 3 個頁面代碼量減少 >50%
+- ✅ 測試覆蓋率 >80%
+- ✅ 所有表格行為一致
+
+**前後對比**:
+```typescript
+// 之前：每個頁面 250+ 行
+const [lessons, setLessons] = useState([])
+const [filter, setFilter] = useState({...})
+const [sort, setSort] = useState({...})
+useEffect(() => { loadLessons() }, [filter, sort])
+// ... handleSort, handleFilter 邏輯重複
+
+// 之後：頁面只需 50 行
+const { data: lessons, filter, setFilter, sort, setSort } = useDataTable({
+  fetchFn: AdminLessonService.getAll,
+  columns: ['title', 'views', 'effectiveness']
+})
+
+return <DataTable data={lessons} columns={columns} {...} />
+```
+
+**新增文件**:
+```
+hooks/
+└── useDataTable.ts
+
+components/ui/
+├── DataTable.tsx
+├── DataTableHeader.tsx
+└── DataTableRow.tsx
+
+__tests__/
+└── hooks/
+    └── useDataTable.test.ts
+```
+
+**完成日期**: _待填寫_
+
+---
+
+## 🧩 第 3 層：業務邏輯層重構（清晰責任）
+
+### ✅ P2-1: 拆分巨大頁面組件
+**狀態**: 📋 待執行
+**優先級**: 🟡 P2
+**工作量**: 中
+**預估時間**: 3-4 天
+
+**WHY**:
+- 頁面組件常 200-400 行，難以測試、難以修改
+
+**現狀問題**:
+```
+LessonsPage.tsx (380 行)
+├─ 5 個 tab 狀態
+├─ 多個 filter、sort 狀態
+├─ fetchAdminLessons 邏輯
+├─ 3 種不同視圖的 JSX
+└─ deleteLesson 邏輯
+```
+
+**具體改進**:
+1. [ ] 定義 3 層架構規範:
+   - **Page** (30-50 行): 路由、認證、數據加載
+   - **Container** (60-80 行): 狀態、事件處理
+   - **View** (50-70 行): 純 UI 渲染
+2. [ ] 拆分 3 個頁面:
+   - [ ] `admin/lessons/` - 拆分為 LessonsContainer + 5 個 View 組件
+   - [ ] `admin/commissions/` - 拆分為 CommissionsContainer + View
+   - [ ] `admin/analytics/` - 拆分為 AnalyticsContainer + View
+
+**驗收標準**:
+- ✅ 所有 page.tsx 文件 <50 行
+- ✅ Container 組件 <100 行
+- ✅ View 組件 <80 行
+- ✅ 每個組件都有單元測試
+
+**前後結構**:
+```typescript
+// 之前：380 行巨型組件
+export default function LessonsPage() {
+  // 200 行混合代碼
+  return <div>...</div>
+}
+
+// 之後：拆分為 3 層
+// page.tsx (40 行)
+export default function LessonsPage() {
+  const { lessons, loading } = useAdminLessons()
+  if (loading) return <LoadingSpinner />
+  return <LessonsContainer data={lessons} />
+}
+
+// LessonsContainer.tsx (80 行)
+export function LessonsContainer({ data }: Props) {
+  const [tab, setTab] = useState('popular')
+  return (
+    <div>
+      <LessonsTabBar tab={tab} onChange={setTab} />
+      {tab === 'popular' && <LessonsPopularView data={data} />}
+      {tab === 'effectiveness' && <LessonsEffectivenessView data={data} />}
+    </div>
+  )
+}
+
+// LessonsPopularView.tsx (70 行)
+export function LessonsPopularView({ data }: Props) {
+  const { filtered, filter, setFilter } = useFilter(data)
+  return (
+    <div>
+      <FilterPanel onChange={setFilter} />
+      <DataTable data={filtered} />
+    </div>
+  )
+}
+```
+
+**新增文件結構**:
+```
+admin/lessons/
+├── page.tsx                    (40 行)
+├── LessonsContainer.tsx        (80 行)
+└── views/
+    ├── LessonsPopularView.tsx
+    ├── LessonsEffectivenessView.tsx
+    ├── LessonsHealthView.tsx
+    ├── LessonsHeatmapView.tsx
+    └── LessonsManageView.tsx
+```
+
+**完成日期**: _待填寫_
+
+---
+
+### ✅ P2-2: 將計算邏輯提取為純函數
+**狀態**: 📋 待執行
+**優先級**: 🟡 P2
+**工作量**: 低
+**預估時間**: 1-2 天
+
+**WHY**:
+- 混在組件中的計算邏輯難以測試、難以重用
+
+**現狀問題**:
+```typescript
+// 散落在組件中的計算
+const effectiveness = lessons.filter(l => l.practices >= 3)
+  .map(l => ({...l, score: (l.avg_rating / 5) * 100}))
+
+const health = lessons.map(l => ({
+  ...l,
+  health: l.completion_rate * 0.4 + l.practice_rate * 0.6
+}))
+```
+
+**具體改進**:
+1. [ ] 創建 `lib/admin/calculations.ts` - 集中所有計算邏輯
+2. [ ] 提取 10+ 個計算函數:
+   - [ ] `calculateEffectiveness(lesson): EffectivenessScore`
+   - [ ] `calculateHealth(lesson): HealthScore`
+   - [ ] `calculateConversionRate(clicks, conversions): number`
+   - [ ] `calculateCommission(amount, rate): number`
+   - [ ] `filterByDateRange(items, start, end): T[]`
+   - [ ] `sortByField(items, field, order): T[]`
+3. [ ] 為每個函數寫單元測試
+4. [ ] 替換所有組件中的內聯計算
+
+**驗收標準**:
+- ✅ 所有計算邏輯都在 `calculations.ts` 中
+- ✅ 每個計算函數都有 5+ 個測試案例
+- ✅ 測試覆蓋率 100% (純函數易測試)
+- ✅ 組件中無複雜計算邏輯
+
+**新增文件**:
+```
+lib/admin/
+├── calculations.ts        # 計算邏輯
+└── calculations.test.ts   # 測試 (50+ 案例)
+```
+
+**範例**:
+```typescript
+// lib/admin/calculations.ts
+export function calculateEffectiveness(lesson: Lesson): EffectivenessScore {
+  if (lesson.practices < 3) return { score: 0, reason: 'insufficient data' }
+  return {
+    score: (lesson.avg_rating / 5) * 100,
+    count: lesson.practices
+  }
+}
+
+// __tests__/lib/calculations.test.ts
+describe('calculateEffectiveness', () => {
+  it('should return 0 when practices < 3', () => {
+    const score = calculateEffectiveness({ practices: 2, avg_rating: 5 })
+    expect(score).toEqual({ score: 0, reason: 'insufficient data' })
+  })
+
+  it('should calculate correctly when practices >= 3', () => {
+    const score = calculateEffectiveness({ practices: 10, avg_rating: 4 })
+    expect(score.score).toBe(80)
+  })
+})
+```
+
+**完成日期**: _待填寫_
+
+---
+
+### ✅ P2-3: 統一狀態管理模式
+**狀態**: 📋 待執行
+**優先級**: 🟡 P2
+**工作量**: 中
+**預估時間**: 3-4 天
+
+**WHY**:
+- 目前 useState + useCallback + useMemo 混亂，難以預測數據流
+
+**現狀問題**:
+```typescript
+// 各個頁面的狀態管理方式不一致
+const [lessons, setLessons] = useState([])
+const [tab, setTab] = useState('popular')
+const [filter, setFilter] = useState({ ...initialFilter })
+const [loading, setLoading] = useState(false)
+```
+
+**具體改進**:
+1. [ ] 定義統一的 Hook 返回格式規範
+2. [ ] 改造所有 `useAdmin*` Hook 統一返回:
+   ```typescript
+   {
+     data: T,           // 實際數據
+     loading: boolean,  // 加載中
+     error: Error | null,  // 錯誤
+     state: {           // UI 狀態
+       tab, filter, sort, ...
+     },
+     actions: {         // 事件處理器
+       setTab, setFilter, retry, ...
+     }
+   }
+   ```
+3. [ ] 為複雜頁面引入 reducer 模式
+4. [ ] 統一錯誤處理流程
+
+**驗收標準**:
+- ✅ 所有 Hook 返回格式一致
+- ✅ 頁面組件中無直接 setState
+- ✅ 所有事件處理器都在 actions 中
+- ✅ 數據流清晰可追蹤
+
+**新增文件**:
+```
+hooks/
+├── types.ts               # 統一 Hook 返回類型定義
+└── useAdminState.ts       # 通用狀態管理 Hook
+```
+
+**前後對比**:
+```typescript
+// 之前：分散的 state
+const [data, setData] = useState([])
+const [tab, setTab] = useState('popular')
+const [filter, setFilter] = useState({})
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState(null)
+
+// 之後：統一的返回格式
+const {
+  data,
+  loading,
+  error,
+  state: { tab, filter, sort },
+  actions: { setTab, setFilter, setSort, retry }
+} = useAdminLessons()
+```
+
+**完成日期**: _待填寫_
+
+---
+
+## 🎨 第 4 層：可維護性與文檔（長期投資）
+
+### ✅ P3-1: 建立通用組件庫
+**狀態**: 📋 待執行
+**優先級**: 🟢 P3
+**工作量**: 低
+**預估時間**: 2-3 天
+
+**WHY**:
+- 狀態標籤、信息框、確認對話框等重複代碼多
+
+**現狀問題**:
+```typescript
+// 狀態標籤重複
+<span className="px-2 py-1 rounded bg-green-100 text-green-800">
+  Active
+</span>
+// ... 在 5 個頁面重複定義
+```
+
+**具體改進**:
+1. [ ] 創建 5 個通用組件:
+   - [ ] `StatusBadge.tsx` - 狀態標籤
+   - [ ] `ConfirmDialog.tsx` - 確認對話框
+   - [ ] `LoadingSpinner.tsx` - 加載指示器
+   - [ ] `EmptyState.tsx` - 空狀態
+   - [ ] `Tooltip.tsx` - 提示框
+2. [ ] 為每個組件寫 Storybook 文檔
+3. [ ] 替換所有頁面中的重複代碼
+
+**驗收標準**:
+- ✅ 5 個通用組件都有完整的 props 定義
+- ✅ 每個組件都有 Storybook 範例
+- ✅ 所有頁面使用統一組件
+
+**新增文件**:
+```
+components/ui/
+├── StatusBadge.tsx
+├── ConfirmDialog.tsx
+├── LoadingSpinner.tsx
+├── EmptyState.tsx
+└── Tooltip.tsx
+
+stories/
+├── StatusBadge.stories.tsx
+├── ConfirmDialog.stories.tsx
+└── ...
+```
+
+**完成日期**: _待填寫_
+
+---
+
+### ✅ P3-2: 完善 TypeScript 類型定義
+**狀態**: 📋 待執行
+**優先級**: 🟢 P3
+**工作量**: 低
+**預估時間**: 1-2 天
+
+**WHY**:
+- 類型定義分散，無法提供足夠的類型安全
+
+**現狀問題**:
+```typescript
+// types 分散在各地
+interface Lesson { ... }       // admin/lessons/page.tsx
+interface Affiliate { ... }    // affiliates/page.tsx
+interface Commission { ... }   // commissions/page.tsx
+```
+
+**具體改進**:
+1. [ ] 統一在 `types/admin.ts` 中定義所有後台類型
+2. [ ] 為所有 API 響應定義明確的類型
+3. [ ] 使用 `Partial<T>` 和 `Omit<T>` 避免類型重複
+4. [ ] 為所有 Service 方法定義返回類型
+
+**驗收標準**:
+- ✅ 所有類型定義集中在 `types/` 目錄
+- ✅ 無 `any` 類型
+- ✅ 所有 API 函數都有明確的返回類型
+- ✅ TypeScript strict mode 啟用無錯誤
+
+**新增文件**:
+```
+types/
+├── admin.ts              # 後台相關類型
+├── api.ts                # API 響應類型
+└── common.ts             # 通用類型
+```
+
+**完成日期**: _待填寫_
+
+---
+
+### ✅ P3-3: 建立開發指南和架構文檔
+**狀態**: 📋 待執行
+**優先級**: 🟢 P3
+**工作量**: 低
+**預估時間**: 2-3 天
+
+**WHY**:
+- 新開發者無法快速上手，不知道代碼的組織邏輯
+
+**現狀問題**:
+- 無 `README.md` 說明後台結構
+- 無新功能開發流程
+- 無 API 端點文檔
+
+**具體改進**:
+1. [ ] 建立 `docs/ADMIN_ARCHITECTURE.md`
+   - 目錄結構說明
+   - 數據流程圖
+   - 添加新頁面的步驟清單
+2. [ ] 建立 `docs/ADMIN_API.md`
+   - 所有 API 端點文檔
+   - 請求/響應範例
+3. [ ] 建立 `docs/CONTRIBUTING.md`
+   - 代碼規範
+   - 提交規範
+   - PR 流程
+
+**驗收標準**:
+- ✅ 3 個文檔都完成
+- ✅ 包含清晰的範例代碼
+- ✅ 包含架構圖 (Mermaid 或圖片)
+
+**新增文件**:
+```
+docs/
+├── ADMIN_ARCHITECTURE.md
+├── ADMIN_API.md
+└── CONTRIBUTING.md
+```
+
+**完成日期**: _待填寫_
+
+---
+
+## 📈 進度追蹤
+
+### 第 1 週 (預計完成 P0-1, P0-2)
+- [ ] Day 1-2: P0-1 測試框架設置
+- [ ] Day 3-4: P0-1 Hook 單元測試
+- [ ] Day 5: P0-2 錯誤處理
+
+### 第 2-3 週 (預計完成 P1-1)
+- [ ] Week 2: 建立 Service 層
+- [ ] Week 3: 遷移 Hook 使用新 Service
+
+### 第 4-5 週 (預計完成 P1-2)
+- [ ] Week 4: 開發 useDataTable
+- [ ] Week 5: 遷移頁面使用新 Hook
+
+### 第 6 週 (預計完成 P2-1)
+- [ ] 拆分頁面組件
+
+### 第 7 週 (預計完成 P2-2, P2-3, P3-*)
+- [ ] 其他改進
+
+---
+
+## 📝 變更日誌
+
+### 2025-12-15
+- ✅ 創建重構計劃文檔
+- 📋 等待用戶確認開始執行
+
+---
+
+## 🎯 下一步行動
+
+**等待用戶確認**: 批准開始執行 P0-1 (建立統一的測試框架)
+
+執行方式：
+1. ✅ 用戶確認
+2. 🔧 開始實作 (TDD 方式)
+3. ✅ 每完成一個子項目就更新此文件
+4. 🔄 提交 Git commit
+5. 🙋 請求用戶驗收
+6. ➡️ 開始下一項
+
+---
+
+**最後更新**: 2025-12-15 by Claude Code
