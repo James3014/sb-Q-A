@@ -52,11 +52,15 @@ export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
     async function loadLesson() {
       setLoading(true)
       setError(null)
+      console.log('Loading lesson:', lessonId) // 調試信息
       const data = await adminGet<{ ok: boolean; lesson: Lesson }>(`${LESSON_API_ENDPOINTS.lessons}/${lessonId}`)
+      console.log('API response:', data) // 調試信息
       if (canceled) return
       if (!data || !data.ok) {
         setError('無法載入課程資料')
+        console.error('Failed to load lesson:', data) // 調試信息
       } else {
+        console.log('Setting initial lesson:', data.lesson) // 調試信息
         setInitialLesson(data.lesson)
       }
       setLoading(false)

@@ -66,8 +66,10 @@ export function useLessonForm(options: UseLessonFormOptions = {}): UseLessonForm
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
+    console.log('useLessonForm: initialState changed:', initialState) // 調試信息
     initialRef.current = computedInitial
     setState(computedInitial)
+    console.log('useLessonForm: state updated:', computedInitial) // 調試信息
   }, [computedInitial])
 
   const setTitle = useCallback((title: string) => {
