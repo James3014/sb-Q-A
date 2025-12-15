@@ -164,6 +164,7 @@ export function LessonFormContent({
       </section>
 
       <section className="space-y-4 rounded border border-zinc-800 p-4">
+        <label className="block text-sm font-semibold text-white">🛠️ 怎麼練</label>
         <StepEditor
           steps={form.state.how.map((step, index) => ({
             id: `step-${index}`,

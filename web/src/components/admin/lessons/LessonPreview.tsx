@@ -43,15 +43,19 @@ export function LessonPreview({ formState }: LessonPreviewProps) {
 
       {/* WHAT 章節 */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white mb-3">這個練習學什麼</h3>
-        <p className="text-zinc-300 leading-relaxed">
-          {what || '（未填寫說明）'}
-        </p>
+        <h3 className="text-lg font-semibold text-white mb-3">😰 你可能遇到這些狀況</h3>
+        <div className="text-zinc-300 leading-relaxed">
+          {what ? (
+            <div dangerouslySetInnerHTML={{ __html: what }} />
+          ) : (
+            '（未填寫說明）'
+          )}
+        </div>
       </div>
 
       {/* WHY 章節 */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white mb-3">為什麼要練</h3>
+        <h3 className="text-lg font-semibold text-white mb-3">🎯 練習目標</h3>
         {why && why.length > 0 ? (
           <ul className="space-y-2">
             {why.map((item, idx) => (
@@ -68,7 +72,7 @@ export function LessonPreview({ formState }: LessonPreviewProps) {
 
       {/* HOW 章節 */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white mb-3">怎麼練</h3>
+        <h3 className="text-lg font-semibold text-white mb-3">🛠️ 怎麼練</h3>
         {how && how.length > 0 ? (
           <div className="space-y-4">
             {how.map((step, idx) => (
@@ -103,7 +107,7 @@ export function LessonPreview({ formState }: LessonPreviewProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 正確信號 */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-3">做對的訊號 ✅</h3>
+            <h3 className="text-lg font-semibold text-white mb-3">✅ 做對的訊號</h3>
             {signals?.correct && signals.correct.length > 0 ? (
               <ul className="space-y-2">
                 {signals.correct.map((item, idx) => (
@@ -120,7 +124,7 @@ export function LessonPreview({ formState }: LessonPreviewProps) {
 
           {/* 錯誤信號 */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-3">做錯的訊號 ❌</h3>
+            <h3 className="text-lg font-semibold text-white mb-3">❌ 做錯的訊號</h3>
             {signals?.wrong && signals.wrong.length > 0 ? (
               <ul className="space-y-2">
                 {signals.wrong.map((item, idx) => (
