@@ -1,6 +1,9 @@
 # === 敏感資料（課程內容、資料庫 Schema）===
 # 這是收費項目，以下資料不應公開
 
+# 私有資料目錄
+private/
+
 # SQL 檔案（Schema、Migration、課程資料）
 *.sql
 docs/*.sql

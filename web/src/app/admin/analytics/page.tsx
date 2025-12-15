@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { StatCard } from '@/components/ui'
+import { ModernStatCard } from '@/components/ui'
 import { adminGet } from '@/lib/adminApi'
 
 interface AnalyticsData {
@@ -120,26 +120,34 @@ export default function AdminAnalyticsPage() {
           </div>
 
           {/* KPI 總覽 */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            <StatCard 
-              label="總點擊數" 
-              value={data.overview.totalClicks} 
-              color="text-yellow-400"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <ModernStatCard
+              label="總點擊數"
+              value={data.overview.totalClicks}
+              icon="👆"
+              subtitle="來自推廣連結"
             />
-            <StatCard 
-              label="總試用數" 
-              value={data.overview.totalTrials} 
-              color="text-blue-400"
+            <ModernStatCard
+              label="總試用數"
+              value={data.overview.totalTrials}
+              change={`${data.overview.clickToTrialRate.toFixed(1)}%`}
+              trend="neutral"
+              icon="🎫"
+              subtitle="啟用折扣碼"
             />
-            <StatCard 
-              label="總轉換數" 
-              value={data.overview.totalConversions} 
-              color="text-green-400"
+            <ModernStatCard
+              label="總轉換數"
+              value={data.overview.totalConversions}
+              change={`${data.overview.trialToConversionRate.toFixed(1)}%`}
+              trend="neutral"
+              icon="✅"
+              subtitle="完成付費"
             />
-            <StatCard 
-              label="總分潤額" 
-              value={`NT$${Math.round(data.overview.totalCommissions)}`} 
-              color="text-purple-400"
+            <ModernStatCard
+              label="總分潤額"
+              value={`NT$${Math.round(data.overview.totalCommissions).toLocaleString()}`}
+              icon="💰"
+              subtitle="累計佣金"
             />
           </div>
 

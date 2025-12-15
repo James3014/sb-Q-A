@@ -33,3 +33,10 @@ export type {
   ConfirmDialogVariant,
   ConfirmDialogProps
 } from './ConfirmDialog'
+
+// Modern UI Components (Phase 1)
+export { ModernStatCard, ModernStatCardPresets } from './modern/ModernStatCard'
+export type {
+  TrendDirection,
+  ModernStatCardProps
+} from './modern/ModernStatCard'
