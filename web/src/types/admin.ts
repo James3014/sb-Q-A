@@ -254,7 +254,7 @@ export interface StandardHookReturn<T, State = any, Actions = any, Stats = any> 
 /**
  * 表單驗證錯誤
  */
-export interface ValidationError {
+export interface AdminValidationError {
   field: string
   message: string
 }

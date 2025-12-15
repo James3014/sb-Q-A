@@ -210,19 +210,21 @@ export default function AdminCommissionsPage() {
             <LoadingSpinner text="載入分潤記錄..." />
           ) : commissions.length === 0 ? (
             <EmptyState
-              icon="💰"
+              emoji="💰"
               title="無分潤記錄"
               description={
                 filter.quarter || filter.status || filter.partner
                   ? "當前篩選條件下沒有符合的記錄"
                   : "尚無分潤記錄，等待合作方推廣產生訂單"
               }
-              action={
+              actionText={
                 (filter.quarter || filter.status || filter.partner)
-                  ? {
-                      label: "清除篩選",
-                      onClick: () => setFilter({ quarter: '', status: '', partner: '' })
-                    }
+                  ? "清除篩選"
+                  : undefined
+              }
+              actionHref={
+                (filter.quarter || filter.status || filter.partner)
+                  ? "#"
                   : undefined
               }
             />

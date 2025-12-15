@@ -88,7 +88,7 @@ export default function UsersPage() {
             <LoadingSpinner text="載入用戶資料..." />
           ) : filtered.length === 0 ? (
             <EmptyState
-              icon="👤"
+              emoji="👤"
               title={search ? "找不到符合條件的用戶" : "尚無用戶"}
               description={search ? `試試其他搜尋關鍵字` : "等待用戶註冊"}
             />

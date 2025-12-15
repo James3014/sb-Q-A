@@ -30,7 +30,7 @@ export interface UseAdminLessonsReturn {
   // 操作
   actions: {
     refresh: () => Promise<void>
-    deleteLesson: (id: string) => Promise<boolean>
+    deleteLesson: (id: string) => Promise<void>
   }
 
   // 操作狀態
@@ -97,9 +97,9 @@ export function useAdminLessons(): UseAdminLessonsReturn {
    * 刪除課程
    */
   const deleteLesson = useCallback(
-    async (id: string): Promise<boolean> => {
+    async (id: string): Promise<void> => {
       if (!window.confirm('確定要刪除此課程嗎？此動作不可逆。')) {
-        return false
+        return
       }
 
       try {
@@ -126,14 +126,12 @@ export function useAdminLessons(): UseAdminLessonsReturn {
         await loadData()
 
         logger.info('useAdminLessons: Lesson deleted successfully', { id })
-        return true
       } catch (err) {
         const message = '刪除失敗，請稍後再試。'
         setActionError(message)
         logger.error('useAdminLessons: Failed to delete lesson', err as Error, {
           id
         })
-        return false
       } finally {
         setActionLoading(false)
       }

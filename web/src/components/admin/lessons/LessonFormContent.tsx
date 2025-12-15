@@ -70,7 +70,7 @@ export function LessonFormContent({
       {/* 預覽面板（手機時全寬，桌面時右側） */}
       {showPreview && (
         <div className="md:hidden">
-          <LessonPreview form={form} />
+          <LessonPreview formState={form.state} />
         </div>
       )}
 
@@ -236,7 +236,7 @@ export function LessonFormContent({
     {/* 右側預覽面板（桌面版顯示） */}
     <div className="hidden md:block md:col-span-1">
       <div className="sticky top-4">
-        <LessonPreview form={form} />
+        <LessonPreview formState={form.state} />
       </div>
     </div>
   </div>

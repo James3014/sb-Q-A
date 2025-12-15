@@ -130,13 +130,11 @@ export default function CouponsPage() {
               <LoadingSpinner text="載入折扣碼..." />
             ) : coupons.length === 0 ? (
               <EmptyState
-                icon="🎫"
+                emoji="🎫"
                 title="尚無折扣碼"
                 description="創建第一個折扣碼來開始推廣"
-                action={{
-                  label: "創建折扣碼",
-                  onClick: () => document.querySelector('input')?.focus()
-                }}
+                actionText="創建折扣碼"
+                actionHref="#"
               />
             ) : (
               coupons.map(coupon => (
