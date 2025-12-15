@@ -40,3 +40,4 @@
  GET /login 200 in 102ms (compile: 38ms, render: 64ms)
  GET /icon-192.png 404 in 82ms (compile: 30ms, render: 52ms)
  ✓ Compiled in 519ms
+[?25h
