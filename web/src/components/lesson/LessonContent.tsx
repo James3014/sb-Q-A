@@ -71,18 +71,32 @@ export function LessonSteps({ steps }: { steps: { text: string; image?: string |
 
 export function LessonSignals({ correct, wrong }: { correct?: string[]; wrong?: string[] }) {
   if (!correct?.length && !wrong?.length) return null
+  
+  // 清理函數：移除 JSON 資料和 CASI 結構化內容
+  const cleanSignal = (signal: string): string => {
+    // 移除 JSON 區塊和 CASI 結構化資料
+    return signal
+      .split(/\n## 🎯 CASI 結構化數據/)[0] // 移除 CASI 資料
+      .split(/```json/)[0] // 移除 JSON 區塊
+      .trim()
+  }
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
       {correct?.length ? (
         <section className="bg-zinc-800 rounded-lg p-5 border-l-4 border-green-500">
           <h2 className="text-lg font-semibold mb-3 text-green-400">✅ 做對時你會感覺</h2>
-          <ul className="text-zinc-300 text-lg leading-[1.8] space-y-2">{correct.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+          <ul className="text-zinc-300 text-lg leading-[1.8] space-y-2">
+            {correct.map((s, i) => <li key={i}>• {cleanSignal(s)}</li>)}
+          </ul>
         </section>
       ) : null}
       {wrong?.length ? (
         <section className="bg-zinc-800 rounded-lg p-5 border-l-4 border-red-500">
           <h2 className="text-lg font-semibold mb-3 text-red-400">❌ 做錯時你可能感覺</h2>
-          <ul className="text-zinc-300 text-lg leading-[1.8] space-y-2">{wrong.map((s, i) => <li key={i}>• {s}</li>)}</ul>
+          <ul className="text-zinc-300 text-lg leading-[1.8] space-y-2">
+            {wrong.map((s, i) => <li key={i}>• {cleanSignal(s)}</li>)}
+          </ul>
         </section>
       ) : null}
     </div>
