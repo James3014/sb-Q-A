@@ -8,9 +8,9 @@
 ## 📊 執行狀態總覽
 
 - ⏳ **進行中**: 0 項
-- ✅ **已完成**: 6 項
-- 📋 **待執行**: 4 項
-- **總進度**: 60% (6/10)
+- ✅ **已完成**: 7 項
+- 📋 **待執行**: 3 項
+- **總進度**: 70% (7/10)
 
 ---
 
@@ -497,10 +497,10 @@ describe('calculateEffectiveness', () => {
 ---
 
 ### ✅ P2-3: 統一狀態管理模式
-**狀態**: 📋 待執行
+**狀態**: ✅ 已完成
 **優先級**: 🟡 P2
 **工作量**: 中
-**預估時間**: 3-4 天
+**完成時間**: 2025-12-15
 
 **WHY**:
 - 目前 useState + useCallback + useMemo 混亂，難以預測數據流
@@ -515,23 +515,29 @@ const [loading, setLoading] = useState(false)
 ```
 
 **具體改進**:
-1. [ ] 定義統一的 Hook 返回格式規範
-2. [ ] 改造所有 `useAdmin*` Hook 統一返回:
+1. [x] 定義統一的 Hook 返回格式規範
+2. [x] 改造所有 Hook 統一返回:
    ```typescript
    {
      data: T,           // 實際數據
      loading: boolean,  // 加載中
      error: Error | null,  // 錯誤
-     state: {           // UI 狀態
+     state: {           // UI 狀態 (可選)
        tab, filter, sort, ...
      },
      actions: {         // 事件處理器
-       setTab, setFilter, retry, ...
+       refresh, create, update, delete, ...
+     },
+     stats: {           // 派生統計 (可選)
+       total, active, ...
      }
    }
    ```
-3. [ ] 為複雜頁面引入 reducer 模式
-4. [ ] 統一錯誤處理流程
+3. [x] 重構 2 個 Hook 遵循規範:
+   - [x] useAffiliates
+   - [x] useAffiliateUsers
+4. [ ] 為複雜頁面引入 reducer 模式 (可選，後續優化)
+5. [x] 統一錯誤處理流程 (已集成 Logger)
 
 **驗收標準**:
 - ✅ 所有 Hook 返回格式一致
@@ -541,31 +547,47 @@ const [loading, setLoading] = useState(false)
 
 **新增文件**:
 ```
+docs/
+└── HOOK_STANDARDS.md      # Hook 返回格式規範 (467 行)
+
 hooks/
-├── types.ts               # 統一 Hook 返回類型定義
-└── useAdminState.ts       # 通用狀態管理 Hook
+├── useAffiliates.ts       # 重構 (116 行，新增類型定義)
+└── useAffiliateUsers.ts   # 重構 (112 行，新增類型定義)
 ```
 
 **前後對比**:
 ```typescript
-// 之前：分散的 state
-const [data, setData] = useState([])
-const [tab, setTab] = useState('popular')
-const [filter, setFilter] = useState({})
-const [loading, setLoading] = useState(false)
-const [error, setError] = useState(null)
+// 之前：分散的操作和數據
+const {
+  affiliates,           // 數據未統一命名
+  loadAffiliates,       // 操作未分組
+  createAffiliate,      // 操作未分組
+  toggleAffiliate       // 操作未分組
+} = useAffiliates()
 
 // 之後：統一的返回格式
 const {
-  data,
-  loading,
-  error,
-  state: { tab, filter, sort },
-  actions: { setTab, setFilter, setSort, retry }
-} = useAdminLessons()
+  data: affiliates,     // 統一命名
+  loading,              // 標準字段
+  error,                // 標準字段
+  stats,                // 派生統計
+  actions: {            // 操作分組
+    refresh,
+    create,
+    toggle
+  }
+} = useAffiliates()
 ```
 
-**完成日期**: _待填寫_
+**完成日期**: 2025-12-15
+
+**實際完成內容**:
+- ✅ 創建 HOOK_STANDARDS.md 規範文件 (467 行)
+- ✅ 重構 useAffiliates: 數據/操作分組 + TypeScript 類型 + useCallback/useMemo 優化
+- ✅ 重構 useAffiliateUsers: state/actions 分組 + Logger 集成
+- ✅ 更新 admin/affiliates/page.tsx 使用新 API
+- ✅ 更新 affiliate.test.ts 測試
+- ✅ 所有測試通過 (191 tests)
 
 ---
 
@@ -741,6 +763,7 @@ docs/
 - ✅ 完成 P2-2: 計算邏輯提取 (17 純函數)
 - ✅ 完成 P1-2: 提取通用表格邏輯 (useDataTable + DataTable + 15 tests)
 - ✅ 完成 P2-1: 拆分 lessons 頁面 (三層架構 + 6 個文件)
+- ✅ 完成 P2-3: 統一狀態管理模式 (Hook 規範 + 2 個 Hook 重構)
 
 ---
 
