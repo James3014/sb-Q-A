@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 import type { UseLessonFormReturn } from '@/hooks/lessons/useLessonForm'
 import type { UseFormValidationReturn } from '@/hooks/lessons/useFormValidation'
 import type { UseImageUploadReturn } from '@/hooks/lessons/useImageUpload'
@@ -10,6 +10,7 @@ import { RichTextEditor } from './RichTextEditor'
 import { ArrayInputField } from './ArrayInputField'
 import { ChipInput } from './ChipInput'
 import { StepEditor } from './StepEditor'
+import { LessonPreview } from './LessonPreview'
 
 interface LessonFormContentProps {
   form: UseLessonFormReturn
@@ -30,6 +31,7 @@ export function LessonFormContent({
   serverError,
   successMessage,
 }: LessonFormContentProps) {
+  const [showPreview, setShowPreview] = useState(true)
   const stepImage = form.state.how[0]?.image || null
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -38,7 +40,44 @@ export function LessonFormContent({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-4">
+      {/* 預覽切換按鈕（手機顯示） */}
+      <div className="md:hidden flex gap-2">
+        <button
+          type="button"
+          onClick={() => setShowPreview(true)}
+          className={`flex-1 px-3 py-2 rounded text-sm font-semibold transition ${
+            showPreview
+              ? 'bg-blue-600 text-white'
+              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+          }`}
+        >
+          📱 預覽
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowPreview(false)}
+          className={`flex-1 px-3 py-2 rounded text-sm font-semibold transition ${
+            !showPreview
+              ? 'bg-blue-600 text-white'
+              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+          }`}
+        >
+          ✏️ 編輯
+        </button>
+      </div>
+
+      {/* 預覽面板（手機時全寬，桌面時右側） */}
+      {showPreview && (
+        <div className="md:hidden">
+          <LessonPreview form={form} />
+        </div>
+      )}
+
+      {/* 編輯表單 */}
+      <div className={`${showPreview && 'md:hidden'} md:grid md:grid-cols-3 md:gap-6`}>
+        {/* 左側編輯欄（MD 以上時 2 列） */}
+        <form onSubmit={handleSubmit} className="md:col-span-2 space-y-6">
       {serverError && (
         <div className="rounded border border-red-500 bg-red-500/10 px-3 py-2 text-sm text-red-300">
           {serverError}
@@ -193,5 +232,14 @@ export function LessonFormContent({
         </button>
       </div>
     </form>
+
+    {/* 右側預覽面板（桌面版顯示） */}
+    <div className="hidden md:block md:col-span-1">
+      <div className="sticky top-4">
+        <LessonPreview form={form} />
+      </div>
+    </div>
+  </div>
+    </div>
   )
 }

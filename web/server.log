@@ -33,3 +33,9 @@
  GET /icon-192.png 404 in 287ms (compile: 254ms, render: 33ms)
  GET /login 200 in 662ms (compile: 590ms, render: 72ms)
  GET /icon-192.png 404 in 96ms (compile: 28ms, render: 68ms)
+ ✓ Compiled in 501ms
+ ✓ Compiled in 357ms
+ ✓ Compiled in 107ms
+ ✓ Compiled in 225ms
+ GET /login 200 in 102ms (compile: 38ms, render: 64ms)
+ GET /icon-192.png 404 in 82ms (compile: 30ms, render: 52ms)
