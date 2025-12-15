@@ -5,6 +5,7 @@ import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { ModernStatCard, LoadingSpinner, EmptyStateNew as EmptyState } from '@/components/ui'
 import { adminGet } from '@/lib/adminApi'
+import { ConversionFunnel } from '@/components/admin/analytics/ConversionFunnel'
 
 interface AnalyticsData {
   overview: {
@@ -160,49 +161,8 @@ export default function AdminAnalyticsPage() {
           </div>
 
           {/* 轉換漏斗 */}
-          <div className="bg-zinc-800 rounded-lg p-6 mb-8">
-            <h3 className="font-bold mb-4">🔄 轉換漏斗</h3>
-            <div className="flex items-center justify-between">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">{data.overview.totalClicks}</div>
-                <div className="text-sm text-gray-400">點擊</div>
-              </div>
-              <div className="flex-1 mx-4">
-                <div className="text-center text-sm text-gray-400 mb-1">
-                  {data.overview.clickToTrialRate.toFixed(1)}%
-                </div>
-                <div className="h-2 bg-zinc-700 rounded">
-                  <div 
-                    className="h-2 bg-blue-500 rounded" 
-                    style={{ width: `${data.overview.clickToTrialRate}%` }}
-                  />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-400">{data.overview.totalTrials}</div>
-                <div className="text-sm text-gray-400">試用</div>
-              </div>
-              <div className="flex-1 mx-4">
-                <div className="text-center text-sm text-gray-400 mb-1">
-                  {data.overview.trialToConversionRate.toFixed(1)}%
-                </div>
-                <div className="h-2 bg-zinc-700 rounded">
-                  <div 
-                    className="h-2 bg-green-500 rounded" 
-                    style={{ width: `${data.overview.trialToConversionRate}%` }}
-                  />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-400">{data.overview.totalConversions}</div>
-                <div className="text-sm text-gray-400">付費</div>
-              </div>
-            </div>
-            <div className="text-center mt-4">
-              <span className="text-sm text-gray-400">
-                整體轉換率：<span className="text-white font-bold">{data.overview.overallConversionRate.toFixed(1)}%</span>
-              </span>
-            </div>
+          <div className="mb-8">
+            <ConversionFunnel data={data.overview} />
           </div>
 
           {/* 合作方排行榜 */}
