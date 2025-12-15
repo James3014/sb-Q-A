@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { ModernStatCard } from '@/components/ui'
+import { ModernStatCard, LoadingSpinner, EmptyStateNew as EmptyState } from '@/components/ui'
 import { adminGet } from '@/lib/adminApi'
 
 interface AnalyticsData {
@@ -66,7 +66,7 @@ export default function AdminAnalyticsPage() {
         <main className="min-h-screen bg-zinc-900 text-white">
           <AdminHeader title="📊 推廣成效分析" />
           <div className="p-4 max-w-6xl mx-auto">
-            <div className="text-center py-8">載入中...</div>
+            <LoadingSpinner text="載入分析數據..." fullscreen />
           </div>
         </main>
       </AdminLayout>
@@ -79,7 +79,15 @@ export default function AdminAnalyticsPage() {
         <main className="min-h-screen bg-zinc-900 text-white">
           <AdminHeader title="📊 推廣成效分析" />
           <div className="p-4 max-w-6xl mx-auto">
-            <div className="text-center py-8 text-red-400">載入失敗</div>
+            <EmptyState
+              icon="📊"
+              title="無法載入分析數據"
+              description="請稍後再試或聯繫系統管理員"
+              action={{
+                label: "重新載入",
+                onClick: () => loadAnalytics()
+              }}
+            />
           </div>
         </main>
       </AdminLayout>
