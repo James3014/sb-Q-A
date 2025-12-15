@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
 import { fetchAdminUsers, AdminUser } from '@/lib/adminData'
-import { StatCard } from '@/components/ui'
+import { StatCard, LoadingSpinner, EmptyState, StatusBadge } from '@/components/ui'
 import { ActivationPanel } from '@/components/ActivationPanel'
 import { getSubscriptionStatus } from '@/lib/subscription'
 import { formatDate } from '@/lib/constants'
@@ -85,9 +85,13 @@ export default function UsersPage() {
           </p>
 
           {loadingData ? (
-            <p className="text-zinc-500">載入中...</p>
+            <LoadingSpinner text="載入用戶資料..." />
           ) : filtered.length === 0 ? (
-            <p className="text-zinc-500">找不到用戶</p>
+            <EmptyState
+              icon="👤"
+              title={search ? "找不到符合條件的用戶" : "尚無用戶"}
+              description={search ? `試試其他搜尋關鍵字` : "等待用戶註冊"}
+            />
           ) : (
             <div className="space-y-2">
               {filtered.map(u => {
@@ -98,7 +102,17 @@ export default function UsersPage() {
                       <p className="text-sm">{u.email}</p>
                       <p className="text-xs text-zinc-500 mb-1">註冊：{formatDate(u.created_at)}</p>
                       <div className="flex gap-2 mt-1 items-center">
-                        <span className={`text-xs px-2 py-0.5 rounded ${status.color}`}>{status.label}</span>
+                        <StatusBadge
+                          variant={
+                            status.isExpired ? 'error' :
+                            u.subscription_type === 'pro' ? 'success' :
+                            'neutral'
+                          }
+                          size="sm"
+                          showDot
+                        >
+                          {status.label}
+                        </StatusBadge>
                         {u.subscription_expires_at && u.subscription_type !== 'free' && (
                           <span className="text-xs text-zinc-500">
                             {status.isExpired ? '已於 ' : '到期：'}
@@ -107,9 +121,9 @@ export default function UsersPage() {
                           </span>
                         )}
                         {u.trial_used && (
-                          <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded">
+                          <StatusBadge variant="info" size="sm">
                             已使用試用
-                          </span>
+                          </StatusBadge>
                         )}
                       </div>
                     </div>

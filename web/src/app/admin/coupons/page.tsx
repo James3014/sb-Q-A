@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { StatCard } from '@/components/ui'
+import { StatCard, LoadingSpinner, EmptyState, StatusBadge } from '@/components/ui'
 
 interface Coupon {
   id: string
@@ -127,9 +127,17 @@ export default function CouponsPage() {
           {/* 折扣碼列表 */}
           <div className="space-y-3">
             {loading ? (
-              <p className="text-zinc-500">載入中...</p>
+              <LoadingSpinner text="載入折扣碼..." />
             ) : coupons.length === 0 ? (
-              <p className="text-zinc-500">尚無折扣碼</p>
+              <EmptyState
+                icon="🎫"
+                title="尚無折扣碼"
+                description="創建第一個折扣碼來開始推廣"
+                action={{
+                  label: "創建折扣碼",
+                  onClick: () => document.querySelector('input')?.focus()
+                }}
+              />
             ) : (
               coupons.map(coupon => (
                 <div key={coupon.id} className="bg-zinc-800 rounded-lg p-4">
@@ -161,9 +169,13 @@ export default function CouponsPage() {
                   <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-zinc-500">狀態：</span>
-                      <span className={coupon.is_active ? 'text-green-400' : 'text-red-400'}>
+                      <StatusBadge
+                        variant={coupon.is_active ? 'success' : 'error'}
+                        size="sm"
+                        showDot
+                      >
                         {coupon.is_active ? '啟用' : '停用'}
-                      </span>
+                      </StatusBadge>
                     </div>
                     <div>
                       <span className="text-zinc-500">使用次數：</span>

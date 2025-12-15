@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AdminLayout, AdminHeader } from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/useAdminAuth'
-import { StatCard } from '@/components/ui'
+import { StatCard, LoadingSpinner, EmptyState, StatusBadge } from '@/components/ui'
 import { adminGet } from '@/lib/adminApi'
 
 interface Commission {
@@ -207,17 +207,25 @@ export default function AdminCommissionsPage() {
 
           {/* 分潤記錄列表 */}
           {loading ? (
-            <p className="text-zinc-500">載入中...</p>
+            <LoadingSpinner text="載入分潤記錄..." />
           ) : commissions.length === 0 ? (
-            <div className="bg-zinc-800 rounded-lg p-6">
-              <p className="text-zinc-500 mb-4">無分潤記錄</p>
-              <div className="text-sm text-zinc-600">
-                <p>調試資訊：</p>
-                <p>• 篩選條件: {JSON.stringify(filter)}</p>
-                <p>• 合作方數量: {partners.length}</p>
-                <p>• 載入狀態: {loading ? '載入中' : '已完成'}</p>
-              </div>
-            </div>
+            <EmptyState
+              icon="💰"
+              title="無分潤記錄"
+              description={
+                filter.quarter || filter.status || filter.partner
+                  ? "當前篩選條件下沒有符合的記錄"
+                  : "尚無分潤記錄，等待合作方推廣產生訂單"
+              }
+              action={
+                (filter.quarter || filter.status || filter.partner)
+                  ? {
+                      label: "清除篩選",
+                      onClick: () => setFilter({ quarter: '', status: '', partner: '' })
+                    }
+                  : undefined
+              }
+            />
           ) : (
             <div className="bg-zinc-800 rounded-lg overflow-hidden">
               <div className="p-4 border-b border-zinc-700 flex justify-between items-center">
@@ -269,14 +277,18 @@ export default function AdminCommissionsPage() {
                         <td className="text-right p-3 text-purple-400">NT${commission.commission_amount}</td>
                         <td className="text-center p-3">{commission.settlement_quarter}</td>
                         <td className="text-center p-3">
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            commission.status === 'pending' ? 'bg-amber-900 text-amber-300' :
-                            commission.status === 'settled' ? 'bg-blue-900 text-blue-300' :
-                            'bg-green-900 text-green-300'
-                          }`}>
+                          <StatusBadge
+                            variant={
+                              commission.status === 'pending' ? 'warning' :
+                              commission.status === 'settled' ? 'info' :
+                              'success'
+                            }
+                            size="sm"
+                            showDot
+                          >
                             {commission.status === 'pending' ? '待結算' :
                              commission.status === 'settled' ? '已結算' : '已支付'}
-                          </span>
+                          </StatusBadge>
                         </td>
                         <td className="text-center p-3 text-zinc-400">
                           {new Date(commission.created_at).toLocaleDateString()}
