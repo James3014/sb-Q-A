@@ -64,13 +64,13 @@ describe('useAffiliates Hook', () => {
     const mockAffiliates = [
       { id: '1', partner_name: 'Test Partner', total_trials: 10 }
     ]
-    
+
     jest.spyOn(AffiliateService, 'getAll').mockResolvedValue(mockAffiliates as any)
-    
+
     const { result } = renderHook(() => useAffiliates())
-    
+
     await waitFor(() => {
-      expect(result.current.affiliates).toEqual(mockAffiliates)
+      expect(result.current.data).toEqual(mockAffiliates)
       expect(result.current.loading).toBe(false)
     })
   })
@@ -84,11 +84,12 @@ describe('useAffiliates Hook', () => {
     }
 
     jest.spyOn(AffiliateService, 'create').mockResolvedValue({ id: '2', ...newAffiliate } as any)
-    
+    jest.spyOn(AffiliateService, 'getAll').mockResolvedValue([])
+
     const { result } = renderHook(() => useAffiliates())
-    
+
     await act(async () => {
-      await result.current.createAffiliate(newAffiliate)
+      await result.current.actions.create(newAffiliate)
     })
 
     expect(AffiliateService.create).toHaveBeenCalledWith(newAffiliate)

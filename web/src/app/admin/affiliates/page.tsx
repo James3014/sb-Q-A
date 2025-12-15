@@ -15,20 +15,19 @@ export default function AdminAffiliatesPage() {
   const { isReady } = useAdminAuth()
   const [showCreateForm, setShowCreateForm] = useState(false)
   
-  const { 
-    affiliates, 
-    loading, 
-    error, 
-    stats, 
-    createAffiliate, 
-    toggleAffiliate 
+  const {
+    data: affiliates,
+    loading,
+    error,
+    stats,
+    actions: { create: createAffiliate, toggle: toggleAffiliate }
   } = useAffiliates()
   
-  const { 
-    expandedAffiliate, 
-    affiliateUsers, 
-    loadingUsers, 
-    toggleExpanded 
+  const {
+    data: affiliateUsers,
+    loading: loadingUsers,
+    state: { expandedAffiliate },
+    actions: { toggleExpanded }
   } = useAffiliateUsers()
 
   if (!isReady || loading) {
