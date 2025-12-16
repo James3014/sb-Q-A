@@ -23,7 +23,7 @@
   /* 漸層：深度與動感 */
   --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   --gradient-border: linear-gradient(165deg, #3b82f6 0%, #6366f1 100%);
-  --gradient-text: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+  --gradient-text: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #ffffff 100%);
 }
 
 /* Snow Mode：強光高對比主題（對比度 ≥12:1） */
