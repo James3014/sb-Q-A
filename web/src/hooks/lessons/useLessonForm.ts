@@ -64,12 +64,25 @@ export function useLessonForm(options: UseLessonFormOptions = {}): UseLessonForm
   const initialRef = useRef(computedInitial)
   const [state, setState] = useState<UseLessonFormState>(computedInitial)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // 使用 ref 來避免 stale closure 問題
+  const stateRef = useRef(state)
+  const onSuccessRef = useRef(onSuccess)
+
+  // 保持 refs 同步
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   useEffect(() => {
-    console.log('useLessonForm: initialState changed:', initialState) // 調試信息
+    onSuccessRef.current = onSuccess
+  }, [onSuccess])
+
+  useEffect(() => {
+    console.log('useLessonForm: initialState changed:', initialState)
     initialRef.current = computedInitial
     setState(computedInitial)
-    console.log('useLessonForm: state updated:', computedInitial) // 調試信息
+    console.log('useLessonForm: state updated:', computedInitial)
   }, [computedInitial])
 
   const setTitle = useCallback((title: string) => {
@@ -107,10 +120,9 @@ export function useLessonForm(options: UseLessonFormOptions = {}): UseLessonForm
   const updateStep = useCallback((index: number, step: Partial<LessonStep>) => {
     setState(prev => {
       const next = [...prev.how]
-      if (!next[index]) {
-        return prev
+      if (next[index]) {
+        next[index] = { ...next[index], ...step }
       }
-      next[index] = { ...next[index], ...step }
       return { ...prev, how: next }
     })
   }, [])
@@ -122,9 +134,10 @@ export function useLessonForm(options: UseLessonFormOptions = {}): UseLessonForm
   const removeStep = useCallback((index: number) => {
     setState(prev => {
       if (prev.how.length <= 1) {
-        return { ...prev, how: [{ text: '' }] }
+        return prev
       }
-      return { ...prev, how: prev.how.filter((_, i) => i !== index) }
+      const next = prev.how.filter((_, i) => i !== index)
+      return { ...prev, how: next }
     })
   }, [])
 
@@ -132,7 +145,7 @@ export function useLessonForm(options: UseLessonFormOptions = {}): UseLessonForm
     setState(initialRef.current)
   }, [])
 
-  const buildPayload = (current: UseLessonFormState): CreateLessonInput => ({
+  const buildPayload = useCallback((current: UseLessonFormState): CreateLessonInput => ({
     title: current.title,
     what: current.what,
     why: current.why,
@@ -141,21 +154,22 @@ export function useLessonForm(options: UseLessonFormOptions = {}): UseLessonForm
     level_tags: current.level_tags,
     slope_tags: current.slope_tags,
     is_premium: current.is_premium,
-  })
+  }), [])
 
   const submit = useCallback(async () => {
     setIsSubmitting(true)
     try {
-      const payload = buildPayload(state)
+      // 使用 stateRef.current 避免 stale closure
+      const payload = buildPayload(stateRef.current)
       const lesson = lessonId
         ? await updateLessonWithValidation(lessonId, payload)
         : await createLessonWithValidation(payload)
-      onSuccess?.(lesson)
+      onSuccessRef.current?.(lesson)
       return lesson
     } finally {
       setIsSubmitting(false)
     }
-  }, [lessonId, onSuccess, state])
+  }, [lessonId, buildPayload])
 
   return {
     state,
