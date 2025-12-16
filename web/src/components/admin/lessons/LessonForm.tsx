@@ -20,31 +20,7 @@ export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
 
-  const form = useLessonForm({
-    lessonId,
-    initialState: initialLesson ? {
-      title: initialLesson.title,
-      what: initialLesson.what,
-      why: initialLesson.why,
-      how: initialLesson.how,
-      signals: initialLesson.signals,
-      level_tags: initialLesson.level_tags,
-      slope_tags: initialLesson.slope_tags,
-      is_premium: initialLesson.is_premium,
-    } : undefined,
-    onSuccess: () => {
-      setStatusMessage(lessonId ? '課程已更新' : '課程建立成功')
-      onSuccess?.()
-    },
-  })
-  const validation = useFormValidation()
-  const imageUpload = useImageUpload({
-    lessonId,
-    stepIndex: 0,
-    onUploaded: url => form.updateStep(0, { image: url }),
-    initialUrl: form.state.how[0]?.image ?? null,
-  })
-
+  // 載入課程資料
   useEffect(() => {
     if (!lessonId) return
     let canceled = false
@@ -52,15 +28,15 @@ export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
     async function loadLesson() {
       setLoading(true)
       setError(null)
-      console.log('Loading lesson:', lessonId) // 調試信息
+      console.log('Loading lesson:', lessonId)
       const data = await adminGet<{ ok: boolean; lesson: Lesson }>(`${LESSON_API_ENDPOINTS.lessons}/${lessonId}`)
-      console.log('API response:', data) // 調試信息
+      console.log('API response:', data)
       if (canceled) return
       if (!data || !data.ok) {
         setError('無法載入課程資料')
-        console.error('Failed to load lesson:', data) // 調試信息
+        console.error('Failed to load lesson:', data)
       } else {
-        console.log('Setting initial lesson:', data.lesson) // 調試信息
+        console.log('Setting initial lesson:', data.lesson)
         setInitialLesson(data.lesson)
       }
       setLoading(false)
@@ -71,6 +47,57 @@ export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
       canceled = true
     }
   }, [lessonId])
+
+  // 等待資料載入完成再初始化表單
+  const form = useLessonForm({
+    lessonId,
+    initialState: initialLesson ? {
+      title: initialLesson.title,
+      what: initialLesson.what,
+      why: initialLesson.why || [],
+      how: initialLesson.how || [{ text: '' }],
+      signals: initialLesson.signals || { correct: [], wrong: [] },
+      level_tags: initialLesson.level_tags || [],
+      slope_tags: initialLesson.slope_tags || [],
+      is_premium: initialLesson.is_premium || false,
+    } : undefined,
+    onSuccess: () => {
+      setStatusMessage(lessonId ? '課程已更新' : '課程建立成功')
+      onSuccess?.()
+    },
+  })
+
+  const validation = useFormValidation()
+  const imageUpload = useImageUpload({
+    lessonId,
+    stepIndex: 0,
+    onUploaded: url => form.updateStep(0, { image: url }),
+    initialUrl: form.state.how[0]?.image ?? null,
+  })
+
+  // 如果是編輯模式且還在載入，顯示載入狀態
+  if (lessonId && loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-zinc-400">載入課程資料中...</div>
+      </div>
+    )
+  }
+
+  // 如果是編輯模式但載入失敗，顯示錯誤
+  if (lessonId && !loading && !initialLesson && error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-400 mb-4">{error}</div>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+        >
+          重新載入
+        </button>
+      </div>
+    )
+  }
 
   const handleSubmit = useCallback(async () => {
     setError(null)

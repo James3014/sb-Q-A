@@ -23,3 +23,4 @@
   Debug Mode: true
  GET / 200 in 2.7s (compile: 2.5s, render: 266ms)
  GET / 200 in 55ms (compile: 9ms, render: 45ms)
+[?25h
