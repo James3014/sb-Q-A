@@ -135,10 +135,17 @@ body {
 
   /* Alpine Velocity 漸層文字 */
   .text-gradient-velocity {
+    color: #ffffff;
+    /* 暗黑模式使用純白色文字 */
+  }
+
+  /* Snow Mode 下使用漸層效果 */
+  [data-theme="snow"] .text-gradient-velocity {
     background: var(--gradient-text);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
   /* 隱藏滾動條（手機水平滑動） */
