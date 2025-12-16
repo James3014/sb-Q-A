@@ -1,144 +1,100 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { LessonFormContent } from './LessonFormContent'
-import { useLessonForm } from '@/hooks/lessons/useLessonForm'
-import { useFormValidation } from '@/hooks/lessons/useFormValidation'
-import { useImageUpload } from '@/hooks/lessons/useImageUpload'
+import { useState } from 'react'
+import { useLessonEditor } from '@/hooks/lessons/useLessonEditor'
+import { LessonFormFields } from './LessonFormFields'
+import { LessonFormActions } from './LessonFormActions'
 import type { Lesson } from '@/types/lessons'
-import { adminGet } from '@/lib/adminApi'
-import { LESSON_API_ENDPOINTS } from '@/constants/lesson'
 
 export interface LessonFormProps {
   lessonId?: string
-  onSuccess?: () => void
+  onSuccess?: (lesson: Lesson) => void
+  onCancel?: () => void
 }
 
-export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
-  const [initialLesson, setInitialLesson] = useState<Lesson | null>(null)
-  const [loading, setLoading] = useState(Boolean(lessonId))
-  const [error, setError] = useState<string | null>(null)
+export function LessonForm({ lessonId, onSuccess, onCancel }: LessonFormProps) {
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
-
-  // 載入課程資料
-  useEffect(() => {
-    if (!lessonId) return
-    let canceled = false
-
-    async function loadLesson() {
-      setLoading(true)
-      setError(null)
-      console.log('Loading lesson:', lessonId)
-      const data = await adminGet<{ ok: boolean; lesson: Lesson }>(`${LESSON_API_ENDPOINTS.lessons}/${lessonId}`)
-      console.log('API response:', data)
-      if (canceled) return
-      if (!data || !data.ok) {
-        setError('無法載入課程資料')
-        console.error('Failed to load lesson:', data)
-      } else {
-        console.log('Setting initial lesson:', data.lesson)
-        setInitialLesson(data.lesson)
-      }
-      setLoading(false)
-    }
-
-    loadLesson()
-    return () => {
-      canceled = true
-    }
-  }, [lessonId])
-
-  // 等待資料載入完成再初始化表單
-  const initialState = initialLesson ? {
-    title: initialLesson.title,
-    what: initialLesson.what,
-    why: initialLesson.why || [],
-    how: initialLesson.how || [{ text: '' }],
-    signals: initialLesson.signals || { correct: [], wrong: [] },
-    level_tags: initialLesson.level_tags || [],
-    slope_tags: initialLesson.slope_tags || [],
-    is_premium: initialLesson.is_premium || false,
-  } : undefined
-
-  const form = useLessonForm({
+  
+  const editor = useLessonEditor({
     lessonId,
-    initialState,
-    onSuccess: () => {
+    onSuccess: (lesson) => {
       setStatusMessage(lessonId ? '課程已更新' : '課程建立成功')
-      onSuccess?.()
+      onSuccess?.(lesson)
     },
   })
 
-  const validation = useFormValidation()
-  const imageUpload = useImageUpload({
-    lessonId,
-    stepIndex: 0,
-    onUploaded: url => form.updateStep(0, { image: url }),
-    initialUrl: form.state.how[0]?.image ?? null,
-  })
+  const handleSubmit = async () => {
+    try {
+      await editor.submit()
+    } catch (error) {
+      console.error('Submit error:', error)
+      setStatusMessage('儲存失敗，請重試')
+    }
+  }
+
+  const handleReset = () => {
+    editor.reset()
+    setStatusMessage(null)
+  }
+
+  const handleCancel = () => {
+    setStatusMessage(null)
+    onCancel?.()
+  }
 
   // 如果是編輯模式且還在載入，顯示載入狀態
-  if (lessonId && loading) {
+  if (lessonId && editor.isSubmitting && !editor.state.title) {
     return (
-      <div className="text-center py-8">
-        <div className="text-zinc-400">載入課程資料中...</div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-gray-400">載入課程資料中...</div>
       </div>
     )
-  }
-
-  // 如果是編輯模式但載入失敗，顯示錯誤
-  if (lessonId && !loading && !initialLesson && error) {
-    return (
-      <div className="text-center py-8">
-        <div className="text-red-400 mb-4">{error}</div>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-        >
-          重新載入
-        </button>
-      </div>
-    )
-  }
-
-  const handleSubmit = useCallback(async () => {
-    setError(null)
-    setStatusMessage(null)
-    const isValid = validation.validateForm({
-      title: form.state.title,
-      what: form.state.what,
-      why: form.state.why,
-      how: form.state.how,
-      signals: form.state.signals,
-      level_tags: form.state.level_tags,
-      slope_tags: form.state.slope_tags,
-      is_premium: form.state.is_premium,
-    })
-    if (!isValid) {
-      setError('請先修正表單錯誤')
-      return
-    }
-    try {
-      await form.submit()
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '儲存失敗'
-      setError(message)
-    }
-  }, [form, validation])
-
-  if (loading) {
-    return <p className="text-sm text-zinc-400">載入課程資料中...</p>
   }
 
   return (
-    <LessonFormContent
-      form={form}
-      validation={validation}
-      image={imageUpload}
-      onSubmit={handleSubmit}
-      isSubmitting={form.isSubmitting}
-      serverError={error}
-      successMessage={statusMessage}
-    />
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="bg-gray-900 rounded-lg shadow-lg p-6">
+        <h1 className="text-2xl font-bold text-white mb-6">
+          {lessonId ? '編輯課程' : '新增課程'}
+        </h1>
+
+        {statusMessage && (
+          <div className={`mb-4 p-3 rounded-md ${
+            statusMessage.includes('失敗') 
+              ? 'bg-red-900 text-red-300 border border-red-700'
+              : 'bg-green-900 text-green-300 border border-green-700'
+          }`}>
+            {statusMessage}
+          </div>
+        )}
+
+        <form onSubmit={(e) => e.preventDefault()}>
+          <LessonFormFields
+            state={editor.state}
+            actions={{
+              setTitle: editor.setTitle,
+              setWhat: editor.setWhat,
+              setWhy: editor.setWhy,
+              setHow: editor.setHow,
+              setSignals: editor.setSignals,
+              setLevelTags: editor.setLevelTags,
+              setSlopeTags: editor.setSlopeTags,
+              setIsPremium: editor.setIsPremium,
+              updateStep: editor.updateStep,
+              addStep: editor.addStep,
+              removeStep: editor.removeStep,
+            }}
+          />
+
+          <LessonFormActions
+            isSubmitting={editor.isSubmitting}
+            isEditMode={Boolean(lessonId)}
+            onSubmit={handleSubmit}
+            onReset={handleReset}
+            onCancel={onCancel ? handleCancel : undefined}
+          />
+        </form>
+      </div>
+    </div>
   )
 }
