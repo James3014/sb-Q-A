@@ -70,10 +70,9 @@ export default function TermsPage() {
           </ul>
 
           <h3>8. 聯繫方式</h3>
-          <p>如有任何問題，請透過以下方式聯繫我們：</p>
+          <p>如有任何問題，請透過平台內建的意見回報系統聯繫我們：</p>
           <ul>
-            <li>意見回報：<Link href="/feedback" className="text-blue-400 hover:underline">平台內建回報系統</Link></li>
-            <li>客服信箱：support@snowboard-app.com</li>
+            <li><Link href="/feedback" className="text-blue-400 hover:underline">💬 意見回報系統</Link></li>
           </ul>
 
           <h3>9. 條款修改</h3>
