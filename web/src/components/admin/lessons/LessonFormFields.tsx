@@ -339,25 +339,25 @@ export const LessonFormFields = memo(function LessonFormFields({
     }
   }
 
-  const handleSignalChange = (type: 'correct' | 'wrong', index: number, value: string) => {
+  const handleSignalChange = useCallback((type: 'correct' | 'wrong', index: number, value: string) => {
     const newSignals = { ...state.signals }
     newSignals[type][index] = value
     actions.setSignals(newSignals)
-  }
+  }, [state.signals, actions.setSignals])
 
-  const addSignal = (type: 'correct' | 'wrong') => {
+  const addSignal = useCallback((type: 'correct' | 'wrong') => {
     const newSignals = { ...state.signals }
     newSignals[type] = [...newSignals[type], '']
     actions.setSignals(newSignals)
-  }
+  }, [state.signals, actions.setSignals])
 
-  const removeSignal = (type: 'correct' | 'wrong', index: number) => {
+  const removeSignal = useCallback((type: 'correct' | 'wrong', index: number) => {
     const newSignals = { ...state.signals }
     if (newSignals[type].length > 1) {
       newSignals[type] = newSignals[type].filter((_, i) => i !== index)
       actions.setSignals(newSignals)
     }
-  }
+  }, [state.signals, actions.setSignals])
 
   return (
     <div className="space-y-6">

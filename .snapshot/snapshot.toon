@@ -1,7 +1,7 @@
 proj: snowskill-web
 desc: DIY Ski teaching lesson platform - ski instructor evaluation & student progress tracking with affiliate marketing system
-v: 0.1.0
-ts: 2025-12-13T23:51:00Z
+v: 0.2.0
+ts: 2025-12-16T08:45:00Z
 split: none
 tech:
   lang: TypeScript
@@ -20,6 +20,7 @@ r[42]{route,handler,tables,tpl}:
   GET /admin,page.tsx,users|payments,AdminDashboard
   GET /admin/users,page.tsx,users,UserManagement
   GET /admin/lessons,page.tsx,lessons,LessonManagement
+  GET /admin/lessons/:id/edit,page.tsx,lessons,LessonEditor
   GET /admin/affiliates,page.tsx,affiliate_partners|affiliate_clicks,AffiliateManagement
   GET /admin/commissions,page.tsx,affiliate_commissions,CommissionDashboard
   GET /admin/analytics,page.tsx,affiliate_clicks|affiliate_commissions|event_log,AnalyticsDashboard
@@ -38,6 +39,7 @@ r[42]{route,handler,tables,tpl}:
   POST /api/payments/webhook,route.ts,payments|users|affiliate_commissions,WebhookAPI
   GET /api/admin/users,route.ts,users,UserListAPI
   GET /api/admin/lessons,route.ts,lessons,LessonListAPI
+  GET /api/admin/lessons/:id,route.ts,lessons,LessonDetailAPI
   POST /api/admin/affiliates/create,route.ts,affiliate_partners,AffiliateCreateAPI
   GET /api/admin/affiliates,route.ts,affiliate_partners|affiliate_clicks|users,AffiliateListAPI
   GET /api/admin/affiliates/users,route.ts,users,AffiliateUsersAPI
@@ -52,10 +54,11 @@ r[42]{route,handler,tables,tpl}:
   POST /api/cron/expire-trials,route.ts,users,TrialExpiryAPI
   POST /api/cron/quarterly-settlement,route.ts,affiliate_commissions,QuarterlySettlementAPI
   GET /api/usercore/proxy,route.ts,users,UserCoreProxyAPI
-m.ctrl[12]{name,path,desc,deps}:
+m.ctrl[15]{name,path,desc,deps}:
   LessonCtrl,src/components/lesson/,lesson details & recommendations,useLessonDetailData
   CheckoutCtrl,src/components/checkout/,payment checkout flow,useCheckout|payments
   AdminCtrl,src/components/admin/,admin dashboards,adminData|adminGuard
+  LessonFormCtrl,src/components/admin/lessons/,TDD refactored lesson form system,useLessonEditor|useFormState|useFormActions
   AffiliateCtrl,src/components/affiliate/,affiliate management UI,useAffiliates|useAffiliateUsers|useAffiliateForm
   AnalyticsCtrl,src/lib/analytics.ts,event tracking & analytics,logger|analytics
   AffiliateAPICtrl,src/app/api/admin/affiliates/,affiliate management API,supabaseServer|affiliateService
@@ -65,8 +68,14 @@ m.ctrl[12]{name,path,desc,deps}:
   DashboardCtrl,src/components/dashboard/,student progress dashboard,improvement lib|useChartStats
   ReferralCtrl,src/components/ReferralBanner.tsx,referral tracking UI,trialSecurity
   SecurityCtrl,src/lib/trialSecurity.ts,anti-abuse mechanisms,rateLimit|botDefense
-m.svc[15]{name,path,desc,deps}:
+  ErrorBoundaryCtrl,src/hooks/common/useErrorBoundary.ts,unified error handling,error recovery
+  FormStateCtrl,src/hooks/form/,modular form state management,useFormState|useFormActions
+m.svc[18]{name,path,desc,deps}:
   LessonSvc,src/lib/lessons.ts,lesson data & access control,accessControl
+  LessonEditorSvc,src/hooks/lessons/useLessonEditor.ts,TDD lesson editing service,useLessonLoader|useFormState|useFormActions
+  LessonLoaderSvc,src/hooks/lessons/useLessonLoader.ts,lesson data loading service,adminApi
+  FormStateSvc,src/hooks/form/useFormState.ts,pure form state management,React state
+  FormActionsSvc,src/hooks/form/useFormActions.ts,stable form action functions,useCallback
   SubscriptionSvc,src/lib/subscription.ts,subscription state management,users tbl
   PaymentSvc,src/lib/payments.ts,payment processing,Stripe API|payments tbl
   UserCoreSvc,src/lib/userCoreClient.ts,UserCore integration,userCoreConfig|userCoreSync
@@ -100,9 +109,12 @@ m.repo[18]{name,path,desc,deps}:
   EventLogServerRepo,src/lib/analyticsServer.ts,event_log tbl,supabaseServer
   AdminUsersRepo,src/app/api/admin/users/route.ts,users tbl,supabaseServer
   AdminLessonsRepo,src/app/api/admin/lessons/route.ts,lessons tbl,supabaseServer
-m.cmp[35]{name,path,desc,deps}:
+m.cmp[38]{name,path,desc,deps}:
   RootLayout,src/app/layout.tsx,root layout wrapper,useSnowMode|useScrollRestoration
   LessonCard,src/components/LessonCard.tsx,lesson list item with alpine velocity design,useAccessibleLessons
+  LessonForm,src/components/admin/lessons/LessonForm.tsx,TDD refactored container component,useLessonEditor
+  LessonFormFields,src/components/admin/lessons/LessonFormFields.tsx,TDD pure UI fields component (memoized),useFormActions
+  LessonFormActions,src/components/admin/lessons/LessonFormActions.tsx,TDD action buttons component,form submission
   SkillImprovementChart,src/components/dashboard/SkillImprovementChart.tsx,progress chart visualization,useChartStats|improvement lib
   ProblemCategories,src/components/home/ProblemCategories.tsx,skill category selector,useAccessibleLessons
   CouponBanner,src/components/CouponBanner.tsx,free trial offer display,
@@ -136,9 +148,15 @@ m.cmp[35]{name,path,desc,deps}:
   CheckoutModal,src/components/CheckoutModal.tsx,payment status modal,
   AuthProvider,src/components/AuthProvider.tsx,authentication context,supabase auth
   LessonDetail,src/components/LessonDetail.tsx,lesson content display,lesson data
-hook[18]{name,path,desc,deps}:
+hook[25]{name,path,desc,deps}:
   useAccessibleLessons,src/hooks/useAccessibleLessons.ts,permission-based lesson filtering,lessons|subscription
   useLessonDetailData,src/hooks/useLessonDetailData.ts,lesson detail page data,lessons|practice|improvement|favorites
+  useLessonEditor,src/hooks/lessons/useLessonEditor.ts,TDD lesson editor composition hook,useLessonLoader|useFormState|useFormActions
+  useLessonLoader,src/hooks/lessons/useLessonLoader.ts,TDD lesson data loading hook,adminApi
+  useLessonForm,src/hooks/lessons/useLessonForm.ts,legacy lesson form hook (backward compatible),React Error #310 fixed
+  useFormState,src/hooks/form/useFormState.ts,TDD pure form state management,React state
+  useFormActions,src/hooks/form/useFormActions.ts,TDD stable form action functions,useCallback
+  useErrorBoundary,src/hooks/common/useErrorBoundary.ts,TDD unified error handling hook,error recovery
   useCheckout,src/hooks/useCheckout.ts,payment flow state mgmt,payments API|subscription
   useChartStats,src/hooks/useChartStats.ts,chart calculation functions,improvement
   useSnowMode,src/hooks/useSnowMode.ts,theme toggle persistence,
@@ -155,6 +173,7 @@ hook[18]{name,path,desc,deps}:
   useAdminAuth,src/lib/useAdminAuth.ts,admin authentication hook,adminAuth
   useFilteredLessons,src/lib/useFilteredLessons.ts,lesson filtering logic,lessons
   useRetry,src/lib/retry.ts,exponential backoff hook,
+  useFormValidation,src/hooks/lessons/useFormValidation.ts,TDD form validation hook,validation rules
 util[12]{name,path,desc,deps}:
   accessControl.ts,src/lib/accessControl.ts,permission checking utilities,subscription
   auth.ts,src/lib/auth.ts,authentication helpers,Supabase Auth
@@ -191,6 +210,19 @@ db[13]{tbl,desc,key}:
   event_log,analytics events,user_id|event_type
   feedback,user feedback,id
 cfg[3]: web/package.json,web/tsconfig.json,web/.env.example
-patterns[8]: Subscription State,API Routes,Custom Hooks,Optimistic Updates,Transaction-based Coupon Redemption,TDD Component Architecture,Service Layer Abstraction,Clean Code Principles
+patterns[10]: Subscription State,API Routes,Custom Hooks,Optimistic Updates,Transaction-based Coupon Redemption,TDD Component Architecture,Service Layer Abstraction,Clean Code Principles,Modular Hook Composition,Performance Optimization (memo)
 security[6]: Supabase Auth,RLS Policies,Rate Limiting,Bot Defense via Turnstile,Trial Abuse Prevention,IP-based Protection
-features[12]: Free Trial via Coupon Code,Affiliate Commission Tracking,Referral Click Tracking,User Progress Dashboard,Practice Recording,Favorite Lessons,Admin Management,Analytics Tracking,Payment Processing,Affiliate Analytics Dashboard,Trial Security System,TDD Refactored Components
+features[14]: Free Trial via Coupon Code,Affiliate Commission Tracking,Referral Click Tracking,User Progress Dashboard,Practice Recording,Favorite Lessons,Admin Management,Analytics Tracking,Payment Processing,Affiliate Analytics Dashboard,Trial Security System,TDD Refactored Form System,React Error #310 Fixed,Modular Form Architecture
+test[12]{file,desc}:
+  useLessonForm.test.ts,TDD lesson form hook tests
+  useFormState.test.ts,TDD form state management tests
+  useFormActions.test.ts,TDD form actions tests
+  useLessonLoader.test.ts,TDD lesson loading tests
+  useLessonEditor.test.ts,TDD lesson editor composition tests
+  useErrorBoundary.test.ts,TDD error handling tests
+  LessonForm.test.tsx,TDD container component tests
+  LessonFormFields.test.tsx,TDD fields component tests
+  LessonFormActions.test.tsx,TDD actions component tests
+  FormPerformance.test.tsx,TDD performance optimization tests
+  FormTypes.test.ts,TDD type safety tests
+  integration.test.ts,TDD integration tests
