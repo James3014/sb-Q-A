@@ -1,18 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLessonEditor } from '@/hooks/lessons/useLessonEditor'
 import { LessonFormFields } from './LessonFormFields'
 import { LessonFormActions } from './LessonFormActions'
 import type { Lesson } from '@/types/lessons'
 
+import type { UseLessonFormState } from '@/hooks/lessons/useLessonForm'
+
 export interface LessonFormProps {
   lessonId?: string
   onSuccess?: (lesson: Lesson) => void
   onCancel?: () => void
+  onStateChange?: (state: UseLessonFormState) => void
 }
 
-export function LessonForm({ lessonId, onSuccess, onCancel }: LessonFormProps) {
+export function LessonForm({ lessonId, onSuccess, onCancel, onStateChange }: LessonFormProps) {
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   
   const editor = useLessonEditor({
@@ -41,6 +44,11 @@ export function LessonForm({ lessonId, onSuccess, onCancel }: LessonFormProps) {
     setStatusMessage(null)
     onCancel?.()
   }
+
+  // 當表單狀態變化時，通知父組件（用於即時預覽）
+  useEffect(() => {
+    onStateChange?.(editor.state)
+  }, [editor.state, onStateChange])
 
   // 如果是編輯模式且還在載入，顯示載入狀態
   if (lessonId && editor.isSubmitting && !editor.state.title) {
@@ -84,6 +92,7 @@ export function LessonForm({ lessonId, onSuccess, onCancel }: LessonFormProps) {
               addStep: editor.addStep,
               removeStep: editor.removeStep,
             }}
+            lessonId={lessonId}
           />
 
           <LessonFormActions

@@ -3,6 +3,7 @@ import { useFormState } from '@/hooks/form/useFormState'
 import { useFormActions } from '@/hooks/form/useFormActions'
 import { useLessonLoader } from '@/hooks/lessons/useLessonLoader'
 import { createLessonWithValidation, updateLessonWithValidation } from '@/lib/lessons/services/lessonService'
+import { levelTagToDisplay, slopeTagToDisplay, levelTagToDb, slopeTagToDb } from '@/constants/lesson'
 import type { Lesson, CreateLessonInput } from '@/types/lessons'
 import type { UseLessonFormState, UseLessonFormOptions, UseLessonFormReturn } from '@/hooks/lessons/useLessonForm'
 
@@ -13,18 +14,18 @@ export function useLessonEditor(options: UseLessonFormOptions = {}): UseLessonFo
   // 載入課程資料
   const { lesson, loading, error } = useLessonLoader(lessonId)
   
-  // 準備初始狀態
+  // 準備初始狀態（將英文 tag 轉換為中文顯示）
   const initialState = useMemo(() => {
     if (!lesson) return undefined
-    
+
     return {
       title: lesson.title,
       what: lesson.what,
       why: lesson.why || [],
       how: lesson.how || [{ text: '' }],
       signals: lesson.signals || { correct: [], wrong: [] },
-      level_tags: lesson.level_tags || [],
-      slope_tags: lesson.slope_tags || [],
+      level_tags: (lesson.level_tags || []).map(levelTagToDisplay),
+      slope_tags: (lesson.slope_tags || []).map(slopeTagToDisplay),
       is_premium: lesson.is_premium || false,
     }
   }, [lesson])
@@ -47,15 +48,15 @@ export function useLessonEditor(options: UseLessonFormOptions = {}): UseLessonFo
     onSuccessRef.current = onSuccess
   }, [onSuccess])
   
-  // 建立 payload
+  // 建立 payload（將中文 tag 轉換為英文儲存）
   const buildPayload = useCallback((current: UseLessonFormState): CreateLessonInput => ({
     title: current.title,
     what: current.what,
     why: current.why,
     how: current.how,
     signals: current.signals,
-    level_tags: current.level_tags,
-    slope_tags: current.slope_tags,
+    level_tags: current.level_tags.map(levelTagToDb),
+    slope_tags: current.slope_tags.map(slopeTagToDb),
     is_premium: current.is_premium,
   }), [])
   

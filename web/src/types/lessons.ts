@@ -1,6 +1,7 @@
 export interface LessonStep {
   text: string
-  image?: string | null
+  image?: string | null  // 單張圖片（向後相容）
+  images?: string[]      // 多張圖片
 }
 
 export interface LessonSignals {

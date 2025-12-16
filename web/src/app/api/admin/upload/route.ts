@@ -25,12 +25,12 @@ export async function POST(req: NextRequest) {
   }
 
   const lessonId = typeof formData.get('lessonId') === 'string' ? String(formData.get('lessonId')) : 'temp'
-  const stepParam = formData.get('stepIndex')
-  const stepIndex = typeof stepParam === 'string' && !Number.isNaN(Number(stepParam)) ? Number(stepParam) : 0
+  const seqParam = formData.get('imageSequence')
+  const imageSequence = typeof seqParam === 'string' && !Number.isNaN(Number(seqParam)) ? Number(seqParam) : 1
 
   setSupabaseGetter(() => auth.supabase)
   try {
-    const result = await uploadAndLink(file, lessonId, stepIndex)
+    const result = await uploadAndLink(file, lessonId, imageSequence)
     return NextResponse.json({ ok: true, ...result })
   } catch (error) {
     if (error instanceof ValidationError) {

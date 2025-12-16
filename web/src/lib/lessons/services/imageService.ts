@@ -29,8 +29,11 @@ function getDimensions(file: File): { width?: number; height?: number } {
   return { width: candidate?.width, height: candidate?.height }
 }
 
-function buildStoragePath(lessonId: string, stepIndex: number, ext: string): string {
-  return `lessons/${lessonId}/${stepIndex}.${ext}`
+function buildStoragePath(lessonId: string, imageSequence: number, ext: string): string {
+  // 格式：{lessonId}/{lessonId}-{sequence}.{ext}
+  // 例如：64/64-01.jpeg, 64/64-02.jpeg
+  const seqNum = String(imageSequence).padStart(2, '0')
+  return `${lessonId}/${lessonId}-${seqNum}.${ext}`
 }
 
 function resolveExtension(file: File): string {
@@ -77,14 +80,14 @@ export interface UploadResult {
   path: string
 }
 
-export async function uploadAndLink(file: File, lessonId: string, stepIndex: number): Promise<UploadResult> {
+export async function uploadAndLink(file: File, lessonId: string, imageSequence: number = 1): Promise<UploadResult> {
   const validation = validateImageFile(file)
   if (!validation.valid) {
     throw new ValidationError(validation.errors)
   }
 
   const compressed = await compressImage(file)
-  const storagePath = buildStoragePath(lessonId, stepIndex, resolveExtension(file))
+  const storagePath = buildStoragePath(lessonId, imageSequence, resolveExtension(file))
   const url = await repository.uploadImage(compressed, storagePath)
   return { url, path: storagePath }
 }

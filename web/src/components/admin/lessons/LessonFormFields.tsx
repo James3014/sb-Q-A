@@ -1,7 +1,8 @@
 'use client'
 
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import { LEVEL_OPTIONS, SLOPE_OPTIONS } from '@/constants/lesson'
+import { StepImageUploader } from './StepImageUploader'
 import type { UseLessonFormState } from '@/hooks/lessons/useLessonForm'
 import type { UseFormActionsReturn } from '@/hooks/form/useFormActions'
 
@@ -9,13 +10,22 @@ interface LessonFormFieldsProps {
   state: UseLessonFormState
   actions: UseFormActionsReturn
   errors?: Record<string, string>
+  lessonId?: string  // 新增：用於圖片上傳
 }
 
-export const LessonFormFields = memo(function LessonFormFields({ 
-  state, 
-  actions, 
-  errors 
+export const LessonFormFields = memo(function LessonFormFields({
+  state,
+  actions,
+  errors,
+  lessonId,
 }: LessonFormFieldsProps) {
+  // 計算所有步驟的圖片總數（用於上傳時計算序號）
+  const totalImageCount = useMemo(() => {
+    return state.how.reduce((sum, step) => {
+      const stepImages = step.images || (step.image ? [step.image] : [])
+      return sum + stepImages.length
+    }, 0)
+  }, [state.how])
   const handleLevelTagToggle = useCallback((tag: string) => {
     const newTags = state.level_tags.includes(tag)
       ? state.level_tags.filter(t => t !== tag)
@@ -189,27 +199,51 @@ export const LessonFormFields = memo(function LessonFormFields({
         <label className="block text-sm font-medium text-gray-300 mb-2">
           怎麼練
         </label>
-        <div className="space-y-2">
-          {state.how.map((step, index) => (
-            <div key={index} className="flex gap-2">
-              <textarea
-                value={step.text}
-                onChange={(e) => actions.updateStep(index, { text: e.target.value })}
-                rows={2}
-                className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder={`步驟 ${index + 1}`}
-              />
-              {state.how.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => actions.removeStep(index)}
-                  className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  刪除
-                </button>
-              )}
-            </div>
-          ))}
+        <div className="space-y-4">
+          {state.how.map((step, index) => {
+            // 取得此步驟的圖片陣列
+            const stepImages = step.images || (step.image ? [step.image] : [])
+            // 計算此步驟之前的圖片數量
+            const prevImageCount = state.how.slice(0, index).reduce((sum, s) => {
+              const imgs = s.images || (s.image ? [s.image] : [])
+              return sum + imgs.length
+            }, 0)
+
+            return (
+              <div key={index} className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+                <div className="flex items-start gap-2 mb-2">
+                  <span className="text-sm font-medium text-gray-400 mt-2">步驟 {index + 1}</span>
+                  {state.how.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => actions.removeStep(index)}
+                      className="ml-auto px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30"
+                    >
+                      刪除
+                    </button>
+                  )}
+                </div>
+                <textarea
+                  value={step.text}
+                  onChange={(e) => actions.updateStep(index, { text: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="描述這個步驟的練習內容..."
+                />
+                {/* 圖片上傳區 */}
+                {lessonId && (
+                  <StepImageUploader
+                    lessonId={lessonId}
+                    currentImageCount={prevImageCount}
+                    images={stepImages}
+                    onImagesChange={(newImages) => {
+                      actions.updateStep(index, { images: newImages, image: newImages[0] || null })
+                    }}
+                  />
+                )}
+              </div>
+            )
+          })}
           <button
             type="button"
             onClick={actions.addStep}
