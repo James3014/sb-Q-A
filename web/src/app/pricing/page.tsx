@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { PageContainer } from '@/components/ui'
 import { useAuth } from '@/components/AuthProvider'
 import { CheckoutModal } from '@/components/CheckoutModal'
+import { PurchaseConfirmModal } from '@/components/PurchaseConfirmModal'
 import { TurnstileWidget } from '@/components/TurnstileWidget'
 import { CouponBanner } from '@/components/CouponBanner'
 import { ReferralBanner } from '@/components/ReferralBanner'
@@ -78,6 +79,17 @@ function PricingContent() {
   const [couponStatus, setCouponStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [couponMessage, setCouponMessage] = useState<string | null>(null)
   const [redeemingTrial, setRedeemingTrial] = useState(false)
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean
+    planId: string
+    planName: string
+    price: string
+  }>({
+    isOpen: false,
+    planId: '',
+    planName: '',
+    price: ''
+  })
 
   const {
     checkoutPlan,
@@ -228,6 +240,33 @@ function PricingContent() {
     }
   }, [couponResult, user, couponParam, router, fetchAccessToken, refreshSubscription])
 
+  const handlePurchaseClick = (planId: string) => {
+    const planInfo = {
+      'pass_7': { name: '7天 PASS', price: '$180' },
+      'pass_30': { name: '30天 PASS', price: '$290' },
+      'pro_yearly': { name: 'PRO 年費', price: '$690/年' }
+    }
+    
+    const info = planInfo[planId as keyof typeof planInfo]
+    if (!info) return
+    
+    setConfirmModal({
+      isOpen: true,
+      planId,
+      planName: info.name,
+      price: info.price
+    })
+  }
+
+  const handleConfirmPurchase = () => {
+    setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    handleCheckout(confirmModal.planId as any)
+  }
+
+  const handleCancelPurchase = () => {
+    setConfirmModal(prev => ({ ...prev, isOpen: false }))
+  }
+
   useEffect(() => {
     trackEvent('pricing_view')
   }, [])
@@ -314,7 +353,7 @@ function PricingContent() {
 
           <div className="grid grid-cols-2 gap-3 mb-4">
             <button
-              onClick={() => handleCheckout('pass_7')}
+              onClick={() => handlePurchaseClick('pass_7')}
               disabled={checkoutPlan !== null || !user}
               className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-zinc-600 disabled:to-zinc-600 disabled:cursor-not-allowed rounded-lg p-3 text-center transition-all font-semibold text-white disabled:opacity-60 active:scale-95"
             >
@@ -324,7 +363,7 @@ function PricingContent() {
               <p className="text-xs opacity-90">7 天方案</p>
             </button>
             <button
-              onClick={() => handleCheckout('pass_30')}
+              onClick={() => handlePurchaseClick('pass_30')}
               disabled={checkoutPlan !== null || !user}
               className="bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-zinc-600 disabled:to-zinc-600 disabled:cursor-not-allowed rounded-lg p-3 text-center transition-all font-semibold text-white disabled:opacity-60 active:scale-95"
             >
@@ -356,7 +395,7 @@ function PricingContent() {
             '✓ 深度練習分析（進步曲線、頻率統計）',
             '✓ 個人化學習建議',
           ]}
-          onSelect={() => handleCheckout('pro_yearly')}
+          onSelect={() => handlePurchaseClick('pro_yearly')}
           loading={checkoutPlan === 'pro_yearly'}
           disabled={!user}
         />
@@ -373,12 +412,31 @@ function PricingContent() {
           <p className="text-zinc-500 text-xs mt-3">支援信用卡付款</p>
         </div>
 
+        {/* 退費政策聲明 */}
+        <div className="bg-amber-900/30 border border-amber-600/50 rounded-lg p-4 mb-6">
+          <h3 className="font-bold mb-3 text-amber-400">⚠️ 重要聲明</h3>
+          <div className="text-sm text-amber-100 space-y-2">
+            <p>本平台提供之內容屬於數位教學服務，於付款完成後即解鎖並開始提供。</p>
+            <p>由於內容於購買後即可完整使用，<strong>恕不提供退費或取消服務</strong>。</p>
+            <p>建議您於購買前詳閱課程介紹與免費內容。</p>
+          </div>
+        </div>
+
         {/* 支付進度模態視窗 */}
         <CheckoutModal
           isOpen={modalStatus !== null}
           status={modalStatus || 'pending'}
           message={modalMessage}
           onClose={handleCloseModal}
+        />
+
+        {/* 購買確認對話框 */}
+        <PurchaseConfirmModal
+          isOpen={confirmModal.isOpen}
+          planName={confirmModal.planName}
+          price={confirmModal.price}
+          onConfirm={handleConfirmPurchase}
+          onCancel={handleCancelPurchase}
         />
 
         {!user && (
@@ -405,7 +463,11 @@ function PricingContent() {
             </div>
             <div>
               <p className="text-zinc-300">Q: 可以退款嗎？</p>
-              <p className="text-zinc-500">A: 如有問題請聯繫客服，我們會協助處理</p>
+              <p className="text-zinc-500">A: 本服務屬數位內容，付款後即可完整使用，恕不提供退費服務</p>
+            </div>
+            <div>
+              <p className="text-zinc-300">Q: 服務條款在哪裡？</p>
+              <p className="text-zinc-500">A: 請參閱 <Link href="/terms" className="text-blue-400 hover:underline">完整服務條款</Link></p>
             </div>
           </div>
         </div>
