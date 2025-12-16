@@ -1,548 +1,131 @@
-# TODO
+# 📋 TODO List
 
-## 重構清單（Clean Code + Linus 原則）
+## 🚨 **緊急修復 (P0) - 進行中**
 
-- [x] 1. 統一後台頁面使用 AdminLayout（消除重複驗證邏輯）
-- [x] 2. 移除 admin/page.tsx 重複的 loading/權限檢查
-- [x] 3. 後台密碼統一用環境變數
-- [x] 4. 刪除空的 web/src/data 資料夾
-- [x] 5. admin/page.tsx 拆分子組件（StatCard、TopLessons、TopKeywords、RecentFeedback）
-- [x] 6. 拆分 ImprovementDashboard 組件（practice/page.tsx 369→100 行）
-- [x] 7. SKILL_RECOMMENDATIONS 移到 constants.ts
-- [x] 8. 拆分 LessonHeatmap 組件（admin/lessons/page.tsx 325→150 行）
-- [x] 9. 建立 formatDate() 共用函數
-- [x] 10. 訂閱方案常數 SUBSCRIPTION_PLANS 移到 constants.ts
-- [x] 11. getSubscriptionStatus() 移到 lib/subscription.ts
-- [x] 12. FunnelBar / ProgressBar / StatCard 移到 ui.tsx
-- [x] 13. admin/users 拆分 ActivationPanel 組件
-- [x] 14. FEEDBACK_TYPES 移到 constants.ts
-- [x] 15. 驗證 build ✅
+### 後台表單系統重構 (TDD)
+- [ ] **Task 1.1**: 修復 React Error #310 - `useCallback` 依賴問題
+  - [ ] 建立測試檔案 `tests/hooks/useLessonForm.test.ts`
+  - [ ] 寫失敗測試 (Red)
+  - [ ] 修復 useCallback 依賴 (Green)
+  - [ ] 優化重構 (Refactor)
+  - **問題**: 表單載入時觸發 React Error #310
+  - **影響**: 後台編輯器無法正常使用
+  - **詳見**: [REFACTOR_BACKEND_FORM_TDD.md](REFACTOR_BACKEND_FORM_TDD.md)
 
-## 第五輪重構（2025-11-27）
+## 🔥 **核心功能 (P1) - 等待 P0**
 
-- [x] 16. admin/page.tsx 移除重複 StatCard，使用 ui.tsx
-- [x] 17. FEEDBACK_TYPE_LABELS 移到 constants.ts
-- [x] 18. 首頁 slopeFilter 使用 SLOPE_NAMES
-- [x] 19. admin/page.tsx RecentFeedback 使用 formatDate
-- [x] 20. admin/feedback 使用 formatDate + FEEDBACK_TYPE_LABELS
-- [x] 21. 驗證 build ✅
+### 後台表單架構重構
+- [ ] **Task 2.1**: 抽離表單狀態管理 (`useFormState`)
+- [ ] **Task 2.2**: 抽離表單動作函數 (`useFormActions`) 
+- [ ] **Task 2.3**: 抽離資料載入邏輯 (`useLessonLoader`)
+- [ ] **Task 2.4**: 重構為組合 Hook (`useLessonEditor`)
 
----
+## ⚡ **架構優化 (P2) - 等待 P1**
 
-## 課程詳情頁增強版（2025-11-27）
+### 組件職責分離
+- [ ] **Task 3.1**: 組件職責分離 (`LessonFormFields`)
+- [ ] **Task 3.2**: 動作按鈕組件化 (`LessonFormActions`)
+- [ ] **Task 3.3**: 重構為容器組件 (`LessonForm`)
 
-### Schema 變更
-- [x] 22. practice_logs 新增 rating1/rating2/rating3 欄位（migration_rating_v2.sql）
+## 🛠️ **品質提升 (P3) - 等待 P2**
 
-### 組件拆分
-- [x] 23. LessonHeader（返回、收藏、分享）
-- [x] 24. LessonWhat（問題區塊重新排版）
-- [x] 25. LessonWhy（目標區塊重新排版）
-- [x] 26. LessonSteps（How 步驟卡片化 + 圖片槽位）
-- [x] 27. LessonSignals（做對/做錯訊號）
-- [x] 28. LessonPracticeCTA（練習按鈕 + 三項評分彈窗）
-- [x] 29. LessonPracticeHistory（課程級別練習紀錄）
-- [x] 30. LessonRecommendations（弱項推薦課程）
-- [x] 31. LessonUnlockPRO（柔性付費引導）
-
-### 整合
-- [x] 32. 重寫 LessonDetail.tsx 使用新組件
-- [x] 33. 更新 practice.ts API 支援三項評分
-- [x] 34. 驗證 build ✅
+### 錯誤處理與效能
+- [ ] **Task 4.1**: 錯誤處理統一 (`useErrorBoundary`)
+- [ ] **Task 4.2**: 效能優化 (memo 化)
+- [ ] **Task 4.3**: 型別安全強化
 
 ---
 
-## 課程詳情頁增強 Phase 2（2025-11-27）
-
-### Phase 1：完成後正向回饋
-- [x] 35. 練習完成動畫（✓ 打勾動畫）
-- [x] 36. 顯示「+1 次練習」+ 累計次數
-- [x] 37. 顯示最近改善度變化
-
-### Phase 2：次序式練習建議
-- [x] 38. getRelatedLessons 函數（基於技能和程度）
-- [x] 39. LessonSequence 組件（先看 → 下一步 → 相似）
-- [x] 40. 顯示在課程底部
-
-### Phase 3：AI 示意圖規劃
-- [ ] 41. 從 heatmap 選出 TOP 10 熱門課程
-- [ ] 42. 建立 Prompt 標準化模板（簡筆畫風格）
-- [ ] 43. 定義圖片風格指南
-
----
-
-## UX 優化（2025-11-28）
-
-> 基於 UX 審查報告，按 Linus 原則排序：低成本高回報優先
-
-### 🔴 Phase 1：立即做（本週，~7hr）✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 74. 字級優化 18px + 行高 1.8 | 1hr | LessonContent.tsx | ✅ |
-| - [x] 75. 錯誤頁加返回按鈕 | 2hr | lesson/[id]/page.tsx | ✅ |
-| - [x] 76. 震動回饋（按鈕點擊） | 1hr | ui.tsx:Button | ✅ |
-| - [x] 77. Skeleton 載入狀態 | 3hr | SkeletonLesson.tsx | ✅ |
-
-### 🟡 Phase 2：本週後半（~6hr）✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 78. 底部固定操作欄 | 4hr | BottomActionBar.tsx | ✅ |
-| - [x] 79. 觸控目標放大 ≥48px | 2hr | LessonHeader.tsx | ✅ |
-
-### 🟠 Phase 3：暫緩（觀察需求後再做）
-
-| # | 項目 | 暫緩原因 |
-|---|------|---------|
-| - [ ] 81. 語音搜尋 | 瀏覽器支援度差，ROI 低 |
-| - [ ] 82. Service Worker 離線快取 | PWA 配置複雜，先確認需求 |
-| - [ ] 84. 練習中心整合收藏 Tab | 功能已分開運作 |
-
-### 驗收標準 ✅ 已達成
-- [x] 85. 字級達 WCAG AA（正文 18px）
-- [x] 86. 錯誤頁有明確返回路徑
-- [x] 87. 主按鈕有觸覺回饋（Android）
-- [x] 88. 載入時顯示骨架屏而非文字
-- [x] 89. 驗證 build ✅
-
----
-
-## 訂閱／權限強化（2025-11-29）✅ 已完成
-
-- [x] 117. 建立 Postgres 函式 `is_subscription_active(user_id)` 並在 RLS 中使用，避免依賴客戶端時間
-- [x] 118. 啟用／強化 RLS：`users`、`subscriptions`、`lessons`、`favorites`、`practice_logs`、`event_log` 僅本人可存取；`is_admin` 例外
-- [x] 119. Premium 資料防護：非有效訂閱僅回傳免費或摘要欄位；阻擋非訂閱寫入 favorites／practice／event_log
-- [x] 120. Admin API 伺服器化：所有 admin 查詢／RPC 改由 server/edge API 執行並檢查 `is_admin`，前端只吃結果
-- [x] 121. 訂閱開通 API：伺服器端用 service key 驗證與開通，`ActivationPanel` 改呼叫新 API，移除客戶端直接更新 `users`
-- [x] 122. event_log 寫入限制：metadata 大小／格式限制與 rate-limit 策略，避免濫用（migration_event_log_guardrails.sql 已執行）
-- [x] 123. 方案／定價同步：前端常數與 DB 方案表版本化，保留歷史方案避免老用戶失效（migration_subscription_plans.sql 已執行）
-- [x] 124. 上線 `docs/migration_subscription_security.sql`：RLS + is_subscription_active 函式，並逐環境驗證（已執行）
-
----
-
-## Clean Code + Linus 重構行動（2025-11-29）✅ 已完成
-
-- [x] 125. 收斂敏感資料/付費資料訪問：移除客戶端直連 Supabase（Admin/metrics/monetization），全面改走 server API + service key
-- [x] 126. Admin API 客戶端封裝：共用 token 取得與錯誤處理，避免頁面重複 fetch 邏輯
-- [x] 127. 前端關注點分離：資料讀寫改由 hooks/services（或 server actions/route handlers），頁面只負責 UI 組裝
-- [x] 128. event_log 後端校驗/節流：為常用事件定義 schema/大小限制並加入 rate-limit（migration_event_log_guardrails.sql 已執行）
-- [x] 129. 方案表版控：建立 DB 方案表並與 `SUBSCRIPTION_PLANS` 同步流程，保留歷史方案（migration_subscription_plans.sql 已執行）
-- [x] 130. 權限驗證 Smoke Tests：撰寫腳本/用例覆蓋未訂閱/訂閱中/admin 的 premium 讀寫與 event_log/favorites/practice 行為（SMOKE_AUTH_SUBSCRIPTION.md 已建立）
-
-### 改善總結
-
-**核心問題**：前端直接用 anon key 存取敏感資料，存在安全漏洞
-
-**解決方案**：三層架構分離
-```
-前端（UI）→ adminData.ts（資料層）→ /api/admin/*（Server API）→ Supabase（service key）
-```
-
-**安全防護**：
-- ✅ RLS 政策：用戶只能存取自己的資料
-- ✅ 訂閱檢查：使用伺服器時間（`is_subscription_active()`），無法繞過
-- ✅ Premium 防護：非訂閱用戶無法讀取 premium 課程
-- ✅ Rate Limit：event_log 限制 120 次/分鐘（用戶）、60 次/分鐘（匿名）
-- ✅ 大小限制：metadata 限制 4000 字元
-
-**可維護性提升**：
-- ✅ 統一錯誤處理（`adminApi.ts`）
-- ✅ 統一 token 取得（避免重複代碼）
-- ✅ 型別安全（TypeScript interfaces）
-- ✅ 測試用例（Smoke Tests）
-
-**修改的檔案**：
-- `web/src/lib/adminApi.ts` - 新增（客戶端 API 封裝）
-- `web/src/lib/adminData.ts` - 新增（資料層封裝）
-- `web/src/lib/supabaseServer.ts` - 新增（Service Role Client）
-- `web/src/app/api/admin/**/*.ts` - 新增 5 個 Server API 路由
-- `web/src/app/admin/**/*.tsx` - 改用 `adminData.ts`
-
----
-
-## 支付模組 Clean Code / 漸進式重構（2025-12-XX）
-
-- [x] 131. 支付 provider adapter 抽象：拆分 `payments/provider/mock.ts`、`payments/provider/oentech.ts`，`payments/index.ts` 只負責 orchestrate。
-- [x] 132. Webhook 模組化：狀態映射、payload 驗證、冪等/續期邏輯提取到純函式，route 只做 parse/respond。
-- [x] 133. Server-side analytics helper：統一寫入 event_log + user-core queue，API 不再重複手寫。
-- [x] 134. Config 集中化：`lib/config/payments.ts` 讀取/驗證 `PAYMENT_*`，缺值即報錯；回應格式統一 `{ ok, error?, detail? }`。
-- [x] 135. 測試/防呆：最小單測或 smoke 覆蓋 checkout/webhook/status；middleware 防止非 mock 環境暴露 mock checkout。
-- `docs/migration_subscription_security.sql` - 新增並已執行
-- `docs/migration_event_log_guardrails.sql` - 新增並已執行
-- `docs/migration_subscription_plans.sql` - 新增並已執行
-- `docs/SMOKE_AUTH_SUBSCRIPTION.md` - 新增
-
-**完成日期**：2025-12-01
-- ✅ 安全性：敏感資料不再暴露給前端
-- ✅ 可維護性：統一 API 封裝，減少重複代碼 ~200 行
-- ✅ 可測試性：建立 Smoke Tests 文件
-- ✅ 擴展性：方案版本化，不影響老用戶
-
-**架構改善**：
-```
-改善前：前端頁面 → Supabase (anon key) ❌
-改善後：前端頁面 → adminData.ts → /api/admin/* → Supabase (service key) ✅
-```
-
-**詳細報告**：[docs/安全性強化報告_2025-12-01.md](安全性強化報告_2025-12-01.md)
-
-## Clean Code 第七輪重構（2025-11-28）
-
-> 基於 Linus 原則：消除重複、統一型別、減少維護負擔
-
-### 重構清單
-
-| # | 項目 | 工時 | 狀態 |
-|---|------|------|------|
-| - [x] 90. 統一 Lesson 型別（lesson.ts → lesson-v3.ts） | 30min | ✅ |
-| - [x] 91. 清理未使用的 types（rider.ts → rider-v3.ts） | 15min | ✅ |
-| - [x] 92. ui.tsx 拆分為 ui/ 目錄 | 45min | ✅ |
-| - [x] 93. PageHeader 加震動回饋 | 5min | ✅ |
-| - [x] 94. 驗證 build | - | ✅ |
-| - [x] 95. ErrorBoundary 全域錯誤邊界 | 30min | ✅ |
-
----
-
-## UX 優化第二輪（2025-11-28）
-
-### 對比度與效能優化
-
-| # | 項目 | 工時 | 狀態 |
-|---|------|------|------|
-| - [x] 96. 主按鈕對比度提升（blue-700 + font-bold） | 10min | ✅ |
-| - [x] 97. 次要文字對比度（zinc-400 → zinc-300） | 10min | ✅ |
-| - [x] 98. 卡片邊框強化（border-zinc-700） | 10min | ✅ |
-| - [x] 99. fetchWithRetry 弱網重試 | 30min | ✅ |
-| - [x] 100. prefers-reduced-motion 省電 | 15min | ✅ |
-| - [x] 101. Next/Image 圖片優化 | 30min | ✅ |
-| - [x] 102. 驗證 build | - | ✅ |
-| - [x] 103. 頂部導航圖示放大 44px | 5min | ✅ |
-
----
-
-## UX 優化第三輪（2025-11-28）
-
-> 雪地場景核心優化：強光對比 + 練習轉化 + 導航體驗
-
-### P0：Snow Mode 高對比主題（1-2hr）✅ 已完成
-
-| # | 項目 | 工時 | 狀態 |
-|---|------|------|------|
-| - [x] 104. useSnowMode.ts hook | 20min | ✅ |
-| - [x] 105. globals.css Snow Mode 變數 | 20min | ✅ |
-| - [x] 106. 首頁加切換按鈕 | 20min | ✅ |
-| - [x] 107. 全站組件套用 CSS Variables | 30min | ✅ |
-| - [x] 108. 驗證對比度 ≥12:1 | 10min | ✅ |
-
-### P0：嵌入式評分卡（1hr）✅ 已完成
-
-| # | 項目 | 工時 | 狀態 |
-|---|------|------|------|
-| - [x] 109. InlinePracticeCard.tsx 組件 | 30min | ✅ |
-| - [x] 110. 滑動評分 RatingSlider | 15min | ✅ |
-| - [x] 111. Confetti 慶祝動效 | 10min | ✅ |
-| - [x] 112. 整合至 BottomActionBar | 15min | ✅ |
-
-### P1：麵包屑導航（30min）✅ 已完成
-
-| # | 項目 | 工時 | 狀態 |
-|---|------|------|------|
-| - [x] 113. Breadcrumb.tsx 組件 | 15min | ✅ |
-| - [x] 114. 整合至 LessonDetail 頂部 | 15min | ✅ |
-
-### P1：智能返回邏輯（30min）✅ 已完成
-
-| # | 項目 | 工時 | 狀態 |
-|---|------|------|------|
-| - [x] 115. BackButton.tsx 智能返回 | 20min | ✅ |
-| - [x] 116. 替換現有返回按鈕 | 10min | ✅ |
-
-### 驗收標準 ✅ 已達成
-
-| 指標 | 當前 | 目標 | 狀態 |
-|------|------|------|------|
-| 強光對比度 | 7.5:1 | 12.3:1 | ✅ |
-| 練習完成轉化率 | 65% | 85%+ | ✅ |
-| 導航迷失率 | ~20% | <5% | ✅ |
-
----
-
-## Schema v3 + Learning Path Engine（2025-11-27）
-
-### Phase 1：Schema v3 Migration
-- [x] 46. 建立 skills 表 + 初始資料（5 個 CASI 技能）
-- [x] 47. 建立 competencies 表 + 初始資料
-- [x] 48. 擴充 lessons 表（新增欄位）
-- [x] 49. 建立 lesson_skills 多對多表
-- [x] 50. 建立 lesson_prerequisites 表
-- [x] 51. 建立 tags + lesson_tags 表
-- [x] 52. 資料遷移腳本（casi → casi_raw + primary_skill_code）
-
-### Phase 2：TypeScript Types
-- [x] 53. 建立 types/lesson.ts
-- [x] 54. 建立 types/rider.ts
-- [x] 55. 建立 types/path.ts
-- [x] 56. 更新現有 API 使用新型別（待整合）
-
-### Phase 3：Learning Path Engine v1
-- [x] 57. filterCandidates() - 候選課程過濾
-- [x] 58. scoreLessons() - 多維度評分
-- [x] 59. schedulePath() - 排程邏輯
-- [x] 60. buildSummary() - 產生人類可讀說明
-- [x] 61. Supabase Edge Function: recommend-path
-
-### Phase 4：症狀 → 課程映射
-- [x] 62. 定義 Symptom codes
-- [x] 63. AI 分析產生 symptom → lesson mapping（284 個）
-- [x] 64. AI 分析產生 lesson prerequisites（9 個）
-- [x] 65. 建立 goal → skill/tag mapping
-
-### 其他調整
-- [x] 44. 步驟卡片圖片槽位預設不展開
-- [x] 45. 驗證 build ✅
-
----
-
-## Clean Code 第六輪重構（2025-11-27）
-
-- [x] 66. 拆分 lesson/index.tsx 為獨立檔案（414→6 個檔案）
-- [x] 67. 精簡 computeClientPath.ts（304→47 行）
-- [x] 68. ImprovementDashboard.tsx 已是單一職責，保留
-- [x] 69. 首頁 page.tsx 已使用 useFilteredLessons，保留
-- [x] 70. admin/lessons/page.tsx 結構清晰，保留
-- [x] 71. LoadingState 已存在，新增 LoadingText
-- [x] 72. types/index.ts 已整合匯出
-- [x] 73. 驗證 build ✅
-
----
-
-## UX 優化第四輪：手機優先（2025-11-28）
-
-> 基於實際雪地使用場景：手機螢幕 + 強光 + 戴手套 + 弱網 + 碎片時間
-
-### P0：卡片與首頁優化（1.5hr）
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [ ] 117. 卡片資訊簡化（移除問題描述） | 30min | LessonCard.tsx | |
-| - [ ] 118. 標題放大到 20px + 徽章放大到 40px | 15min | LessonCard.tsx | |
-| - [ ] 119. 快速入口改水平滑動 | 20min | ProblemCategories.tsx | |
-| - [ ] 120. 新增 scrollbar-hide CSS | 5min | globals.css | |
-| - [ ] 121. 按鈕間距加大到 12px | 10min | ProblemCategories.tsx | |
-| - [ ] 122. 觸控目標 ≥44px | 10min | ProblemCategories.tsx | |
-
-### P0：評分系統重構（1hr）
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [ ] 123. 滑桿改成分段按鈕（5 個） | 30min | InlinePracticeCard.tsx | |
-| - [ ] 124. 按鈕高度 48px + 選中放大 | 15min | InlinePracticeCard.tsx | |
-| - [ ] 125. 加入觸覺回饋 | 10min | InlinePracticeCard.tsx | |
-| - [ ] 126. 視覺回饋優化 | 5min | InlinePracticeCard.tsx | |
-
-### P1：底部操作欄優化（15min）
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [ ] 127. 主按鈕獨立一行 | 10min | BottomActionBar.tsx | |
-| - [ ] 128. 次要按鈕移到上方 | 5min | BottomActionBar.tsx | |
-
-### P1：詳情頁徽章放大（30min）
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [ ] 129. 等級/雪道徽章放大到 40px | 20min | LessonTitle.tsx | |
-| - [ ] 130. 間距加大到 12px | 10min | LessonTitle.tsx | |
-
-### 驗收標準
-
-| 指標 | 當前 | 目標 | 狀態 |
-|------|------|------|------|
-| 單手操作成功率 | ~60% | >90% | |
-| 戴手套點擊準確率 | ~50% | >85% | |
-| 快速掃描課程數（10秒） | 3-5 個 | 8-10 個 | |
-| 評分誤觸率 | ~40% | <10% | |
-| 底部主按鈕誤觸 | ~25% | <5% | |
-
----
-
-## Alpine Velocity 美學系統（2025-11-28）
-
-> 速度感 + 滑雪場視覺 + 手機優先，避免通用字體，創造獨特品牌識別
-
-### Phase 1：基礎美學實作（1hr）✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 131. 字體系統升級（Bebas Neue + Space Mono） | 10min | globals.css | ✅ |
-| - [x] 132. 課程卡片斜切角設計 | 20min | LessonCard.tsx | ✅ |
-| - [x] 133. 速度光暈動畫（velocity-shine） | 15min | globals.css | ✅ |
-| - [x] 134. 滾動觸發斜向滑入動畫 | 15min | LessonCard.tsx | ✅ |
-
-### Phase 2：進階視覺優化（15min）✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 135. 卡片標題文字陰影與光暈 | 2min | globals.css | ✅ |
-| - [x] 136. 快速入口按鈕視覺差異化 | 5min | ProblemCategories.tsx | ✅ |
-| - [x] 137. 微動效細節（脈動光暈） | 3min | globals.css | ✅ |
-| - [x] 138. Snow Mode 環境光暈 | 3min | globals.css | ✅ |
-| - [x] 139. 斜切角視覺強化（3 層光影） | 2min | LessonCard.tsx | ✅ |
-
-### 視覺效果總結
-
-**字體系統**：
-- Display：Bebas Neue（滑雪場標誌風格）
-- Body：Space Mono（技術感等寬字體）
-
-**卡片特色**：
-- 斜切角邊緣（模擬滑雪板）
-- 速度光暈動畫（點擊觸發）
-- 對角線裝飾（右上角漸層）
-- 滾動斜向滑入動畫
-- 3 層光影效果（左上高光 + 右上裝飾 + 底部光暈）
-- 3 秒脈動光暈（呼吸感）
-
-**快速入口**：
-- 優先按鈕（後刃/前刃）淡橙底色
-- 選中時橙黃漸層爆發
-- 底部指示器
-- 觸覺震動回饋
-
-**Snow Mode**：
-- 頂部徑向光暈（模擬雪地反光）
-- 文字陰影強化（強光可讀性）
-
-### Frontend Design 評分
-
-| 維度 | 優化前 | 優化後 | 提升 |
-|------|--------|--------|------|
-| Typography | 9/10 | 10/10 | ↑10% |
-| Color Depth | 7/10 | 9/10 | ↑30% |
-| Motion | 8/10 | 10/10 | ↑25% |
-| Spatial Composition | 9/10 | 10/10 | ↑10% |
-| Visual Details | 7/10 | 10/10 | ↑40% |
-| **整體** | **8.6/10** | **9.6/10** | **↑12%** |
-
-### 效能影響
-
-- 新增 CSS：<1KB（壓縮後）
-- 動畫：GPU 加速，60fps 穩定
-- 載入速度影響：<0.1 秒
-- 行動裝置相容性：100%
-
----
-
-## Clean Code 第八輪重構（2025-11-28）
-
-> 基於 Clean Code 和 Linus 原則：消除重複、單一職責、最小化複雜度
-
-### 重構清單
-
-| # | 項目 | 工時 | 風險 | ROI | 狀態 |
-|---|------|------|------|-----|------|
-| - [x] 140. 消除重複樣式（PageContainer 組件） | 15min | 🟢 低 | ⭐⭐⭐⭐⭐ | ✅ |
-| - [x] 141. 移除 console.log（21 處） | 10min | 🟢 低 | ⭐⭐⭐⭐⭐ | ✅ |
-| - [x] 142. LessonCard 簡化（拆分 hook + 組件） | 20min | 🟡 中 | ⭐⭐⭐⭐ | ✅ |
-| - [x] 143. practice/page 拆分（Dashboard + Logs） | 30min | 🟡 中 | ⭐⭐⭐⭐ | ✅ |
-| - [x] 144. 統一日期格式化（全局使用 formatDate） | 15min | 🟢 低 | ⭐⭐⭐ | ✅ |
-| - [x] 145. InlinePracticeCard 樣式抽取 | 20min | 🟢 低 | ⭐⭐⭐ | ✅ 已簡化 |
-| - [x] 146. 型別統一使用 lesson-v3.ts | 15min | 🟡 中 | ⭐⭐⭐ | ✅ 已統一 |
-| - [x] 147. admin 頁面共用邏輯抽取（useAdminData） | 25min | 🟡 中 | ⭐⭐⭐ | ✅ 已有 AdminLayout |
-| - [x] 148. 驗證 build | - | - | - | ✅ |
-
-**總工時**：2.5 小時
-
----
-
-## Dashboard 數據優化（2025-12-01）
-
-> 目標：收集能改善內容的用戶行為數據
-
-### Phase 1：低成本高價值（1-2 天）✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 149. 追蹤搜尋無結果 | 15min | page.tsx + analytics.ts | ✅ |
-| - [x] 150. 追蹤課程來源（from: search/home/related） | 20min | LessonCard.tsx + LessonRecommend.tsx | ✅ |
-| - [x] 151. Dashboard 新增「內容缺口」+「來源分析」面板 | 30min | admin/page.tsx + admin.ts | ✅ |
-
-### Phase 2：內容優化數據（3-5 天）✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 152. 滾動深度追蹤（25/50/75/100%） | 30min | useScrollDepth.ts + LessonDetail.tsx | ✅ |
-| - [x] 153. 練習開始追蹤（vs 完成率） | 15min | BottomActionBar.tsx | ✅ |
-| - [x] 154. Dashboard 新增「課程健康度」面板 | 45min | admin/lessons/page.tsx + admin.ts | ✅ |
-
-### Phase 3：Dashboard 進階面板 ✅ 已完成
-
-| # | 項目 | 工時 | 檔案 | 狀態 |
-|---|------|------|------|------|
-| - [x] 155. 搜尋無結果 TOP 10 面板 | 30min | admin/page.tsx | ✅ (Phase 1 內容缺口) |
-| - [x] 156. 課程來源分析（搜尋 vs 推薦 vs 首頁） | 30min | admin/page.tsx | ✅ (Phase 1 來源分析) |
-| - [x] 157. 課程健康度綜合評分（跳出率+滾動+有效度） | 45min | admin/lessons/page.tsx | ✅ (Phase 2 健康度) |
-
-### 數據用途對照
-
-| 數據 | 洞察 | 行動 |
-|------|------|------|
-| 搜尋無結果 | 用戶想學但找不到 | 新增課程 |
-| 課程來源 | 哪個入口最有效 | 優化導流 |
-| 滾動深度 | 內容是否太長 | 精簡或分段 |
-| 練習完成率 | 用戶是否願意練 | 優化 CTA |
-| 課程健康度 | 綜合表現 | 重寫低分課程 |
-
----
-
-## ✅ 已完成
-
-### Clean Code 第五輪 (2025-11-27)
-- [x] admin/page.tsx 移除重複 StatCard
-- [x] FEEDBACK_TYPE_LABELS 常數化
-- [x] 首頁 slopeFilter 使用 SLOPE_NAMES
-- [x] 所有日期顯示統一使用 formatDate
-
-### Clean Code 第四輪 (2025-11-27)
-- [x] formatDate() 共用日期格式化函數
-- [x] SUBSCRIPTION_PLANS 訂閱方案常數
-- [x] FEEDBACK_TYPES 回報類型常數
-- [x] getSubscriptionStatus() 訂閱狀態函數
-- [x] calculateExpiryDate() 到期日計算
-- [x] ProgressBar / FunnelBar / StatCard 共用組件
-- [x] ActivationPanel 開通面板組件
-- [x] admin/users 205→95 行
-- [x] admin/monetization 移除內嵌 FunnelBar
-
-### Clean Code 第三輪 (2025-11-27)
-- [x] ImprovementDashboard 拆成獨立組件
-- [x] LessonHeatmap 拆成獨立組件
+## ✅ **已完成功能**
+
+### Clean Code 重構 (2025-12-16)
+- [x] 統一後台頁面使用 AdminLayout（消除重複驗證邏輯）
+- [x] 移除 admin/page.tsx 重複的 loading/權限檢查
+- [x] 後台密碼統一用環境變數
+- [x] 刪除空的 web/src/data 資料夾
+- [x] admin/page.tsx 拆分子組件（StatCard、TopLessons、TopKeywords、RecentFeedback）
+- [x] 拆分 ImprovementDashboard 組件（practice/page.tsx 369→100 行）
 - [x] SKILL_RECOMMENDATIONS 移到 constants.ts
-- [x] practice/page.tsx 369→100 行
-- [x] admin/lessons/page.tsx 325→150 行
+- [x] 拆分 LessonHeatmap 組件（admin/lessons/page.tsx 325→150 行）
+- [x] 建立 formatDate() 共用函數
+- [x] 訂閱方案常數 SUBSCRIPTION_PLANS 移到 constants.ts
+- [x] getSubscriptionStatus() 移到 lib/subscription.ts
+- [x] FunnelBar / ProgressBar / StatCard 移到 ui.tsx
+- [x] admin/users 拆分 ActivationPanel 組件
+- [x] FEEDBACK_TYPES 移到 constants.ts
+- [x] 驗證 build ✅
 
-### Clean Code 第二輪 (2025-11-27)
-- [x] 5 個 admin 頁面統一使用 AdminLayout + AdminHeader
-- [x] 移除所有重複的權限驗證邏輯（約 -150 行）
-- [x] useAdminAuth hook 統一管理驗證狀態
-- [x] 環境變數 NEXT_PUBLIC_ADMIN_PASSWORD
-- [x] admin/page.tsx 拆分 4 個子組件
+### 聯盟行銷系統 (2025-12-12)
+- [x] 🤝 合作方管理（聯盟行銷系統）
+- [x] 💰 分潤管理（季結算/批次支付）
+- [x] 📊 推廣成效分析（KPI/漏斗/排行榜/洞察）
+- [x] **聯盟行銷系統 TDD 重構**
+  - 巨大組件拆分：400+ 行 → 5 個專職組件
+  - 業務邏輯抽離：3 個專用 Hook
+  - 服務層抽象：統一 API 調用
+  - 工具函數模組化：消除重複代碼
+  - 型別定義統一：TypeScript 安全
 
-### 後台 Dashboard
-- [x] 總覽頁
-- [x] 用戶管理（搜尋、開通）
+### 安全性強化（2025-11-29）
+- [x] 移除客戶端直連 Supabase（Admin/metrics/monetization）
+- [x] Admin API 伺服器化（service key + RLS）
+- [x] 客戶端 API 封裝（adminApi.ts + adminData.ts）
+- [x] 前端關注點分離（頁面只負責 UI）
+- [x] event_log 後端校驗/節流（rate-limit + 大小限制）
+- [x] 訂閱方案版本化（DB 方案表 + 歷史保留）
+
+### 前台功能
+- [x] 課程列表與搜尋
+- [x] 分類篩選（程度/雪道/技能）
+- [x] 課程詳情頁
+- [x] 用戶登入/註冊
+- [x] 收藏功能
+- [x] 練習紀錄
+- [x] 付費方案頁
+- [x] 意見回報
+
+### 後台功能
+- [x] Dashboard（DAU/WAU/熱門課程/搜尋/回報）
+- [x] 用戶管理（搜尋/開通訂閱/註冊時間顯示）
 - [x] 回報管理
 - [x] 課程分析
 - [x] 付費分析
 
-### 事件追蹤
-- [x] event_log 表
-- [x] trackEvent 函數
-- [x] 埋點完成
+---
 
-### Clean Code 第一輪
-- [x] constants.ts
-- [x] ui.tsx 共用組件
-- [x] useFilteredLessons hook
-- [x] LessonDetail 拆分子組件
+## 🗺️ **未來規劃**
+
+**優先開發**
+- [ ] **推播提醒**
+  - 即將過期提醒（7天前）
+  - 新課程上線通知
+  - 練習成績改善提醒
+
+- [ ] **個人化機制**
+  - 學習進度儀表板（進度條/時間統計）
+  - 個人化課程推薦（基於瀏覽/練習歷史）
+  - 改善計畫跟蹤（針對弱項課程自動推薦）
+
+**未來考慮**
+- [ ] 離線模式（Offline-first PWA）
+- [ ] 社群功能（課程討論/經驗分享）
+- [ ] 教練端平台（學生管理/進度追蹤）
+- [ ] 多語言支援（中文/英文/日文）
+
+---
+
+## 📊 **進度總覽**
+
+| 類別 | 完成 | 進行中 | 待開始 | 總計 |
+|------|------|--------|--------|------|
+| 緊急修復 (P0) | 0 | 1 | 0 | 1 |
+| 核心功能 (P1) | 0 | 0 | 4 | 4 |
+| 架構優化 (P2) | 0 | 0 | 3 | 3 |
+| 品質提升 (P3) | 0 | 0 | 3 | 3 |
+| **總計** | **0** | **1** | **10** | **11** |
+
+**當前焦點**: 修復 React Error #310 (TDD 方式)
+
+---
+
+*最後更新：2025-12-16*
