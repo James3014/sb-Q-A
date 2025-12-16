@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import type { LessonSignals, LessonStep, UseLessonFormState } from '@/hooks/lessons/useLessonForm'
+import type { LessonSignals, LessonStep } from '@/types/lessons'
+import type { UseLessonFormState } from '@/hooks/lessons/useLessonForm'
 
 export interface UseFormActionsReturn {
   setTitle: (title: string) => void

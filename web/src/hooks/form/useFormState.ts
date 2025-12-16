@@ -29,7 +29,7 @@ const mergeInitialState = (initial?: Partial<UseLessonFormState>): UseLessonForm
 
 export interface UseFormStateReturn {
   state: UseLessonFormState
-  setState: (updates: Partial<UseLessonFormState>) => void
+  setState: (updates: Partial<UseLessonFormState> | ((prev: UseLessonFormState) => UseLessonFormState)) => void
   reset: () => void
 }
 
@@ -44,8 +44,12 @@ export function useFormState(initialState?: Partial<UseLessonFormState>): UseFor
     setStateInternal(computedInitial)
   }, [computedInitial])
 
-  const setState = useCallback((updates: Partial<UseLessonFormState>) => {
-    setStateInternal(prev => ({ ...prev, ...updates }))
+  const setState = useCallback((updates: Partial<UseLessonFormState> | ((prev: UseLessonFormState) => UseLessonFormState)) => {
+    if (typeof updates === 'function') {
+      setStateInternal(updates)
+    } else {
+      setStateInternal(prev => ({ ...prev, ...updates }))
+    }
   }, [])
 
   const reset = useCallback(() => {
