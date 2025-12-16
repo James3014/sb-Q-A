@@ -8,6 +8,17 @@ export interface LessonPreviewProps {
   formState: UseLessonFormState
 }
 
+// 格式化文字：處理換行和粗體
+function formatText(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/\n/g, '<br/>')
+    // 數字標題前加換行（1. 2. 3. 或 1、2、3、）
+    .replace(/(\d+[\.\、:：]\s*)/g, '<br/><b>$1</b>')
+    // 移除開頭多餘的 <br/>
+    .replace(/^<br\/>/, '')
+}
+
 export function LessonPreview({ formState }: LessonPreviewProps) {
   const { title, what, why, how, signals, level_tags, slope_tags, is_premium } = formState
 
@@ -93,7 +104,10 @@ export function LessonPreview({ formState }: LessonPreviewProps) {
                     />
                   </div>
                 )}
-                <p className="text-zinc-300 leading-relaxed">{step.text}</p>
+                <p
+                  className="text-zinc-300 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: formatText(step.text) }}
+                />
               </div>
             ))}
           </div>
