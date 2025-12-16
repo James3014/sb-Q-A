@@ -49,18 +49,20 @@ export function LessonForm({ lessonId, onSuccess }: LessonFormProps) {
   }, [lessonId])
 
   // 等待資料載入完成再初始化表單
+  const initialState = initialLesson ? {
+    title: initialLesson.title,
+    what: initialLesson.what,
+    why: initialLesson.why || [],
+    how: initialLesson.how || [{ text: '' }],
+    signals: initialLesson.signals || { correct: [], wrong: [] },
+    level_tags: initialLesson.level_tags || [],
+    slope_tags: initialLesson.slope_tags || [],
+    is_premium: initialLesson.is_premium || false,
+  } : undefined
+
   const form = useLessonForm({
     lessonId,
-    initialState: initialLesson ? {
-      title: initialLesson.title,
-      what: initialLesson.what,
-      why: initialLesson.why || [],
-      how: initialLesson.how || [{ text: '' }],
-      signals: initialLesson.signals || { correct: [], wrong: [] },
-      level_tags: initialLesson.level_tags || [],
-      slope_tags: initialLesson.slope_tags || [],
-      is_premium: initialLesson.is_premium || false,
-    } : undefined,
+    initialState,
     onSuccess: () => {
       setStatusMessage(lessonId ? '課程已更新' : '課程建立成功')
       onSuccess?.()

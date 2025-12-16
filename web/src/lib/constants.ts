@@ -10,10 +10,10 @@ export const LEVEL_NAMES: Record<string, string> = {
 
 // 雪道標籤
 export const SLOPE_NAMES: Record<string, string> = {
-  green: '綠道',
-  blue: '藍道',
-  black: '黑道',
-  mogul: '蘑菇',
+  green: '綠線',
+  blue: '紅線',
+  black: '黑線',
+  mogul: '饅頭',
   powder: '粉雪',
   park: '公園',
   tree: '樹林',
