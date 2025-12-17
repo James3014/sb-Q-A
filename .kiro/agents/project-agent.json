@@ -1,30 +1,44 @@
 {
   "name": "project-agent",
-  "description": "單板教學 App 專案助手 - 專精於 Next.js、Supabase、滑雪教學內容管理",
+  "description": "單板教學 App 專案助手 - 專精於 Next.js、Supabase、滑雪教學內容管理，具備 Supabase 資料庫管理能力",
+  "prompt": null,
+  "mcpServers": {},
+  "tools": [],
+  "toolAliases": {},
   "allowedTools": [
-    "fs_read",
-    "fs_write", 
+    "web_fetch",
     "execute_bash",
     "web_search",
-    "web_fetch"
+    "fs_read",
+    "@supabase/*",
+    "fs_write"
   ],
   "resources": [
-    "file://README.md",
-    "file://docs/**/*.md",
-    "file://web/src/**/*.ts",
-    "file://web/src/**/*.tsx",
-    "file://web/package.json"
+    "file://.snapshot/snapshot.toon"
   ],
+  "hooks": {},
   "toolsSettings": {
     "fs_read": {
-      "allowedPaths": ["./", "~/Downloads/diyski/project/specs/單板教學/**"]
+      "allowedPaths": [
+        "./",
+        "~/Downloads/diyski/project/specs/單板教學/**"
+      ]
     },
     "fs_write": {
-      "allowedPaths": ["./web/**", "./docs/**"]
+      "allowedPaths": [
+        "./web/**",
+        "./docs/**"
+      ]
     },
     "execute_bash": {
-      "allowedCommands": ["npm.*", "git.*", "cd.*"],
+      "allowedCommands": [
+        "npm.*",
+        "git.*",
+        "cd.*"
+      ],
       "autoAllowReadonly": true
     }
-  }
+  },
+  "useLegacyMcpJson": false,
+  "model": null
 }

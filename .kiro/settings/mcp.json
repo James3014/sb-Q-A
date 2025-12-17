@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "url": "",
+      "headers": {},
+      "oauthScopes": [
+        "openid",
+        "email",
+        "profile",
+        "offline_access"
+      ],
+      "command": "/opt/homebrew/bin/node",
+      "args": [
+        "/Users/jameschen/Downloads/diyski/project/specs/單板教學/supabase-mcp-server.js"
+      ],
+      "env": {
+        "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ic3R3Z2d4Znd2ZnJ1d2dmY3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxNDQzNTAsImV4cCI6MjA3OTcyMDM1MH0.El_8nfyiJ7ORf0I21Kb1GhBAHk6k8F-ux4rYLhZo0kY",
+        "SUPABASE_URL": "https://nbstwggxfwvfruwgfcqd.supabase.co"
+      },
+      "timeout": 120000,
+      "disabled": false,
+      "disabledTools": []
+    }
+  }
+}
