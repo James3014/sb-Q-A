@@ -54,11 +54,14 @@ const nextConfig: NextConfig = {
             value: 'camera=(), microphone=(), geolocation=()',
           },
           // CSP: 內容安全政策
+          // 注意: unsafe-inline 是 Next.js App Router SSR hydration 所必需的
+          // 已移除 unsafe-eval 以提升安全性
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
+              // unsafe-inline: Next.js SSR hydration 需要（無法用 nonce 替代）
+              "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://nbstwggxfwvfruwgfcqd.supabase.co",
